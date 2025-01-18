@@ -19,6 +19,7 @@ import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -99,6 +100,7 @@ void apriltagVisionThreadProc() {
   // We'll output to NT
   NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("apriltags");
   IntegerArrayPublisher pubTags = tagsTable.getIntegerArrayTopic("tags").publish();
+  BooleanPublisher pubFoundFlag = tagsTable.getBooleanTopic("foundTargetFlage").publish();
 
   // This cannot be 'true'. The program will never exit if it is. This
   // lets the robot stop this thread when restarting robot code or
@@ -173,6 +175,7 @@ void apriltagVisionThreadProc() {
 
     // put list of tags onto dashboard
     pubTags.set(tags.stream().mapToLong(Long::longValue).toArray());
+    pubFoundFlag.set(targetFound);
 
     // Give the output stream a new image to display
     //outputStream.putFrame(mat);

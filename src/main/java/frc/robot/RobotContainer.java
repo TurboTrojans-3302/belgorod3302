@@ -23,6 +23,7 @@ import frc.robot.commands.GoToCommand;
 import frc.robot.subsystems.DriveDashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.utils.Elastic;
+import frc.robot.subsystems.AprilTagFinder;
  
 
 /*
@@ -39,6 +40,9 @@ public class RobotContainer {
   private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
+
+  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
+  
 
   private final REVBlinkinLED m_BlinkinLED;
 
@@ -71,6 +75,8 @@ public class RobotContainer {
     m_shuffleboardTab.add("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
+
+    m_AprilTagFinder.setTarget(1);
   }
 
   /**
