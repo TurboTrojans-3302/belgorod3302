@@ -30,6 +30,8 @@ public class AprilTagFinder extends SubsystemBase {
 
   private int target = 0;
   private boolean targetFound = false;
+  private double angleToTarget = 0.0;
+  private double distanceToTarget = 0.0;
 
   public boolean isTargetFound() {
     return targetFound;
@@ -62,6 +64,16 @@ public class AprilTagFinder extends SubsystemBase {
 
   public synchronized int getTarget(){
     return target;
+  }
+
+  public synchronized double getAngleToTarget(){
+    return angleToTarget;
+    //TODO use the pose already created to get the angle
+  }
+
+  public synchronized double getDistanceToTarget(){
+    return distanceToTarget;
+    //TODO use trig to get distance from apriltag
   }
 
 void apriltagVisionThreadProc() {
@@ -172,6 +184,7 @@ void apriltagVisionThreadProc() {
                 pose.getX(), pose.getY(), pose.getZ(), rot.getX(), rot.getY(), rot.getZ()
               });
     }
+    
 
     // put list of tags onto dashboard
     pubTags.set(tags.stream().mapToLong(Long::longValue).toArray());
