@@ -32,6 +32,10 @@ public class AprilTagFinder extends SubsystemBase {
   private boolean targetFound = false;
   private double angleToTarget = 0.0;
   private double distanceToTarget = 0.0;
+  private double cameraFOV = 50.0;
+  private int resolutionH = 640;
+  private int resolutionV = 480;
+  //private double percentageErrorFromStraight = 0.0;
 
   public boolean isTargetFound() {
     return targetFound;
@@ -67,8 +71,9 @@ public class AprilTagFinder extends SubsystemBase {
   }
 
   public synchronized double getAngleToTarget(){
+    // (assumes camera is level with apriltag) percentageErrorFromStraight = ((targetDetected.getCenterX() - targetDetected.getCornerX(1)) - (targetDetected.getCenterY() - targetDetected.getCornerY(1))) / (targetDetected.getCenterY() - targetDetected.getCornerY(1));
+    angleToTarget = ((targetDetected.getCenterX() / resolutionH) * cameraFOV) - (cameraFOV / 2);
     return angleToTarget;
-    //TODO use the pose already created to get the angle
   }
 
   public synchronized double getDistanceToTarget(){
@@ -93,7 +98,7 @@ void apriltagVisionThreadProc() {
   // Get the UsbCamera from CameraServer
   UsbCamera camera = CameraServer.startAutomaticCapture();
   // Set the resolution
-  camera.setResolution(640, 480);
+  camera.setResolution(resolutionH, resolutionV);
 
   // Get a CvSink. This will capture Mats from the camera
   CvSink cvSink = CameraServer.getVideo();
@@ -173,7 +178,7 @@ void apriltagVisionThreadProc() {
           3);
 
       // determine pose
-      Transform3d pose = estimator.estimate(detection);
+      final Transform3d pose = estimator.estimate(detection);
 
       // put pose into dashboard
       Rotation3d rot = pose.getRotation();
