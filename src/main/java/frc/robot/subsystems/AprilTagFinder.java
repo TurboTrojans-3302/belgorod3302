@@ -71,13 +71,23 @@ public class AprilTagFinder extends SubsystemBase {
   }
 
   public synchronized double getAngleToTarget(){
+    if (targetFound){
     // (assumes camera is level with apriltag) percentageErrorFromStraight = ((targetDetected.getCenterX() - targetDetected.getCornerX(1)) - (targetDetected.getCenterY() - targetDetected.getCornerY(1))) / (targetDetected.getCenterY() - targetDetected.getCornerY(1));
     angleToTarget = ((targetDetected.getCenterX() / resolutionH) * cameraFOV) - (cameraFOV / 2);
     return angleToTarget;
+    }
+    else{
+      return 0.0;
+    }
   }
 
   public synchronized double getDistanceToTarget(){
+    if (targetFound){
     return distanceToTarget;
+    }
+    else {
+      return 0.0;
+    }
     //TODO use trig to get distance from apriltag
   }
 
