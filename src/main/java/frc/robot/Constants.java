@@ -155,5 +155,23 @@ public final class Constants {
     public static final Pose2d ZeroZero = new Pose2d(0.0, 0.0, new Rotation2d());
   }
 
+  public static final class ElevatorConstants {
+    //theoretical for now
+    public static final int kLeftMotorElevatorCanId = 10;
+    public static final int kRightMotorElevatorCanId = 11;
+    //dio roborio 
+    public static final int kElevatorHighLimitSwitchId = 0;
+    public static final int kElevatorLowLimitSwitchId = 1;
+    //position in motor rotations for different levels of the reef, all random numbers that need to be tested of course
+    public static final double kLevel1Trough = 50;
+    public static final double kLevel2 = 75;
+    public static final double kLevel3 = 100;
+    public static final double kLevel4 = 125;
+    //honestly the processor probably wouldn't require the elevator to move at all from the start position, but if it is already up it could be useful to have a preset position
+    public static final double kProcessor = 15;
+
+    public static final double kElevatorAutoSpeed = 0.25;
+  }
+
 public static final int BLINKIN_LED_PWM_CHANNEL = 0;
 }
