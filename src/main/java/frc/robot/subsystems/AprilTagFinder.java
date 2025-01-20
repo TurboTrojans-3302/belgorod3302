@@ -20,10 +20,12 @@ import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 
 public class AprilTagFinder extends SubsystemBase {
@@ -32,11 +34,11 @@ public class AprilTagFinder extends SubsystemBase {
   private boolean targetFound = false;
   private double angleToTarget = 0.0;
   private double distanceToTarget = 0.0;
-  private double cameraFOV = 50.0;
-  private int resolutionH = 640;
-  private int resolutionV = 480;
+  private double cameraFOV;
+  private int resolutionV;
+  private int resolutionH;
   //private double percentageErrorFromStraight = 0.0;
-
+ 
   public boolean isTargetFound() {
     return targetFound;
   }
@@ -60,6 +62,9 @@ public class AprilTagFinder extends SubsystemBase {
     var visionThread = new Thread(this::apriltagVisionThreadProc);
     visionThread.setDaemon(true);
     visionThread.start();
+    cameraFOV = Constants.CameraConstants.cameraFOV;
+    resolutionV = Constants.CameraConstants.resolutionV;
+    resolutionH = Constants.CameraConstants.resolutionH;
   }
 
   public synchronized void setTarget(int target){
@@ -127,7 +132,8 @@ void apriltagVisionThreadProc() {
   // We'll output to NT
   NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("apriltags");
   IntegerArrayPublisher pubTags = tagsTable.getIntegerArrayTopic("tags").publish();
-  BooleanPublisher pubFoundFlag = tagsTable.getBooleanTopic("foundTargetFlage").publish();
+  BooleanPublisher pubFoundFlag = tagsTable.getBooleanTopic("foundTargetFlag").publish();
+  DoublePublisher pubAngle = tagsTable.getDoubleTopic("AngleToTarget").publish();
 
   // This cannot be 'true'. The program will never exit if it is. This
   // lets the robot stop this thread when restarting robot code or
@@ -204,6 +210,7 @@ void apriltagVisionThreadProc() {
     // put list of tags onto dashboard
     pubTags.set(tags.stream().mapToLong(Long::longValue).toArray());
     pubFoundFlag.set(targetFound);
+    pubAngle.set(angleToTarget);
 
     // Give the output stream a new image to display
     //outputStream.putFrame(mat);

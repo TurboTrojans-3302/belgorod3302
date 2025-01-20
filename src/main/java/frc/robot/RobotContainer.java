@@ -42,7 +42,6 @@ public class RobotContainer {
   private final SendableChooser<Pose2d> m_startPosChooser;
 
   private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
-  
 
   private final REVBlinkinLED m_BlinkinLED;
 
