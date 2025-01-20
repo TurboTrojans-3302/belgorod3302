@@ -16,6 +16,7 @@ import com.revrobotics.RelativeEncoder;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 
@@ -59,7 +60,7 @@ public class Elevator extends SubsystemBase {
   } 
 
   public double setSpeed(double speed){
-    elevatorSpeed = speed;
+    elevatorSpeed = MathUtil.clamp(speed, -Constants.ElevatorConstants.kElevatorMaxSpeed, Constants.ElevatorConstants.kElevatorMaxSpeed);
     leftElevatorMotor.set(elevatorSpeed);
     rightElevatorMotor.set(-elevatorSpeed);
     return elevatorSpeed;

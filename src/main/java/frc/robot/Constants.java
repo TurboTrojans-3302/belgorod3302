@@ -171,6 +171,7 @@ public final class Constants {
     public static final double kProcessor = 15;
 
     public static final double kElevatorAutoSpeed = 0.25;
+    public static final double kElevatorMaxSpeed = 0.75;
   }
 
   public static final class IntakeConstants {
@@ -179,6 +180,14 @@ public final class Constants {
     public static final double intakeSpeedMax = 0.75;
     public static final double intakeSpeedMin = -0.75;
 
+  }
+
+  public static final class ClimberConstants {
+    public static final int leftClimberID = 13;
+    public static final int rightClimberID = 14;
+    public static final int climberLimitSwitchID = 3;
+    public static final double climberMaxSpeed = 0.5;
+    public static final double climberAutoSpeed = 0.3;
   }
 
 public static final int BLINKIN_LED_PWM_CHANNEL = 0;
