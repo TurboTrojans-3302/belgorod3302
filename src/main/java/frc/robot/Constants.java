@@ -173,5 +173,13 @@ public final class Constants {
     public static final double kElevatorAutoSpeed = 0.25;
   }
 
+  public static final class IntakeConstants {
+    public static final int intakeMotorID = 12;
+    public static final int intakeLimitSwitchID = 2;
+    public static final double intakeSpeedMax = 0.75;
+    public static final double intakeSpeedMin = -0.75;
+
+  }
+
 public static final int BLINKIN_LED_PWM_CHANNEL = 0;
 }
