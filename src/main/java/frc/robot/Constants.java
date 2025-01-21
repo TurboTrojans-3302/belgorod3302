@@ -137,8 +137,8 @@ public final class Constants {
     public static final double VcameraFOV = 50.0;
     public static final int resolutionH = 640;
     public static final int resolutionV = 480;
-    public static final double cameraHeight = 0.5; //Meters
-    public static final double aprilTagHeight = 1.0; //Meters
+    public static final double cameraHeight = 36; //in
+    public static final double aprilTagHeight = 12.0; //in
     public static final double cameraAngle = 0.0;
   }
 

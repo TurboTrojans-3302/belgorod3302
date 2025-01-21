@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 
+
 public class AprilTagFinder extends SubsystemBase {
 
   private int target = 0;
@@ -96,7 +97,8 @@ public class AprilTagFinder extends SubsystemBase {
 
   public synchronized double getDistanceToTarget(){
     if (targetFound){
-      distanceToTarget = (aprilTagHeight - cameraHeight) / (((targetDetected.getCenterY() / resolutionV) * VcameraFOV) - (VcameraFOV / 2) + cameraAngle);
+      double angle = ((targetDetected.getCenterY() / resolutionV) * VcameraFOV) - (VcameraFOV / 2) + cameraAngle;
+      distanceToTarget = (cameraHeight - aprilTagHeight) / Math.tan(Math.toRadians(angle));
     return distanceToTarget;
     }
     else {
