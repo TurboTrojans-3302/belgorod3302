@@ -34,9 +34,13 @@ public class AprilTagFinder extends SubsystemBase {
   private boolean targetFound = false;
   private double angleToTarget = 0.0;
   private double distanceToTarget = 0.0;
-  private double cameraFOV;
+  private double HcameraFOV;
+  private double VcameraFOV;
   private int resolutionV;
   private int resolutionH;
+  private double cameraHeight;
+  private double aprilTagHeight;
+  private double cameraAngle;
   //private double percentageErrorFromStraight = 0.0;
  
   public boolean isTargetFound() {
@@ -62,9 +66,13 @@ public class AprilTagFinder extends SubsystemBase {
     var visionThread = new Thread(this::apriltagVisionThreadProc);
     visionThread.setDaemon(true);
     visionThread.start();
-    cameraFOV = Constants.CameraConstants.cameraFOV;
+    HcameraFOV = Constants.CameraConstants.HcameraFOV;
+    VcameraFOV = Constants.CameraConstants.VcameraFOV;
     resolutionV = Constants.CameraConstants.resolutionV;
     resolutionH = Constants.CameraConstants.resolutionH;
+    cameraHeight = Constants.CameraConstants.cameraHeight;
+    aprilTagHeight = Constants.CameraConstants.aprilTagHeight;
+    cameraAngle = Constants.CameraConstants.cameraAngle;
   }
 
   public synchronized void setTarget(int target){
@@ -78,7 +86,7 @@ public class AprilTagFinder extends SubsystemBase {
   public synchronized double getAngleToTarget(){
     if (targetFound){
     // (assumes camera is level with apriltag) percentageErrorFromStraight = ((targetDetected.getCenterX() - targetDetected.getCornerX(1)) - (targetDetected.getCenterY() - targetDetected.getCornerY(1))) / (targetDetected.getCenterY() - targetDetected.getCornerY(1));
-    angleToTarget = ((targetDetected.getCenterX() / resolutionH) * cameraFOV) - (cameraFOV / 2);
+    angleToTarget = ((targetDetected.getCenterX() / resolutionH) * HcameraFOV) - (HcameraFOV / 2);
     return angleToTarget;
     }
     else{
@@ -88,6 +96,7 @@ public class AprilTagFinder extends SubsystemBase {
 
   public synchronized double getDistanceToTarget(){
     if (targetFound){
+      distanceToTarget = (aprilTagHeight - cameraHeight) / (((targetDetected.getCenterY() / resolutionV) * VcameraFOV) - (VcameraFOV / 2) + cameraAngle);
     return distanceToTarget;
     }
     else {
@@ -134,6 +143,7 @@ void apriltagVisionThreadProc() {
   IntegerArrayPublisher pubTags = tagsTable.getIntegerArrayTopic("tags").publish();
   BooleanPublisher pubFoundFlag = tagsTable.getBooleanTopic("foundTargetFlag").publish();
   DoublePublisher pubAngle = tagsTable.getDoubleTopic("AngleToTarget").publish();
+  DoublePublisher pubDistance = tagsTable.getDoubleTopic("DistanceToTarget").publish();
 
   // This cannot be 'true'. The program will never exit if it is. This
   // lets the robot stop this thread when restarting robot code or
@@ -210,7 +220,8 @@ void apriltagVisionThreadProc() {
     // put list of tags onto dashboard
     pubTags.set(tags.stream().mapToLong(Long::longValue).toArray());
     pubFoundFlag.set(targetFound);
-    pubAngle.set(angleToTarget);
+    pubAngle.set(getAngleToTarget());
+    pubDistance.set(getDistanceToTarget());
 
     // Give the output stream a new image to display
     //outputStream.putFrame(mat);
