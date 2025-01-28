@@ -9,6 +9,7 @@ import com.swervedrivespecialties.swervelib.rev.NeoSteerConfiguration;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import com.swervedrivespecialties.swervelib.ctre.CanCoderAbsoluteConfiguration;
 import com.swervedrivespecialties.swervelib.ctre.CtreUtils;
@@ -365,6 +366,12 @@ public class TTSwerveModule implements SwerveModule {
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
             mDriveController.encoder.getPosition(),
+            new Rotation2d(getSteerAngle()));
+    }
+
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(
+            mDriveController.getStateVelocity(),
             new Rotation2d(getSteerAngle()));
     }
 }

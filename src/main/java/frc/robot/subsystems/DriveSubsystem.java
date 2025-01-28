@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.RobotMap;
 
 
@@ -145,46 +146,36 @@ public class DriveSubsystem extends SubsystemBase {
                         });
 
 
-        SmartDashboard.putString("frontleft", frontLeftModule.getPosition().toString());
-        SmartDashboard.putString("frontRight", frontRightModule.getPosition().toString());
-        SmartDashboard.putString("backLeft", backLeftModule.getPosition().toString());
-        SmartDashboard.putString("backRight", backRightModule.getPosition().toString());
-        SmartDashboard.putNumber("Front Left Module Angle", Math.toDegrees(frontLeftModule.getSteerAngle()));
-        SmartDashboard.putNumber("Front Right Module Angle", Math.toDegrees(frontRightModule.getSteerAngle()));
-        SmartDashboard.putNumber("Back Left Module Angle", Math.toDegrees(backLeftModule.getSteerAngle()));
-        SmartDashboard.putNumber("Back Right Module Angle", Math.toDegrees(backRightModule.getSteerAngle()));                 
-        SmartDashboard.putNumber("Front Left Commanded Angle", FLcommandedAngle);
-     SmartDashboard.putNumber("Front Right Commanded Angle", FRcommandedAngle);
-    SmartDashboard.putNumber("Back Left Commanded Angle", BLcommandedAngle);
-       SmartDashboard.putNumber("Back Right Commanded Angle", BRcommandedAngle);            
-        
-
-
-        // SmartDashboard.putNumber("Gyroscope Angle", ahrs.getYaw());
-        // SmartDashboard.putNumber("Gyroscope Pitch", ahrs.getPitch());
-
-        SmartDashboard.putString("Pose:", m_pose.toString());
-
     }
 
-    public Pose2d getPose2d(){
+    public Pose2d getPose(){
         return m_pose;
     }
 
-    public void setPose2d(Pose2d pose){
+    public void setPose(Pose2d pose){
         m_pose = pose;
     }
 
-    public void driveHeading(Translation2d translation, double heading) {
-
+    public double turnToHeading(double heading){
         double angle = getAngleDeg();
 		double currentAngularRate = getAngularRateDegPerSec();
 		double angle_error = angleDeltaDeg(heading, angle);
 		double yawCommand = - angle_error * kPgain - (currentAngularRate) * kDgain;
-
+        return yawCommand;       
+    }
+    
+    public void driveHeading(Translation2d translation, double heading) {
+        double yawCommand = turnToHeading(heading);
         drive(translation, yawCommand, true);
     }
 
+    public void drive( double x, double y, double rotation, boolean fieldOriented, boolean fake) {
+        drive(new Translation2d(x, y), rotation, fieldOriented);
+    }   
+
+    public void drive(Translation2d translation, double rotation) {        
+        drive(translation, rotation, true);
+    }
 
     public void drive(Translation2d translation, double rotation, boolean fieldOriented) {
 
@@ -284,6 +275,29 @@ public class DriveSubsystem extends SubsystemBase {
         backLeftModule.set(0, -Math.PI/4);
         backRightModule.set(0, Math.PI);
     }
+
+    public double getSpeed(){
+    ChassisSpeeds chassisSpeeds =  DriveConstants.kDriveKinematics.toChassisSpeeds(
+                                          frontLeftModule.getState(),
+                                          frontRightModule.getState(),
+                                          backLeftModule.getState(),
+                                          backRightModule.getState());
+    return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  }
+
+  public void setX(){ stop(); }
+
+  public void resetOdometry(Pose2d pose) {
+    mOdometry.resetPosition(
+        Rotation2d.fromDegrees(getAngleDeg()),
+        new SwerveModulePosition[] {
+            frontLeftModule.getPosition(),
+            frontRightModule.getPosition(),
+            backLeftModule.getPosition(),
+            backRightModule.getPosition()
+        },
+        pose);
+  }
 }
 
 //TODO Create a stop method for the drivetrain
