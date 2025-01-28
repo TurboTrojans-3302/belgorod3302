@@ -16,6 +16,7 @@ import edu.wpi.first.apriltag.AprilTagDetector;
 import edu.wpi.first.apriltag.AprilTagPoseEstimator;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -129,7 +130,7 @@ void apriltagVisionThreadProc() {
   // Get a CvSink. This will capture Mats from the camera
   CvSink cvSink = CameraServer.getVideo();
   // Setup a CvSource. This will send images back to the Dashboard
-  //CvSource outputStream = CameraServer.putVideo("Detected", 1280, 720);
+  CvSource outputStream = CameraServer.putVideo("Detected", resolutionH, resolutionV);
 
   // Mats are very memory expensive. Lets reuse these.
   var mat = new Mat();
@@ -226,7 +227,7 @@ void apriltagVisionThreadProc() {
     pubDistance.set(getDistanceToTarget());
 
     // Give the output stream a new image to display
-    //outputStream.putFrame(mat);
+    outputStream.putFrame(mat);
   }
 
   pubTags.close();
