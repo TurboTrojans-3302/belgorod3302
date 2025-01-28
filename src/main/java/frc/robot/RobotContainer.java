@@ -20,7 +20,6 @@ import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.WaitCommand;
 import frc.robot.commands.GoToCommand;
-import frc.robot.subsystems.DriveDashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.utils.Elastic;
  
@@ -34,8 +33,7 @@ import frc.utils.Elastic;
 public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final DriveDashboard mDriveDashboard = new DriveDashboard(m_robotDrive);  
-
+  
   private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
@@ -54,7 +52,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController, mDriveDashboard));
+    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
 
 
     m_shuffleboardTab = Shuffleboard.getTab("Game");
