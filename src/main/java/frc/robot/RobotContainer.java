@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DoNothing;
+import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.WaitCommand;
@@ -61,7 +62,7 @@ public class RobotContainer {
     //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("do nothing", new DoNothing());
+    m_autonomousChooser.setDefaultOption("drive to april tag", new DriveToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
     
    // m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
 

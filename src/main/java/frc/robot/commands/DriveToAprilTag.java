@@ -20,12 +20,15 @@ public class DriveToAprilTag extends Command {
   DriveSubsystem m_drive;
   int m_apriltag;
   AprilTagFinder m_finder;
+  double distance;
 
   /** Creates a new DriveToAprilTag. */
   public DriveToAprilTag(DriveSubsystem drive, int apriltag, AprilTagFinder finder) {
     m_drive = drive;
     m_apriltag = apriltag;
     m_finder = finder;
+    distance = m_finder.getDistanceToTarget();
+    
     addRequirements(m_drive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -46,7 +49,7 @@ public class DriveToAprilTag extends Command {
     Double heading = m_drive.getAngleDeg();
 
     if(m_finder.isTargetFound()) {
-      heading = heading + m_finder.getAngleToTarget();
+      heading = heading - m_finder.getAngleToTarget();
     }
 
     m_drive.driveHeading(forward, heading);
@@ -54,6 +57,8 @@ public class DriveToAprilTag extends Command {
     SmartDashboard.getNumber("Heading", heading);
     SmartDashboard.getNumber("Target Angle", m_finder.getAngleToTarget());
     SmartDashboard.getBoolean("Target Found", m_finder.isTargetFound());
+    distance = m_finder.getDistanceToTarget();
+    
   }
   
 
@@ -65,6 +70,13 @@ public class DriveToAprilTag extends Command {
   @Override
   public boolean isFinished() {
     //return true if we are close to the tag
-    return false;
+    if (m_finder.getDistanceToTarget() < 120.0){
+      return true;
+    } else {
+      return false;
+    }
+    
+
+    
   }
 }
