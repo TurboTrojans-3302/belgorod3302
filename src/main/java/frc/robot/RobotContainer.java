@@ -35,7 +35,7 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   
-  private final ShuffleboardTab m_shuffleboardTab;
+  //private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
 
@@ -58,18 +58,18 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
 
 
-    m_shuffleboardTab = Shuffleboard.getTab("Game");
+    //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
     m_autonomousChooser.setDefaultOption("do nothing", new DoNothing());
     
-    m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
+   // m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
     m_startPosChooser.addOption("Left +30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(30.0)));
     m_startPosChooser.addOption("Right -30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(-30.0)));
-    m_shuffleboardTab.add("Start Position", m_startPosChooser);
+   // m_shuffleboardTab.add("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
