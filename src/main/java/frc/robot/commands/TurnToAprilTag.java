@@ -4,7 +4,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.AprilTagFinder;
 import frc.robot.subsystems.DriveSubsystem;
@@ -13,15 +12,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class DriveToAprilTag extends Command {
+public class TurnToAprilTag extends Command {
 
   DriveSubsystem m_drive;
   int m_apriltag;
   AprilTagFinder m_finder;
   double distance;
 
-  /** Creates a new DriveToAprilTag. */
-  public DriveToAprilTag(DriveSubsystem drive, int apriltag, AprilTagFinder finder) {
+  /** Creates a new TurnToAprilTag. */
+  public TurnToAprilTag(DriveSubsystem drive, int apriltag, AprilTagFinder finder) {
     m_drive = drive;
     m_apriltag = apriltag;
     m_finder = finder;
@@ -43,20 +42,16 @@ public class DriveToAprilTag extends Command {
   @Override
   public void execute() {
 
-    Translation2d forward = new Translation2d(0.2, 0);
     Double heading = m_drive.getAngleDeg();
 
     if(m_finder.isTargetFound()) {
       heading = heading - m_finder.getAngleToTarget();
     }
 
-    m_drive.driveHeading(forward, heading);
-
-    SmartDashboard.getNumber("Heading", heading);
-    SmartDashboard.getNumber("Target Angle", m_finder.getAngleToTarget());
-    SmartDashboard.getBoolean("Target Found", m_finder.isTargetFound());
+    SmartDashboard.putNumber("Heading", heading);
+    SmartDashboard.putNumber("Target Angle", m_finder.getAngleToTarget());
+    SmartDashboard.putBoolean("Target Found", m_finder.isTargetFound());
     distance = m_finder.getDistanceToTarget();
-    
   }
   
 
@@ -66,15 +61,5 @@ public class DriveToAprilTag extends Command {
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() {
-    //return true if we are close to the tag
-    if (m_finder.getDistanceToTarget() < 120.0){
-      return true;
-    } else {
-      return false;
-    }
-    
-
-    
-  }
+  public boolean isFinished() { return false; }
 }

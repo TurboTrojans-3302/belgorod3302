@@ -7,22 +7,15 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.DoNothing;
 import frc.robot.commands.DriveToAprilTag;
-import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.WaitCommand;
-import frc.robot.commands.GoToCommand;
+import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.utils.Elastic;
 import frc.robot.subsystems.AprilTagFinder;
  
 
@@ -62,7 +55,8 @@ public class RobotContainer {
     //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("drive to april tag", new DriveToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
+    m_autonomousChooser.setDefaultOption("drive to april tag 1", new DriveToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
+    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
     
    // m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
 
