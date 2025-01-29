@@ -134,10 +134,10 @@ public final class Constants {
 
   public static final class CameraConstants{
     public static final double HcameraFOV = 50.0;
-    public static final double VcameraFOV = 50.0;
+    public static final double VcameraFOV = 53.58;
     public static final int resolutionH = 640;
     public static final int resolutionV = 480;
-    public static final double cameraHeight = 36; //in
+    public static final double cameraHeight = 17.25; //in
     public static final double aprilTagHeight = 12.0; //in
     public static final double cameraAngle = 0.0;
   }
