@@ -55,8 +55,8 @@ public class RobotContainer {
     //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("drive to april tag 1", new DriveToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
-    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
+    m_autonomousChooser.addOption("drive to april tag 1", new DriveToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
+    m_autonomousChooser.setDefaultOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
     
    // m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
 
