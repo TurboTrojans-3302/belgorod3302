@@ -108,6 +108,8 @@ public class AprilTagFinder extends SubsystemBase {
     //TODO use trig to get distance from apriltag
   }
 
+
+
 void apriltagVisionThreadProc() {
   var detector = new AprilTagDetector();
   // look for tag36h11, correct 1 error bit (hamming distance 1)
@@ -238,5 +240,6 @@ void apriltagVisionThreadProc() {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+        
   }
 }

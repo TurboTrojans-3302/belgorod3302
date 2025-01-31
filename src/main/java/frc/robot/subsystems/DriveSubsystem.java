@@ -139,11 +139,11 @@ public class DriveSubsystem extends SubsystemBase {
         var gyroAngle = Rotation2d.fromRadians(getAngleRad());
 
          // Update the pose
-         m_pose = mOdometry.update(gyroAngle,
-                        new SwerveModulePosition[] {
-                        frontLeftModule.getPosition(), frontRightModule.getPosition(),
-                        backLeftModule.getPosition(), backRightModule.getPosition()
-                        });
+      //   m_pose = mOdometry.update(gyroAngle,
+      //                  new SwerveModulePosition[] {
+      //                  frontLeftModule.getPosition(), frontRightModule.getPosition(),
+      //                  backLeftModule.getPosition(), backRightModule.getPosition()
+      //                  });
 
 
     }
