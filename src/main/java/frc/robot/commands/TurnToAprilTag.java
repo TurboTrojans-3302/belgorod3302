@@ -11,6 +11,20 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
+/*
+ * TODO Saturday
+ * 
+ * Find a limelight camera
+ * Mount it on the robot (at the real height)
+ * Dial in the TurnFactor constant
+ * Question: Can we see the apriltag while driving?
+ * 
+ * 
+ * 
+ */
+
+
+ /* RoboRIO and webcam has maximum range of ~57inches */
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TurnToAprilTag extends Command {
@@ -19,6 +33,9 @@ public class TurnToAprilTag extends Command {
   int m_apriltag;
   AprilTagFinder m_finder;
   double distance;
+
+  public static final double TurnTolerance = 1.5;
+  public static final double TurnFactor = 1.0;
 
   /** Creates a new TurnToAprilTag. */
   public TurnToAprilTag(DriveSubsystem drive, int apriltag, AprilTagFinder finder) {
@@ -44,11 +61,13 @@ public class TurnToAprilTag extends Command {
   public void execute() {
 
     Double heading = m_drive.getAngleDeg();
+    Double errorAngle = m_finder.getAngleToTarget();
 
-    if(m_finder.isTargetFound()) {
-      heading = heading - m_finder.getAngleToTarget();
-      m_drive.driveHeading(new Translation2d(0.0, 0.0), (heading / 5));
+    if(m_finder.isTargetFound() && Math.abs(errorAngle) > TurnTolerance) {
+      heading = heading - (errorAngle * TurnFactor);
     }
+
+    m_drive.driveHeading(new Translation2d(0.0, 0.0), heading);
 
     SmartDashboard.putNumber("Heading", heading);
     SmartDashboard.putNumber("Target Angle", m_finder.getAngleToTarget());
