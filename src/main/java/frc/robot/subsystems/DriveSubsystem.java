@@ -15,6 +15,9 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 
+import au.grapplerobotics.ConfigurationFailedException;
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -51,6 +54,7 @@ public class DriveSubsystem extends SubsystemBase {
     public double BRcommandedAngle;
     public double FRcommandedAngle;
     
+    private LaserCan dxSensor = new LaserCan(RobotMap.DRIVETRAIN_DX_SENSOR);
 
     private static DriveSubsystem m_instance;
 
@@ -123,6 +127,13 @@ public class DriveSubsystem extends SubsystemBase {
               backRightModule.getPosition()
             }, defaultStartPosition);
             
+        try {
+            dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
+            dxSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
+            dxSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+        } catch (ConfigurationFailedException e) {
+            System.out.println("LaserCan Configuration failed! " + e);
+        }
     }
 
     public static DriveSubsystem getInstance() {
@@ -297,6 +308,16 @@ public class DriveSubsystem extends SubsystemBase {
             backRightModule.getPosition()
         },
         pose);
+  }
+
+  public Double disanceToObjectMeters(){
+    Measurement m = dxSensor.getMeasurement();
+    return m.distance_mm * 0.001;
+  }
+
+  public boolean distanceMeasurmentGood(){
+    Measurement m = dxSensor.getMeasurement();
+    return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 }
 
