@@ -17,9 +17,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.AprilTagFinder;
-import edu.wpi.first.apriltag.AprilTagDetector;
-import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.RobotContainer;
 
 
@@ -51,7 +48,6 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     DataLogManager.start();
-    CameraServer.startAutomaticCapture();
   }
 
   /**

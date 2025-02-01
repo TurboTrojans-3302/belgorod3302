@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import org.opencv.core.Point;
-import org.opencv.imgproc.Imgproc;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,11 +12,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.TurnToAprilTag;
+import frc.robot.commands.TurnToAprilTagA;
+import frc.robot.commands.TurnToAprilTagB;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.AprilTagFinder;
  
 
 /*
@@ -35,8 +31,6 @@ public class RobotContainer {
   //private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
-
-  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
 
   private final REVBlinkinLED m_BlinkinLED;
 
@@ -58,8 +52,8 @@ public class RobotContainer {
     //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.addOption("drive to april tag 1", new DriveToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
-    m_autonomousChooser.setDefaultOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1, m_AprilTagFinder));
+    m_autonomousChooser.setDefaultOption("turn to april tag A 1", new TurnToAprilTagA(m_robotDrive, 1));
+    m_autonomousChooser.addOption("turn to april tag B 1", new TurnToAprilTagB(m_robotDrive, 1));
     
    // m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
 
@@ -70,8 +64,6 @@ public class RobotContainer {
    // m_shuffleboardTab.add("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
-
-    m_AprilTagFinder.setTarget(1);
 
 
   }
