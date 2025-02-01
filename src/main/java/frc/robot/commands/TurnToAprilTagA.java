@@ -15,8 +15,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /*
  * TODO Saturday
  * 
- * Find a limelight camera
- * Mount it on the robot (at the real height)
+ * Find a limelight camera - done
+ * Mount it on the robot (at the real height) - kinda done
+ * 
+ * Limelight can see the apriltag form ~12' away
+ * 
  * Dial in the TurnFactor constant
  * Question: Can we see the apriltag while driving?
  * 
@@ -36,7 +39,7 @@ public class TurnToAprilTagA extends Command {
   RawFiducial detectedTarget;
 
   public static final double TurnTolerance = 1.5;
-  public static final double TurnFactor = 1.0;
+  public static final double TurnFactor = .2;
 
   /** Creates a new TurnToAprilTag. */
   public TurnToAprilTagA(DriveSubsystem drive, int apriltag) {
@@ -95,6 +98,7 @@ public class TurnToAprilTagA extends Command {
       }
     }
   }
+
 
   boolean isTargetFound() {
     return targetFound;

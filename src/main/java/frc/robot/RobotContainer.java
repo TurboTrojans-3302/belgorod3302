@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -55,7 +56,7 @@ public class RobotContainer {
     m_autonomousChooser.setDefaultOption("turn to april tag A 1", new TurnToAprilTagA(m_robotDrive, 1));
     m_autonomousChooser.addOption("turn to april tag B 1", new TurnToAprilTagB(m_robotDrive, 1));
     
-   // m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
+    SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
