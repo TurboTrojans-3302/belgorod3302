@@ -149,6 +149,7 @@ public class DriveSubsystem extends SubsystemBase {
         // Get the rotation of the robot from the gyro.
         var gyroAngle = Rotation2d.fromRadians(getAngleRad());
 
+
          // Update the pose
       //   m_pose = mOdometry.update(gyroAngle,
       //                  new SwerveModulePosition[] {
@@ -156,6 +157,7 @@ public class DriveSubsystem extends SubsystemBase {
       //                  backLeftModule.getPosition(), backRightModule.getPosition()
       //                  });
 
+      SmartDashboard.putNumber("Heading", getAngleDeg());
 
     }
 

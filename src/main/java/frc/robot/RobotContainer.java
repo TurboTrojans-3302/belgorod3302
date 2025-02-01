@@ -14,8 +14,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.TurnToAprilTagA;
-import frc.robot.commands.TurnToAprilTagB;
+import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
  
 
@@ -53,9 +52,9 @@ public class RobotContainer {
     //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("turn to april tag A 1", new TurnToAprilTagA(m_robotDrive, 1));
-    m_autonomousChooser.addOption("turn to april tag B 1", new TurnToAprilTagB(m_robotDrive, 1));
-    
+    m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
+    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
+    m_autonomousChooser.addOption("turn to april tag 11", new TurnToAprilTag(m_robotDrive, 11));
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();

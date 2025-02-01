@@ -12,26 +12,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
-/*
- * TODO Saturday
- * 
- * Find a limelight camera - done
- * Mount it on the robot (at the real height) - kinda done
- * 
- * Limelight can see the apriltag form ~12' away
- * 
- * Dial in the TurnFactor constant
- * Question: Can we see the apriltag while driving?
- * 
- * 
- * 
- */
-
-
- /* RoboRIO and webcam has maximum range of ~57inches */
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurnToAprilTagA extends Command {
+public class TurnToAprilTag extends Command {
+  public static final String cameraName = "limelight";
 
   DriveSubsystem m_drive;
   int m_targetTag;
@@ -39,10 +23,10 @@ public class TurnToAprilTagA extends Command {
   RawFiducial detectedTarget;
 
   public static final double TurnTolerance = 1.5;
-  public static final double TurnFactor = .2;
+  public static final double TurnFactor = 1.0;
 
   /** Creates a new TurnToAprilTag. */
-  public TurnToAprilTagA(DriveSubsystem drive, int apriltag) {
+  public TurnToAprilTag(DriveSubsystem drive, int apriltag) {
     m_drive = drive;
     m_targetTag = apriltag;
     
@@ -53,27 +37,27 @@ public class TurnToAprilTagA extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    LimelightHelpers.setPriorityTagID(cameraName, m_targetTag);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    lookForTarget();
-
     Double heading = m_drive.getAngleDeg();
 
     if(isTargetFound()) {
         Double errorAngle = getAngleToTarget();
         heading = heading  - (errorAngle * TurnFactor);
-        SmartDashboard.putNumber("Target Angle", getAngleToTarget());
+        
     }
 
     m_drive.driveHeading(new Translation2d(0.0, 0.0), heading);
-
-    SmartDashboard.putNumber("Heading", heading);
+    SmartDashboard.putNumber("Target Angle", getAngleToTarget());
+    SmartDashboard.putNumber("Commanded heading", heading);
     SmartDashboard.putBoolean("Target Found", isTargetFound());
+
+
   }
   
 
@@ -85,32 +69,11 @@ public class TurnToAprilTagA extends Command {
   @Override
   public boolean isFinished() { return false; }
 
-  private void lookForTarget() {
-    targetFound = false;
-    detectedTarget = null;
-
-    RawFiducial[] detectedTags = LimelightHelpers.getRawFiducials("limelight");
-
-    for(RawFiducial tag : detectedTags) {
-      if(tag.id == m_targetTag) {
-        targetFound = true;
-        detectedTarget = tag;
-      }
-    }
-  }
-
-
   boolean isTargetFound() {
-    return targetFound;
+    return LimelightHelpers.getTV(cameraName);
   }
 
   Double getAngleToTarget() {
-    Double angle = 0.0;
-
-    if(isTargetFound()) {
-      angle = detectedTarget.txnc;
-    } 
-
-    return angle;
+    return LimelightHelpers.getTX(cameraName);
   }
 }
