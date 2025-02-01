@@ -158,6 +158,8 @@ public class DriveSubsystem extends SubsystemBase {
       //                  });
 
       SmartDashboard.putNumber("Heading", getAngleDeg());
+      SmartDashboard.putNumber("lCan Distance", getDistanceToObjectMeters());
+      SmartDashboard.putBoolean("lCan ready", distanceMeasurmentGood());
 
     }
 
@@ -177,9 +179,15 @@ public class DriveSubsystem extends SubsystemBase {
         return yawCommand;       
     }
     
-    public void driveHeading(Translation2d translation, double heading) {
+    public void driveHeadingField(Translation2d translation, double heading) {
         double yawCommand = turnToHeading(heading);
         drive(translation, yawCommand, true);
+    }
+
+    
+    public void driveHeadingRobot(Translation2d translation, double heading) {
+        double yawCommand = turnToHeading(heading);
+        drive(translation, yawCommand, false);
     }
 
     public void drive( double x, double y, double rotation, boolean fieldOriented, boolean fake) {
@@ -312,7 +320,7 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
   }
 
-  public Double disanceToObjectMeters(){
+  public Double getDistanceToObjectMeters(){
     Measurement m = dxSensor.getMeasurement();
     return m.distance_mm * 0.001;
   }

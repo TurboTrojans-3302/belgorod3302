@@ -8,13 +8,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.RawFiducial;
 import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurnToAprilTag extends Command {
+public class DriveToAprilTag extends Command {
   public static final String cameraName = "limelight";
 
   DriveSubsystem m_drive;
@@ -24,9 +25,11 @@ public class TurnToAprilTag extends Command {
 
   public static final double TurnTolerance = 1.5;
   public static final double TurnFactor = 1.0;
+  public static final double ForwardSpeed = 0.2;
+  public static final double TargetDistance = 0.09; //meters
 
   /** Creates a new TurnToAprilTag. */
-  public TurnToAprilTag(DriveSubsystem drive, int apriltag) {
+  public DriveToAprilTag(DriveSubsystem drive, int apriltag) {
     m_drive = drive;
     m_targetTag = apriltag;
     
@@ -52,10 +55,12 @@ public class TurnToAprilTag extends Command {
         
     }
 
-    m_drive.driveHeadingField(new Translation2d(0.0, 0.0), heading);
+    m_drive.driveHeadingRobot(new Translation2d(ForwardSpeed, 0.0), heading);
     SmartDashboard.putNumber("Target Angle", getAngleToTarget());
     SmartDashboard.putNumber("Commanded heading", heading);
+    SmartDashboard.putNumber("Target Distance", getDistance());
     SmartDashboard.putBoolean("Target Found", isTargetFound());
+
 
 
   }
@@ -67,7 +72,9 @@ public class TurnToAprilTag extends Command {
 
   // Returns true when the command should end.
   @Override
-  public boolean isFinished() { return false; }
+  public boolean isFinished() { 
+    return m_drive.getDistanceToObjectMeters() < TargetDistance; 
+  }
 
   boolean isTargetFound() {
     return LimelightHelpers.getTV(cameraName);
@@ -75,5 +82,13 @@ public class TurnToAprilTag extends Command {
 
   Double getAngleToTarget() {
     return LimelightHelpers.getTX(cameraName);
+  }
+
+  public double getDistance(){
+    Pose3d targetPose = LimelightHelpers.getTargetPose3d_CameraSpace(cameraName);
+    double distance = targetPose.getTranslation().getNorm();
+    System.out.println("Distance:" + distance);
+   
+    return distance;
   }
 }

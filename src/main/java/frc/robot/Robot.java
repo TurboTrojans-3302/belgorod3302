@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
   
   private RobotContainer m_robotContainer;
 
+  
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -47,7 +49,8 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    DataLogManager.start();
+    //DataLogManager.start();
+    CanBridge.runTCP();
   }
 
   /**
