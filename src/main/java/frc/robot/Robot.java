@@ -7,11 +7,7 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
-import org.opencv.core.Point;
-import org.opencv.imgproc.Imgproc;
-
 import au.grapplerobotics.CanBridge;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;

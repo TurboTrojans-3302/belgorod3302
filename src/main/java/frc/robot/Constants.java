@@ -3,8 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -64,6 +62,8 @@ public final class Constants {
     public static final int kRearLeftTurningCanId = 5;
     public static final int kFrontRightTurningCanId = 1;
     public static final int kRearRightTurningCanId = 7;
+
+    public static final int kDXSensorCanId = 0;
 
     public static final boolean kGyroReversed = false;
     public static final double headingP = 0.02;
