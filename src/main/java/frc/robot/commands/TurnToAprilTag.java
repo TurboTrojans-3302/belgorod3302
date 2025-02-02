@@ -7,7 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.RawFiducial;
-import frc.robot.subsystems.Drive.LudwigDriveTrain;
+import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TurnToAprilTag extends Command {
   public static final String cameraName = "limelight";
 
-  LudwigDriveTrain m_drive;
+  DriveSubsystem m_drive;
   int m_targetTag;
   boolean targetFound = false;
   RawFiducial detectedTarget;
@@ -26,7 +26,7 @@ public class TurnToAprilTag extends Command {
   public static final double TurnFactor = 1.0;
 
   /** Creates a new TurnToAprilTag. */
-  public TurnToAprilTag(LudwigDriveTrain drive, int apriltag) {
+  public TurnToAprilTag(DriveSubsystem drive, int apriltag) {
     m_drive = drive;
     m_targetTag = apriltag;
     

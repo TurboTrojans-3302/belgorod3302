@@ -13,7 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.Drive.LudwigDriveTrain;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class GoToCommand extends Command {
 
@@ -22,35 +22,35 @@ public class GoToCommand extends Command {
 
   private Pose2d m_dest;
   private Transform2d m_delta;
-  private LudwigDriveTrain m_drive;
+  private DriveSubsystem m_drive;
   private TrapezoidProfile m_trapezoid = new TrapezoidProfile(new Constraints(Constants.DriveConstants.kMaxSpeedMetersPerSecond  / 2.0,
                                                        Constants.DriveConstants.kMaxSpeedMetersPerSecond )); //todo use full speed;
   private State m_goal = new State(0.0, 0.0);
   private double m_startTimeMillis;
   private boolean m_relativeFlag;
 
-  private GoToCommand(LudwigDriveTrain drive){
+  private GoToCommand(DriveSubsystem drive){
     m_drive = drive;
     addRequirements(m_drive);
   }
 
-  public GoToCommand(LudwigDriveTrain drive, Pose2d dest){
+  public GoToCommand(DriveSubsystem drive, Pose2d dest){
     this(drive);
     m_dest = dest;
     m_relativeFlag = false;
   }
 
-  public static GoToCommand absolute(LudwigDriveTrain drive, double x, double y, double heading){
+  public static GoToCommand absolute(DriveSubsystem drive, double x, double y, double heading){
     Pose2d dest = new Pose2d(x, y, Rotation2d.fromDegrees(heading));
     return new GoToCommand(drive, dest);
   }
 
-  public static GoToCommand relative(LudwigDriveTrain drive, double x, double y, double theta){
+  public static GoToCommand relative(DriveSubsystem drive, double x, double y, double theta){
     Transform2d delta = new Transform2d(x, y, Rotation2d.fromDegrees(theta));
     return new GoToCommand(drive, delta);
   }
 
-  public GoToCommand(LudwigDriveTrain drive, Transform2d delta){
+  public GoToCommand(DriveSubsystem drive, Transform2d delta){
     this(drive);
     m_delta = delta;
     m_relativeFlag = true;

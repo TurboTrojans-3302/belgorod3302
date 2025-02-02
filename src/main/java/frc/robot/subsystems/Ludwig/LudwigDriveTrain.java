@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Drive;
+package frc.robot.subsystems.Ludwig;
 
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
@@ -23,11 +23,11 @@ import edu.wpi.first.wpilibj.ADIS16448_IMU.CalibrationTime;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.DriveSubsystemBase;
 import frc.utils.SwerveUtils;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
-public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
+public class LudwigDriveTrain extends DriveSubsystemBase  {
   private LaserCan dxSensor = new LaserCan(Constants.DriveConstants.kDXSensorCanId);
   
   // Create MAXSwerveModules
@@ -131,7 +131,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
    *
    * @return The pose.
    */
-  @Override
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
   }
@@ -141,7 +140,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
    *
    * @param pose The pose to which to set the odometry.
    */
-  @Override
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
         Rotation2d.fromDegrees(m_gyro.getAngle()),
@@ -160,7 +158,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
     return rotation;
   }
   
-  @Override
   public void drive(Translation2d translation, double rotation){
     double x = translation.getX();
     double y = translation.getY();
@@ -168,7 +165,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
     drive(x, y, rotation, true, true);
   }
 
-  @Override
   public void driveHeadingRobot(Translation2d translation, double rotation){
     double x = translation.getX();
     double y = translation.getY();
@@ -176,7 +172,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
     drive(x, y, rotation, false, true);
   }
   
-  @Override
   public void driveHeadingField(Translation2d translation, double rotation){
     double x = translation.getX();
     double y = translation.getY();
@@ -184,7 +179,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
     drive(x, y, rotation, true, true);
   }
   
-  @Override
   public void drive(Translation2d translation){
     drive(translation, 0.0);
   }
@@ -200,7 +194,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  @Override
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
 
     double xSpeedCommanded;
@@ -319,7 +312,6 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
-  @Override
   public double getHeading() {
     return m_odometry.getPoseMeters().getRotation().getDegrees();
   }
@@ -329,12 +321,10 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  @Override
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  @Override
   public double getSpeed(){
     ChassisSpeeds chassisSpeeds =  DriveConstants.kDriveKinematics.toChassisSpeeds(
                                           m_frontLeft.getState(),
@@ -348,13 +338,11 @@ public class LudwigDriveTrain extends SubsystemBase implements DriveSubsystem {
   public void setI(double val){ headingPidController.setI(val); }
   public void setD(double val){ headingPidController.setD(val); }
 
-  @Override
   public Double getDistanceToObjectMeters(){
     Measurement m = dxSensor.getMeasurement();
     return m.distance_mm * 0.001;
   }
 
-  @Override
   public boolean distanceMeasurmentGood(){
     Measurement m = dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
