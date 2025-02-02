@@ -8,14 +8,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Drive.LudwigDriveTrain;
 
 public class TeleopDrive extends Command {
-  private DriveSubsystem m_robotDrive;
+  private LudwigDriveTrain m_robotDrive;
   private XboxController m_driverController;
 
   /** Creates a new TeleopDrive. */
-  public TeleopDrive(DriveSubsystem robotDrive, XboxController driverController) {
+  public TeleopDrive(LudwigDriveTrain robotDrive, XboxController driverController) {
     m_driverController = driverController;
     m_robotDrive = robotDrive;
     addRequirements(m_robotDrive);

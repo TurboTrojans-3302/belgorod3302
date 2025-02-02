@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
+import frc.robot.subsystems.Drive.LudwigDriveTrain;
 import frc.robot.commands.DriveToAprilTag;
-import frc.robot.subsystems.DriveSubsystem;
 
  
 
@@ -28,7 +28,7 @@ import frc.robot.subsystems.DriveSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems
-  public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final LudwigDriveTrain m_robotDrive = new LudwigDriveTrain();
   
   //private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
