@@ -16,8 +16,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-import frc.robot.Constants;
-
 //missing file
 import frc.robot.Configs;
 

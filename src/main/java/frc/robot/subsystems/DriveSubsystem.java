@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class DriveSubsystem extends SubsystemBase {
+  private LaserCan dxSensor = new LaserCan(Constants.DriveConstants.kDXSensorCanId);
+  
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = MAXSwerveModule.getInstance(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -155,6 +159,20 @@ public class DriveSubsystem extends SubsystemBase {
   }
   
   public void drive(Translation2d translation, double rotation){
+    double x = translation.getX();
+    double y = translation.getY();
+
+    drive(x, y, rotation, true, true);
+  }
+
+  public void driveHeadingRobot(Translation2d translation, double rotation){
+    double x = translation.getX();
+    double y = translation.getY();
+
+    drive(x, y, rotation, false, true);
+  }
+  
+  public void driveHeadingField(Translation2d translation, double rotation){
     double x = translation.getX();
     double y = translation.getY();
 
@@ -319,4 +337,14 @@ public class DriveSubsystem extends SubsystemBase {
   public void setP(double val){ headingPidController.setP(val); }
   public void setI(double val){ headingPidController.setI(val); }
   public void setD(double val){ headingPidController.setD(val); }
+
+  public Double getDistanceToObjectMeters(){
+    Measurement m = dxSensor.getMeasurement();
+    return m.distance_mm * 0.001;
+  }
+
+  public boolean distanceMeasurmentGood(){
+    Measurement m = dxSensor.getMeasurement();
+    return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
+  }
 }

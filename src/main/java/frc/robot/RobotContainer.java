@@ -7,22 +7,17 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.DoNothing;
-import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.WaitCommand;
-import frc.robot.commands.GoToCommand;
-import frc.robot.subsystems.DriveDashboard;
+import frc.robot.commands.TurnToAprilTag;
+import frc.robot.commands.DriveToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.utils.Elastic;
+
  
 
 /*
@@ -34,9 +29,8 @@ import frc.utils.Elastic;
 public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final DriveDashboard mDriveDashboard = new DriveDashboard(m_robotDrive);  
-
-  private final ShuffleboardTab m_shuffleboardTab;
+  
+  //private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
 
@@ -54,23 +48,27 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController, mDriveDashboard));
+    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
 
 
-    m_shuffleboardTab = Shuffleboard.getTab("Game");
+    //m_shuffleboardTab = Shuffleboard.getTab("Game");
     
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("do nothing", new DoNothing());
-    
-    m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
+    m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
+    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
+    m_autonomousChooser.addOption("turn to april tag 11", new TurnToAprilTag(m_robotDrive, 11));
+    m_autonomousChooser.addOption("Drive to april tag 1", new DriveToAprilTag(m_robotDrive, 1));
+    SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
     m_startPosChooser.addOption("Left +30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(30.0)));
     m_startPosChooser.addOption("Right -30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(-30.0)));
-    m_shuffleboardTab.add("Start Position", m_startPosChooser);
+   // m_shuffleboardTab.add("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
+
+
   }
 
   /**

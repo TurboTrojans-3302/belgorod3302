@@ -7,14 +7,13 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
-import edu.wpi.first.wpilibj.DataLogManager;
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.cameraserver.CameraServer;
 
 
 
@@ -32,6 +31,7 @@ public class Robot extends TimedRobot {
   
   private RobotContainer m_robotContainer;
 
+  
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -44,8 +44,8 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    DataLogManager.start();
-    CameraServer.startAutomaticCapture();
+    //DataLogManager.start();
+    CanBridge.runTCP();
   }
 
   /**
@@ -126,7 +126,8 @@ public class Robot extends TimedRobot {
       m_robotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 0.0);
       m_robotContainer.m_copilotController.setRumble(RumbleType.kBothRumble, 0.0);
     }
-
+    
+        
   }
 
   @Override
