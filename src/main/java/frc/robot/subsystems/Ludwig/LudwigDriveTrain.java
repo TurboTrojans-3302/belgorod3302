@@ -21,14 +21,12 @@ import edu.wpi.first.wpilibj.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.CalibrationTime;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
-import frc.robot.Constants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystemBase;
 import frc.utils.SwerveUtils;
 
 
 public class LudwigDriveTrain extends DriveSubsystemBase  {
-  private LaserCan dxSensor = new LaserCan(Constants.DriveConstants.kDXSensorCanId);
+  private LaserCan dxSensor = new LaserCan(DriveConstants.kDXSensorCanId);
   
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = MAXSwerveModule.getInstance(
@@ -105,9 +103,9 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
 
   /** Creates a new DriveSubsystem. */
   public LudwigDriveTrain() {
-    headingPidController = new PIDController(Constants.DriveConstants.headingP,
-                                             Constants.DriveConstants.headingI,
-                                             Constants.DriveConstants.headingD);
+    headingPidController = new PIDController(DriveConstants.headingP,
+                                             DriveConstants.headingI,
+                                             DriveConstants.headingD);
     headingPidController.enableContinuousInput(0.0, 360.0);
     headingPidController.setTolerance(2.0);
   }
@@ -346,5 +344,10 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
   public boolean distanceMeasurmentGood(){
     Measurement m = dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
+  }
+
+  @Override
+  public double getMaxSpeedMetersPerSecond() {
+    return DriveConstants.kMaxSpeedMetersPerSecond;
   }
 }

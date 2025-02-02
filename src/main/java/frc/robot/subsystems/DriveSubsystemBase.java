@@ -31,4 +31,6 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     public abstract boolean distanceMeasurmentGood();
 
     public abstract void resetOdometry(Pose2d pose);
+
+    public abstract double getMaxSpeedMetersPerSecond();
 }

@@ -16,8 +16,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-//missing file
-import frc.robot.Configs;
 
 public class MAXSwerveModule {
   private final SparkMax m_drivingSpark;

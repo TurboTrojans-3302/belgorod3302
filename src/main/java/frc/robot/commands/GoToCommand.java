@@ -23,15 +23,16 @@ public class GoToCommand extends Command {
   private Pose2d m_dest;
   private Transform2d m_delta;
   private DriveSubsystem m_drive;
-  private TrapezoidProfile m_trapezoid = new TrapezoidProfile(new Constraints(Constants.DriveConstants.kMaxSpeedMetersPerSecond  / 2.0,
-                                                       Constants.DriveConstants.kMaxSpeedMetersPerSecond )); //todo use full speed;
-  private State m_goal = new State(0.0, 0.0);
+  private TrapezoidProfile m_trapezoid;
+    private State m_goal = new State(0.0, 0.0);
   private double m_startTimeMillis;
   private boolean m_relativeFlag;
 
   private GoToCommand(DriveSubsystem drive){
     m_drive = drive;
     addRequirements(m_drive);
+    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedMetersPerSecond()  / 2.0,
+                                                       m_drive.getMaxSpeedMetersPerSecond())); //todo use full speed;
   }
 
   public GoToCommand(DriveSubsystem drive, Pose2d dest){

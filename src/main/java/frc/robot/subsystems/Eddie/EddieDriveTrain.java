@@ -28,9 +28,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystemBase;
-import frc.robot.RobotMap;
 
 
 /**
@@ -54,7 +52,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public double BRcommandedAngle;
     public double FRcommandedAngle;
     
-    private LaserCan dxSensor = new LaserCan(RobotMap.DRIVETRAIN_DX_SENSOR);
+    private LaserCan dxSensor = new LaserCan(DriveConstants.DRIVETRAIN_DX_SENSOR);
 
     private static EddieDriveTrain m_instance;
 
@@ -76,29 +74,29 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     
         private final TTSwerveModule frontLeftModule = new TTSwerveModule(
                                                         leftSideConfiguration,
-                                                        RobotMap.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
+                                                        DriveConstants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
                                                         FRONT_LEFT_ANGLE_OFFSET );
     private final TTSwerveModule frontRightModule = new TTSwerveModule(
                                                         rightSideConfiguration,
-                                                        RobotMap.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
+                                                        DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
                                                         FRONT_RIGHT_ANGLE_OFFSET );
 
     private final TTSwerveModule backLeftModule  = new TTSwerveModule(
                                                         leftSideConfiguration,
-                                                        RobotMap.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
+                                                        DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
                                                         BACK_LEFT_ANGLE_OFFSET );
 
     private final TTSwerveModule backRightModule =  new TTSwerveModule(
                                                         rightSideConfiguration,
-                                                        RobotMap.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
-                                                        RobotMap.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
+                                                        DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
+                                                        DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
                                                         BACK_RIGHT_ANGLE_OFFSET );
                          
                         
@@ -306,7 +304,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public double getSpeed(){
-    ChassisSpeeds chassisSpeeds =  DriveConstants.kDriveKinematics.toChassisSpeeds(
+    ChassisSpeeds chassisSpeeds =  kinematics.toChassisSpeeds(
                                           frontLeftModule.getState(),
                                           frontRightModule.getState(),
                                           backLeftModule.getState(),
@@ -337,6 +335,10 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     Measurement m = dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
+
+@Override
+public double getMaxSpeedMetersPerSecond() {
+    return DriveConstants.kMaxSpeedMetersPerSecond;}
 }
 
 //TODO Create a stop method for the drivetrain
