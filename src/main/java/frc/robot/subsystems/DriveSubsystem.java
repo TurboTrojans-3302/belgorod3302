@@ -15,6 +15,9 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 
+import au.grapplerobotics.ConfigurationFailedException;
+import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -51,6 +54,7 @@ public class DriveSubsystem extends SubsystemBase {
     public double BRcommandedAngle;
     public double FRcommandedAngle;
     
+    private LaserCan dxSensor = new LaserCan(RobotMap.DRIVETRAIN_DX_SENSOR);
 
     private static DriveSubsystem m_instance;
 
@@ -123,6 +127,13 @@ public class DriveSubsystem extends SubsystemBase {
               backRightModule.getPosition()
             }, defaultStartPosition);
             
+        try {
+            dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
+            dxSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
+            dxSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+        } catch (ConfigurationFailedException e) {
+            System.out.println("LaserCan Configuration failed! " + e);
+        }
     }
 
     public static DriveSubsystem getInstance() {
@@ -138,13 +149,17 @@ public class DriveSubsystem extends SubsystemBase {
         // Get the rotation of the robot from the gyro.
         var gyroAngle = Rotation2d.fromRadians(getAngleRad());
 
-         // Update the pose
-         m_pose = mOdometry.update(gyroAngle,
-                        new SwerveModulePosition[] {
-                        frontLeftModule.getPosition(), frontRightModule.getPosition(),
-                        backLeftModule.getPosition(), backRightModule.getPosition()
-                        });
 
+         // Update the pose
+      //   m_pose = mOdometry.update(gyroAngle,
+      //                  new SwerveModulePosition[] {
+      //                  frontLeftModule.getPosition(), frontRightModule.getPosition(),
+      //                  backLeftModule.getPosition(), backRightModule.getPosition()
+      //                  });
+
+      SmartDashboard.putNumber("Heading", getAngleDeg());
+      SmartDashboard.putNumber("lCan Distance", getDistanceToObjectMeters());
+      SmartDashboard.putBoolean("lCan ready", distanceMeasurmentGood());
 
     }
 
@@ -164,9 +179,15 @@ public class DriveSubsystem extends SubsystemBase {
         return yawCommand;       
     }
     
-    public void driveHeading(Translation2d translation, double heading) {
+    public void driveHeadingField(Translation2d translation, double heading) {
         double yawCommand = turnToHeading(heading);
         drive(translation, yawCommand, true);
+    }
+
+    
+    public void driveHeadingRobot(Translation2d translation, double heading) {
+        double yawCommand = turnToHeading(heading);
+        drive(translation, yawCommand, false);
     }
 
     public void drive( double x, double y, double rotation, boolean fieldOriented, boolean fake) {
@@ -297,6 +318,16 @@ public class DriveSubsystem extends SubsystemBase {
             backRightModule.getPosition()
         },
         pose);
+  }
+
+  public Double getDistanceToObjectMeters(){
+    Measurement m = dxSensor.getMeasurement();
+    return m.distance_mm * 0.001;
+  }
+
+  public boolean distanceMeasurmentGood(){
+    Measurement m = dxSensor.getMeasurement();
+    return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 }
 
