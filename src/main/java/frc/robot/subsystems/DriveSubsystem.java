@@ -12,9 +12,8 @@
 
 package frc.robot.subsystems;
 
-import frc.robot.subsystems.Ludwig.LudwigDriveTrain;
+//import frc.robot.subsystems.Ludwig.LudwigDriveTrain;
+//public class DriveSubsystem extends LudwigDriveTrain{}
 
-/** Add your docs here. */
-public class DriveSubsystem extends LudwigDriveTrain{}
-
-//TODO Create a stop method for the drivetrain
+import frc.robot.subsystems.Eddie.EddieDriveTrain;
+public class DriveSubsystem extends EddieDriveTrain{}
