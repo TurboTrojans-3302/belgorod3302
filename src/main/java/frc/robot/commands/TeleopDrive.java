@@ -30,21 +30,25 @@ public class TeleopDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_driverController.getRightTriggerAxis() < 0.5){
-    m_robotDrive.drive(
-                    stick2speed(-m_driverController.getLeftY()),
-                    stick2speed(-m_driverController.getLeftX()),
-                    stick2speed(-m_driverController.getRightX()),
-                    true,
-                    false);
-    } 
-    else if (m_driverController.getRightTriggerAxis() > 0.5) {
-      m_robotDrive.drive(
-                    stick2speed(-0.5 * m_driverController.getLeftY()),
-                    stick2speed(-0.5 * m_driverController.getLeftX()),
-                    stick2speed(-0.5 * m_driverController.getRightX()),
-                    true,
-                    false);}
+    double speedScale;
+    if (m_driverController.getRightTriggerAxis() < 0.5) {
+      speedScale = 1;
+    } else {
+      speedScale = 0.5;
+    }
+
+    if(m_driverController.getRightBumperButton()) {
+      m_robotDrive.driveRobotOriented(
+        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
+        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
+        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+    } else {
+      m_robotDrive.driveFieldOriented(
+        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
+        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
+        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+    }
+    
   }
 
   // applies deadband and scaling to raw stick value
@@ -54,12 +58,13 @@ public class TeleopDrive extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
   }
-  
+
 }

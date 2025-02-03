@@ -12,7 +12,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class GoToCommand extends Command {
@@ -94,7 +93,7 @@ public class GoToCommand extends Command {
     double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
 
 
-    m_drive.drive(unitTranslation.times(speed), turn);
+    m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }
 
   // Called once the command ends or is interrupted.

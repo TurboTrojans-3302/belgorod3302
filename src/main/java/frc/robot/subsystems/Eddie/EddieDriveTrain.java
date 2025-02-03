@@ -18,6 +18,7 @@ import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -149,11 +150,11 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
 
          // Update the pose
-      //   m_pose = mOdometry.update(gyroAngle,
-      //                  new SwerveModulePosition[] {
-      //                  frontLeftModule.getPosition(), frontRightModule.getPosition(),
-      //                  backLeftModule.getPosition(), backRightModule.getPosition()
-      //                  });
+        m_pose = mOdometry.update(gyroAngle,
+                       new SwerveModulePosition[] {
+                       frontLeftModule.getPosition(), frontRightModule.getPosition(),
+                       backLeftModule.getPosition(), backRightModule.getPosition()
+                       });
 
       SmartDashboard.putNumber("Heading", getHeading());
       SmartDashboard.putNumber("lCan Distance", getDistanceToObjectMeters());
@@ -176,58 +177,40 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 		double yawCommand = - angle_error * kPgain - (currentAngularRate) * kDgain;
         return yawCommand;       
     }
-    
-    public void driveHeadingField(Translation2d translation, double heading) {
-        double yawCommand = turnToHeading(heading);
-        drive(translation, yawCommand, true);
-    }
 
-    
-    public void driveHeadingRobot(Translation2d translation, double heading) {
-        double yawCommand = turnToHeading(heading);
-        drive(translation, yawCommand, false);
-    }
-
-    public void drive( double x, double y, double rotation, boolean fieldOriented, boolean fake) {
-        drive(new Translation2d(x, y), rotation, fieldOriented);
-    }   
-
-    public void drive(Translation2d translation, double rotation) {        
-        drive(translation, rotation, true);
-    }
-
-    public void drive(Translation2d translation){
-        drive(translation, 0.0);
-    }
-
-    public void drive(Translation2d translation, double rotation, boolean fieldOriented) {
-
+    public void driveFieldOriented(Double x, Double y, Double rotation){
+        Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= 2.0 / Math.hypot(WHEELBASE, TRACKWIDTH);
-        ChassisSpeeds speeds;
-        if (fieldOriented) {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), -translation.getY(), rotation,
-                    Rotation2d.fromDegrees(ahrs.getAngle()));
-        } else {
-            speeds = new ChassisSpeeds(translation.getX(), -translation.getY(), rotation);
-        }
+        driveFieldOriented(new Translation2d(x, y), rotation);
+    }   
 
+
+    public void driveRobotOriented(Double x, Double y, Double rotation){
+        Translation2d translation = new Translation2d(x, y);
+        translation = translation.times(MAX_SPEED);
+        rotation *= 2.0 / Math.hypot(WHEELBASE, TRACKWIDTH);
+        driveRobotOriented(new Translation2d(x, y), rotation);
+    }   
+
+    
+    private double speedToVoltage(double speed) {
+        return MathUtil.clamp(speed / MAX_SPEED, -1.0, 1.0) * 12.0;
+    }
+
+    public void drive(ChassisSpeeds speeds) {
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        frontLeftModule.set(states[0].speedMetersPerSecond, states[0].angle.getRadians());
-        frontRightModule.set(states[1].speedMetersPerSecond, states[1].angle.getRadians());
-        backLeftModule.set(states[2].speedMetersPerSecond, states[2].angle.getRadians());
-        backRightModule.set(states[3].speedMetersPerSecond, states[3].angle.getRadians());
-        //TODO we'd really like to set the velocity in m/s
-
-        
+        frontLeftModule.set(speedToVoltage(states[0].speedMetersPerSecond), states[0].angle.getRadians());
+        frontRightModule.set(speedToVoltage(states[1].speedMetersPerSecond), states[1].angle.getRadians());
+        backLeftModule.set(speedToVoltage(states[2].speedMetersPerSecond), states[2].angle.getRadians());
+        backRightModule.set(speedToVoltage(states[3].speedMetersPerSecond), states[3].angle.getRadians());
+    
 
        FLcommandedAngle = states[0].angle.getDegrees();
        FRcommandedAngle = states[1].angle.getDegrees();
        BLcommandedAngle = states[2].angle.getDegrees();
-       BRcommandedAngle = states[3].angle.getDegrees();
-
-     
+       BRcommandedAngle = states[3].angle.getDegrees();     
     }
     
     public void setAll(double speed, double angleRadians) {
@@ -274,11 +257,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public Translation2d getVelocityVector(){
-        Translation2d v1 = new Translation2d(frontLeftModule.getDriveVelocity(), 
-                                         Rotation2d.fromRadians(frontLeftModule.getAbsoluteAngle()));
-        Translation2d v2 = new Translation2d(backRightModule.getDriveVelocity(),
-                                         Rotation2d.fromRadians(backLeftModule.getAbsoluteAngle()));
-        return v1.plus(v2).div(2);
+        ChassisSpeeds chassisSpeeds =  getChassisSpeeds();
+        return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
     static public double angleDeltaDeg(double src, double dest) {
@@ -303,14 +283,18 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         backRightModule.set(0, Math.PI);
     }
 
+    public ChassisSpeeds getChassisSpeeds(){
+        return kinematics.toChassisSpeeds(
+            frontLeftModule.getState(),
+            frontRightModule.getState(),
+            backLeftModule.getState(),
+            backRightModule.getState());
+    }
+    
     public double getSpeed(){
-    ChassisSpeeds chassisSpeeds =  kinematics.toChassisSpeeds(
-                                          frontLeftModule.getState(),
-                                          frontRightModule.getState(),
-                                          backLeftModule.getState(),
-                                          backRightModule.getState());
-    return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-  }
+        Translation2d velocityVector = getVelocityVector();
+        return velocityVector.getNorm();
+    }
 
   public void setX(){ stop(); }
 
@@ -340,5 +324,3 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 public double getMaxSpeedMetersPerSecond() {
     return DriveConstants.kMaxSpeedMetersPerSecond;}
 }
-
-//TODO Create a stop method for the drivetrain
