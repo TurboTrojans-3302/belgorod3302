@@ -13,26 +13,27 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.utils.SwerveUtils;
 
 public class GoToCommand extends Command {
 
   private final double DISTANCE_TOLERANCE = 0.050;
   private final double HEADING_TOLERANCE = 2.0;
+  private final double dT = Robot.kDefaultPeriod;
 
   private Pose2d m_dest;
   private Transform2d m_delta;
   private DriveSubsystem m_drive;
   private TrapezoidProfile m_trapezoid;
-    private State m_goal = new State(0.0, 0.0);
-  private double m_startTimeMillis;
   private boolean m_relativeFlag;
 
   private GoToCommand(DriveSubsystem drive){
     m_drive = drive;
     addRequirements(m_drive);
-    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedMetersPerSecond()  / 2.0,
-                                                       m_drive.getMaxSpeedMetersPerSecond())); //todo use full speed;
+    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedLimit()  / 2.0,
+                                                       m_drive.getMaxSpeedLimit())); //todo use full speed;
   }
 
   public GoToCommand(DriveSubsystem drive, Pose2d dest){
@@ -60,7 +61,7 @@ public class GoToCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_startTimeMillis = System.currentTimeMillis();
+
     if(m_relativeFlag){
       Translation2d dest_translation = m_delta.getTranslation();
       Rotation2d dest_rotation = m_drive.getPose().getRotation().plus(m_delta.getRotation());
@@ -78,18 +79,26 @@ public class GoToCommand extends Command {
   }
 
   private double deltaHeading(){
-    return translation2dest().getAngle().getDegrees();
+    return SwerveUtils.angleDeltaDeg(m_drive.getHeading(), m_dest.getRotation().getDegrees());
   }
 
-  private double calculateSpeed(){
-    State currentState = new State(distance(), m_drive.getSpeed());
-    return -m_trapezoid.calculate(t(), currentState, m_goal).velocity;
-  }
+  private double speedTowardTarget(){
+    Double botDirection = m_drive.getVelocityVector().getAngle().getRadians();
+    Double targetDirection = translation2dest().getAngle().getRadians();
+    Double difference = targetDirection - botDirection;
 
+    return m_drive.getSpeed() * Math.cos(difference);
+  }
+  
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double speed = calculateSpeed();
+
+    State currentState = new State(0.0, speedTowardTarget());
+    State goalState = new State(distance(), 0.0);
+    
+    double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
+  
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
     double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
 
@@ -110,7 +119,5 @@ public class GoToCommand extends Command {
     return distance() < DISTANCE_TOLERANCE && 
            Math.abs(deltaHeading()) < HEADING_TOLERANCE;
   }
-
-  private double t(){ return (System.currentTimeMillis() - m_startTimeMillis) / 1000.0; }
 
 }

@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Add your docs here. */
 public abstract class DriveSubsystemBase extends SubsystemBase {
+
+    private double m_maxSpeed = 0.0;
+
     public abstract Pose2d getPose();
 
     public abstract void drive(Translation2d translation, double rotation);
@@ -32,5 +35,16 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract void resetOdometry(Pose2d pose);
 
-    public abstract double getMaxSpeedMetersPerSecond();
+    public abstract double getMaxSpeedLimit();
+
+    public double getMaxSpeed() {
+        return m_maxSpeed;
+    }
+
+    public void setMaxSpeed(){
+        double speed = getSpeed();
+        if(speed >= m_maxSpeed){
+            m_maxSpeed = (speed + m_maxSpeed)/2.0;
+        }
+    }
 }

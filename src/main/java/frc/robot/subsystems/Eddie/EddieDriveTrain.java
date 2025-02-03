@@ -26,32 +26,35 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystemBase;
-
 
 /**
  *
  */
 public class EddieDriveTrain extends DriveSubsystemBase {
-   
-    public static final double TRACKWIDTH = 19.5 * 0.0254; //distance between the left and right wheels
-    public static final double WHEELBASE = 23.5 * 0.0254; //front to back distance
-    public static final double MAX_SPEED = 5.0; // m/s 
+
+    public static final double TRACKWIDTH = 19.5 * 0.0254; // distance between the left and right wheels
+    public static final double WHEELBASE = 23.5 * 0.0254; // front to back distance
+    public static final double MAX_SPEED = 5.0; // m/s
     public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(209.787-180.0);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(151.43 );
+    private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(209.787 - 180.0);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(151.43);
     private static final double BACK_LEFT_ANGLE_OFFSET = Math.toRadians(303.485 - 180.0);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(342.33 );
+    private static final double BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(342.33);
     private static final double kPgain = 0.080;
     private static final double kDgain = 0;
     public double FLcommandedAngle;
     public double BLcommandedAngle;
     public double BRcommandedAngle;
     public double FRcommandedAngle;
-    
+
     private LaserCan dxSensor = new LaserCan(DriveConstants.DRIVETRAIN_DX_SENSOR);
 
     private static EddieDriveTrain m_instance;
@@ -59,72 +62,78 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     private SwerveDriveOdometry mOdometry;
 
     ModuleConfiguration rightSideConfiguration = new ModuleConfiguration(
-        0.10033,
-        (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
-        true,
-        (9.0 / 24.0) * (14.0 / 72.0),
-        true );
+            0.10033,
+            (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
+            true,
+            (9.0 / 24.0) * (14.0 / 72.0),
+            true);
 
     ModuleConfiguration leftSideConfiguration = new ModuleConfiguration(
-        0.10033,
-        (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
-        false,
-        (9.0 / 24.0) * (14.0 / 72.0),
-        true );
-    
-        private final TTSwerveModule frontLeftModule = new TTSwerveModule(
-                                                        leftSideConfiguration,
-                                                        DriveConstants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
-                                                        FRONT_LEFT_ANGLE_OFFSET );
+            0.10033,
+            (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
+            false,
+            (9.0 / 24.0) * (14.0 / 72.0),
+            true);
+
+    private final TTSwerveModule frontLeftModule = new TTSwerveModule(
+            leftSideConfiguration,
+            DriveConstants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
+            DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
+            DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
+            FRONT_LEFT_ANGLE_OFFSET);
     private final TTSwerveModule frontRightModule = new TTSwerveModule(
-                                                        rightSideConfiguration,
-                                                        DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
-                                                        FRONT_RIGHT_ANGLE_OFFSET );
+            rightSideConfiguration,
+            DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
+            DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
+            DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
+            FRONT_RIGHT_ANGLE_OFFSET);
 
-    private final TTSwerveModule backLeftModule  = new TTSwerveModule(
-                                                        leftSideConfiguration,
-                                                        DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
-                                                        BACK_LEFT_ANGLE_OFFSET );
+    private final TTSwerveModule backLeftModule = new TTSwerveModule(
+            leftSideConfiguration,
+            DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
+            DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
+            DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
+            BACK_LEFT_ANGLE_OFFSET);
 
-    private final TTSwerveModule backRightModule =  new TTSwerveModule(
-                                                        rightSideConfiguration,
-                                                        DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
-                                                        DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
-                                                        BACK_RIGHT_ANGLE_OFFSET );
-                         
-                        
+    private final TTSwerveModule backRightModule = new TTSwerveModule(
+            rightSideConfiguration,
+            DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
+            DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
+            DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
+            BACK_RIGHT_ANGLE_OFFSET);
+
     private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-            new Translation2d(-WHEELBASE / 2.0, TRACKWIDTH / 2.0),  //front left
-            new Translation2d(-WHEELBASE / 2.0, -TRACKWIDTH / 2.0), //front right
-            new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), //back  left
-            new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0) //back  right
+            new Translation2d(-WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left
+            new Translation2d(-WHEELBASE / 2.0, -TRACKWIDTH / 2.0), // front right
+            new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // back left
+            new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0) // back right
     );
 
     private final AHRS ahrs = new AHRS(SerialPort.Port.kUSB);
     private Pose2d m_pose;
- 
+
+    //dashboard stuff
+    DoublePublisher speedPub;
+    DoublePublisher headingPub;
+    DoublePublisher maxSpeedPub;
+    DoublePublisher dxPub;
+    BooleanPublisher dxGoodPub;
+    
+
     public EddieDriveTrain() {
-        m_instance = this;    
+        m_instance = this;
 
         ahrs.reset();
 
-
         mOdometry = new SwerveDriveOdometry(
-            kinematics, Rotation2d.fromRadians(getAngleRad()),
-            new SwerveModulePosition[] {
-              frontLeftModule.getPosition(),
-              frontRightModule.getPosition(),
-              backLeftModule.getPosition(),
-              backRightModule.getPosition()
-            }, defaultStartPosition);
-            
+                kinematics, Rotation2d.fromRadians(getAngleRad()),
+                new SwerveModulePosition[] {
+                        frontLeftModule.getPosition(),
+                        frontRightModule.getPosition(),
+                        backLeftModule.getPosition(),
+                        backRightModule.getPosition()
+                }, defaultStartPosition);
+
         try {
             dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
             dxSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
@@ -132,6 +141,14 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         } catch (ConfigurationFailedException e) {
             System.out.println("LaserCan Configuration failed! " + e);
         }
+
+        // dashboard stuff
+        NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("DriveTrain");
+        speedPub = tagsTable.getDoubleTopic("Speed").publish();
+        maxSpeedPub = tagsTable.getDoubleTopic("MaxSpeed").publish();
+        headingPub = tagsTable.getDoubleTopic("Heading").publish();
+        dxPub = tagsTable.getDoubleTopic("DX Sensor").publish();
+        dxGoodPub = tagsTable.getBooleanTopic("DX Good").publish();
     }
 
     public static EddieDriveTrain getInstance() {
@@ -147,56 +164,55 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         // Get the rotation of the robot from the gyro.
         var gyroAngle = Rotation2d.fromRadians(getAngleRad());
 
+        // Update the pose
+        m_pose = mOdometry.update(gyroAngle,
+                new SwerveModulePosition[] {
+                        frontLeftModule.getPosition(), frontRightModule.getPosition(),
+                        backLeftModule.getPosition(), backRightModule.getPosition()
+                });
 
-         // Update the pose
-      //   m_pose = mOdometry.update(gyroAngle,
-      //                  new SwerveModulePosition[] {
-      //                  frontLeftModule.getPosition(), frontRightModule.getPosition(),
-      //                  backLeftModule.getPosition(), backRightModule.getPosition()
-      //                  });
-
-      SmartDashboard.putNumber("Heading", getHeading());
-      SmartDashboard.putNumber("lCan Distance", getDistanceToObjectMeters());
-      SmartDashboard.putBoolean("lCan ready", distanceMeasurmentGood());
-
+        speedPub.set(getSpeed());
+        maxSpeedPub.set(getMaxSpeed());
+        headingPub.set(getHeading());
+        dxGoodPub.set(distanceMeasurmentGood());
+        dxPub.set(getDistanceToObjectMeters());
     }
 
-    public Pose2d getPose(){
+    public Pose2d getPose() {
         return m_pose;
     }
 
-    public void setPose(Pose2d pose){
+    public void setPose(Pose2d pose) {
         m_pose = pose;
     }
 
-    public double turnToHeading(double heading){
+    public double turnToHeading(double heading) {
         double angle = getHeading();
-		double currentAngularRate = getAngularRateDegPerSec();
-		double angle_error = angleDeltaDeg(heading, angle);
-		double yawCommand = - angle_error * kPgain - (currentAngularRate) * kDgain;
-        return yawCommand;       
+        double currentAngularRate = getAngularRateDegPerSec();
+        double angle_error = angleDeltaDeg(heading, angle);
+        double yawCommand = -angle_error * kPgain - (currentAngularRate) * kDgain;
+        return yawCommand;
     }
-    
+
     public void driveHeadingField(Translation2d translation, double heading) {
         double yawCommand = turnToHeading(heading);
         drive(translation, yawCommand, true);
     }
 
-    
     public void driveHeadingRobot(Translation2d translation, double heading) {
         double yawCommand = turnToHeading(heading);
         drive(translation, yawCommand, false);
     }
 
-    public void drive( double x, double y, double rotation, boolean fieldOriented, boolean fake) {
+    public void drive(double x, double y, double rotation, boolean fieldOriented, boolean fake) {
         drive(new Translation2d(x, y), rotation, fieldOriented);
-    }   
+    }
 
-    public void drive(Translation2d translation, double rotation) {        
+    public void drive(Translation2d translation, double rotation) {
         drive(translation, rotation, true);
     }
 
-    public void drive(Translation2d translation){
+    public void drive(Translation2d translation) {
         drive(translation, 0.0);
     }
 
@@ -212,42 +228,41 @@ public class EddieDriveTrain extends DriveSubsystemBase {
             speeds = new ChassisSpeeds(translation.getX(), -translation.getY(), rotation);
         }
 
-
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
         frontLeftModule.set(states[0].speedMetersPerSecond, states[0].angle.getRadians());
         frontRightModule.set(states[1].speedMetersPerSecond, states[1].angle.getRadians());
         backLeftModule.set(states[2].speedMetersPerSecond, states[2].angle.getRadians());
         backRightModule.set(states[3].speedMetersPerSecond, states[3].angle.getRadians());
-        //TODO we'd really like to set the velocity in m/s
+        // TODO we'd really like to set the velocity in m/s
 
-        
+        FLcommandedAngle = states[0].angle.getDegrees();
+        FRcommandedAngle = states[1].angle.getDegrees();
+        BLcommandedAngle = states[2].angle.getDegrees();
+        BRcommandedAngle = states[3].angle.getDegrees();
 
-       FLcommandedAngle = states[0].angle.getDegrees();
-       FRcommandedAngle = states[1].angle.getDegrees();
-       BLcommandedAngle = states[2].angle.getDegrees();
-       BRcommandedAngle = states[3].angle.getDegrees();
-
-     
     }
-    
+
     public void setAll(double speed, double angleRadians) {
         frontLeftModule.set(speed, angleRadians);
         frontRightModule.set(speed, angleRadians);
         backLeftModule.set(speed, angleRadians);
         backRightModule.set(speed, angleRadians);
-        //SmartDashboard.putNumber("Front Left Commanded Angle", Math.toDegrees(angleRadians));
-       //SmartDashboard.putNumber("Front Right Commanded Angle", Math.toDegrees(angleRadians));
-        //SmartDashboard.putNumber("Back Left Commanded Angle", Math.toDegrees(angleRadians));
-        //SmartDashboard.putNumber("Back Right Commanded Angle", Math.toDegrees(angleRadians));
+        // SmartDashboard.putNumber("Front Left Commanded Angle",
+        // Math.toDegrees(angleRadians));
+        // SmartDashboard.putNumber("Front Right Commanded Angle",
+        // Math.toDegrees(angleRadians));
+        // SmartDashboard.putNumber("Back Left Commanded Angle",
+        // Math.toDegrees(angleRadians));
+        // SmartDashboard.putNumber("Back Right Commanded Angle",
+        // Math.toDegrees(angleRadians));
     }
-
 
     public void resetGyroscope() {
         ahrs.setAngleAdjustment(ahrs.getAngle() - ahrs.getAngleAdjustment());
     }
 
     public double getPitchDeg() {
-       return ahrs.getPitch();
+        return ahrs.getPitch();
     }
 
     public double getHeading() {
@@ -255,10 +270,10 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public double getTurnRate() {
-        return -ahrs.getRate(); //todo confirm the sign of this
+        return -ahrs.getRate(); // todo confirm the sign of this
     }
 
-    public double getAngleRad(){
+    public double getAngleRad() {
         return Math.toRadians(getHeading());
     }
 
@@ -273,23 +288,23 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return -ahrs.getRate();
     }
 
-    public Translation2d getVelocityVector(){
-        Translation2d v1 = new Translation2d(frontLeftModule.getDriveVelocity(), 
-                                         Rotation2d.fromRadians(frontLeftModule.getAbsoluteAngle()));
+    public Translation2d getVelocityVector() {
+        Translation2d v1 = new Translation2d(frontLeftModule.getDriveVelocity(),
+                Rotation2d.fromRadians(frontLeftModule.getAbsoluteAngle()));
         Translation2d v2 = new Translation2d(backRightModule.getDriveVelocity(),
-                                         Rotation2d.fromRadians(backLeftModule.getAbsoluteAngle()));
+                Rotation2d.fromRadians(backLeftModule.getAbsoluteAngle()));
         return v1.plus(v2).div(2);
     }
 
     static public double angleDeltaDeg(double src, double dest) {
-		double delta = (dest - src) % 360.0;
-		if(Math.abs(delta) > 180) {
-			delta = delta - (Math.signum(delta) * 360);
-		}
-		return delta;
+        double delta = (dest - src) % 360.0;
+        if (Math.abs(delta) > 180) {
+            delta = delta - (Math.signum(delta) * 360);
+        }
+        return delta;
     }
-    
-    public void calibrateSterrRelativeEncoder(){
+
+    public void calibrateSterrRelativeEncoder() {
         frontLeftModule.calibrateSterrRelativeEncoder();
         frontRightModule.calibrateSterrRelativeEncoder();
         backLeftModule.calibrateSterrRelativeEncoder();
@@ -297,48 +312,50 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public void stop() {
-        frontLeftModule.set(0, Math.PI/4);
-        frontRightModule.set(0, -Math.PI/4);
-        backLeftModule.set(0, -Math.PI/4);
+        frontLeftModule.set(0, Math.PI / 4);
+        frontRightModule.set(0, -Math.PI / 4);
+        backLeftModule.set(0, -Math.PI / 4);
         backRightModule.set(0, Math.PI);
     }
 
-    public double getSpeed(){
-    ChassisSpeeds chassisSpeeds =  kinematics.toChassisSpeeds(
-                                          frontLeftModule.getState(),
-                                          frontRightModule.getState(),
-                                          backLeftModule.getState(),
-                                          backRightModule.getState());
-    return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-  }
+    public double getSpeed() {
+        ChassisSpeeds chassisSpeeds = kinematics.toChassisSpeeds(
+                frontLeftModule.getState(),
+                frontRightModule.getState(),
+                backLeftModule.getState(),
+                backRightModule.getState());
+        return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+    }
 
-  public void setX(){ stop(); }
+    public void setX() {
+        stop();
+    }
 
-  public void resetOdometry(Pose2d pose) {
-    mOdometry.resetPosition(
-        Rotation2d.fromDegrees(getHeading()),
-        new SwerveModulePosition[] {
-            frontLeftModule.getPosition(),
-            frontRightModule.getPosition(),
-            backLeftModule.getPosition(),
-            backRightModule.getPosition()
-        },
-        pose);
-  }
+    public void resetOdometry(Pose2d pose) {
+        mOdometry.resetPosition(
+                Rotation2d.fromDegrees(getHeading()),
+                new SwerveModulePosition[] {
+                        frontLeftModule.getPosition(),
+                        frontRightModule.getPosition(),
+                        backLeftModule.getPosition(),
+                        backRightModule.getPosition()
+                },
+                pose);
+    }
 
-  public Double getDistanceToObjectMeters(){
-    Measurement m = dxSensor.getMeasurement();
-    return m.distance_mm * 0.001;
-  }
+    public Double getDistanceToObjectMeters() {
+        Measurement m = dxSensor.getMeasurement();
+        return m.distance_mm * 0.001;
+    }
 
-  public boolean distanceMeasurmentGood(){
-    Measurement m = dxSensor.getMeasurement();
-    return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
-  }
+    public boolean distanceMeasurmentGood() {
+        Measurement m = dxSensor.getMeasurement();
+        return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
+    }
 
-@Override
-public double getMaxSpeedMetersPerSecond() {
-    return DriveConstants.kMaxSpeedMetersPerSecond;}
+    @Override
+    public double getMaxSpeedLimit() {
+        return DriveConstants.kMaxSpeedMetersPerSecond;
+    }
+
 }
-
-//TODO Create a stop method for the drivetrain

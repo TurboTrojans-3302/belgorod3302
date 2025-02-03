@@ -347,7 +347,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
   }
 
   @Override
-  public double getMaxSpeedMetersPerSecond() {
+  public double getMaxSpeedLimit() {
     return DriveConstants.kMaxSpeedMetersPerSecond;
   }
 }
