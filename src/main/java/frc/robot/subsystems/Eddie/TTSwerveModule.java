@@ -36,6 +36,11 @@ public class TTSwerveModule implements SwerveModule {
     private SteerControllerImplementation mSteerController;
     private DriveControllerImplementation mDriveController;
     private Mk4ModuleConfiguration mModuleConfiguration;
+    private boolean angleInverted = false;
+
+    public boolean isAngleInverted() {
+        return angleInverted;
+    }
 
     public TTSwerveModule(
             ModuleConfiguration mechanicalConfiguration,
@@ -58,7 +63,7 @@ public class TTSwerveModule implements SwerveModule {
         driveClosedLoopConfig.pid(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD)
                 .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
                 .velocityFF(DriveConstants.drivingVelocityFeedForward)
-                .outputRange(-1, 1);   
+                .outputRange(-1, 1);
 
         double nominalVoltage = mModuleConfiguration.getNominalVoltage();
         double currentLimit = mModuleConfiguration.getDriveCurrentLimit();
@@ -140,7 +145,6 @@ public class TTSwerveModule implements SwerveModule {
     private static class DriveControllerImplementation implements DriveController {
         private final SparkMax motor;
         private final RelativeEncoder encoder;
-        private boolean inverted = false;
 
         private DriveControllerImplementation(SparkMax motor, RelativeEncoder encoder) {
             this.motor = motor;
@@ -149,22 +153,16 @@ public class TTSwerveModule implements SwerveModule {
 
         @Override
         public void setReferenceVoltage(double voltage) {
-            motor.setVoltage(inverted ? -voltage : voltage);
+            motor.setVoltage(voltage);
         }
 
         @Override
         public double getStateVelocity() {
-            double v = encoder.getVelocity();
-            return inverted ? -v : v;
-        }
-
-        public void invert() {
-            inverted = !inverted;
+            return encoder.getVelocity();
         }
 
         public void setVelocity(double driveVelocity) {
-            double v = inverted ? -driveVelocity : driveVelocity;
-            motor.getClosedLoopController().setReference(v, ControlType.kVelocity);
+            motor.getClosedLoopController().setReference(driveVelocity, ControlType.kVelocity);
         }
     }
 
@@ -259,7 +257,6 @@ public class TTSwerveModule implements SwerveModule {
             return encoder.getVelocity();
         }
 
-
         public REVLibError setInverted(boolean inverted) {
             if (ErrorCode.OK == encoder.configSensorDirection(inverted)) {
                 return REVLibError.kOk;
@@ -271,29 +268,6 @@ public class TTSwerveModule implements SwerveModule {
         public boolean getInverted() {
             return encoder.configGetSensorDirection();
         }
-
-        // @Override
-        // public REVLibError setAverageDepth(int depth) {
-        // // TODO Auto-generated method stub
-        // return REVLibError.kNotImplemented;
-        // }
-
-        // @Override
-        // public int getAverageDepth() {
-        // // TODO Auto-generated method stub
-        // return 0;
-        // }
-
-        // @Override
-        // public REVLibError setZeroOffset(double offset) {
-        // return ErrorCode.OK == encoder.configMagnetOffset(offset) ? REVLibError.kOk :
-        // REVLibError.kError;
-        // }
-
-        // @Override
-        // public double getZeroOffset() {
-        // return encoder.configGetMagnetOffset();
-        // }
     }
 
     public enum Direction {
@@ -334,7 +308,9 @@ public class TTSwerveModule implements SwerveModule {
             // Only need to add 180 deg here because the target angle will be put back into
             // the range [0, 2pi)
             steerAngle += Math.PI;
-            mDriveController.invert();
+            angleInverted = true;
+        } else {
+            angleInverted = false;
         }
 
         // Put the target angle back into the range [0, 2pi)
@@ -353,9 +329,9 @@ public class TTSwerveModule implements SwerveModule {
         mDriveController.setReferenceVoltage(driveVoltage);
     }
 
-    public void setVelocity(double driveVelocity, double steerAngle){
-                setSteerAngle(steerAngle);
-                mDriveController.setVelocity(driveVelocity);
+    public void setVelocity(double driveVelocity, double steerAngle) {
+        setSteerAngle(steerAngle);
+        mDriveController.setVelocity(angleInverted ? -driveVelocity: driveVelocity);
     }
 
     public double getAbsoluteAngle() {
