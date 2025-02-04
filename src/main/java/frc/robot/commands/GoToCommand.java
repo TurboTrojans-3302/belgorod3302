@@ -103,7 +103,7 @@ public class GoToCommand extends Command {
     double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
 
 
-    m_drive.drive(unitTranslation.times(speed), turn);
+    m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }
 
   // Called once the command ends or is interrupted.
