@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,9 +28,13 @@ import frc.robot.subsystems.DriveSubsystem;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  private static RobotContainer instance;
+
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  
+  public Field2d m_field = new Field2d();
+
   //private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
@@ -44,6 +49,8 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    instance = this;
+    
     // Configure the button bindings
     configureButtonBindings();
 
@@ -71,6 +78,9 @@ public class RobotContainer {
 
   }
 
+  public static RobotContainer getInstance() { return instance; }
+
+  
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
