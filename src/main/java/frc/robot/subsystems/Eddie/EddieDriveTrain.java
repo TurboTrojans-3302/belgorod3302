@@ -29,27 +29,30 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
  *
  */
 public class EddieDriveTrain extends DriveSubsystemBase {
-   
-    public static final double TRACKWIDTH = 19.5 * 0.0254; //distance between the left and right wheels
-    public static final double WHEELBASE = 23.5 * 0.0254; //front to back distance
-    public static final double MAX_SPEED = 5.0; // m/s 
+
+    public static final double TRACKWIDTH = 19.5 * 0.0254; // distance between the left and right wheels
+    public static final double WHEELBASE = 23.5 * 0.0254; // front to back distance
+    public static final double MAX_SPEED = 5.0; // m/s
     public static final double MAX_ROTATION = 4.0;
     public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
-    private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(209.787 - 180.0);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(151.43);
-    private static final double BACK_LEFT_ANGLE_OFFSET = Math.toRadians(303.485 - 180.0);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(342.33);
+    // TODO Calibrate these angle offsets if necessary
+    private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(-29.787);
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(-151.43);
+    private static final double BACK_LEFT_ANGLE_OFFSET = Math.toRadians(-123.485);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(-342.33);
     private static final double kPgain = 0.080;
     private static final double kDgain = 0;
     public double FLcommandedAngle;
@@ -68,14 +71,14 @@ public class EddieDriveTrain extends DriveSubsystemBase {
             (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
             true,
             (9.0 / 24.0) * (14.0 / 72.0),
-            true);
+            false);
 
     ModuleConfiguration leftSideConfiguration = new ModuleConfiguration(
             0.10033,
             (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
             false,
             (9.0 / 24.0) * (14.0 / 72.0),
-            true);
+            false);
 
     private final TTSwerveModule frontLeftModule = new TTSwerveModule(
             leftSideConfiguration,
@@ -114,13 +117,12 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     private final AHRS ahrs = new AHRS(SerialPort.Port.kUSB);
     private Pose2d m_pose;
 
-    //dashboard stuff
+    // dashboard stuff
     DoublePublisher speedPub;
     DoublePublisher headingPub;
     DoublePublisher maxSpeedPub;
     DoublePublisher dxPub;
     BooleanPublisher dxGoodPub;
-    
 
     public EddieDriveTrain() {
         m_instance = this;
@@ -178,6 +180,27 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         headingPub.set(getHeading());
         dxGoodPub.set(distanceMeasurmentGood());
         dxPub.set(getDistanceToObjectMeters());
+
+        SmartDashboard.putData("Swerve Drive", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("SwerveDrive");
+
+                builder.addDoubleProperty("Front Left Angle", () -> frontLeftModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Front Left Velocity", () -> frontLeftModule.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Front Right Angle", () -> frontRightModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Front Right Velocity", () -> frontRightModule.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Back Left Angle", () -> backLeftModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Back Left Velocity", () -> backLeftModule.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Back Right Angle", () -> backRightModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Back Right Velocity", () -> backRightModule.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Robot Angle", () -> getAngleRad(), null);
+            }
+        });
     }
 
     public Pose2d getPose() {
@@ -196,22 +219,20 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return yawCommand;
     }
 
-    public void driveFieldOriented(Double x, Double y, Double rotation){
+    public void driveFieldOriented(Double x, Double y, Double rotation) {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= MAX_ROTATION;
         driveFieldOriented(new Translation2d(x, y), rotation);
-    }   
+    }
 
-
-    public void driveRobotOriented(Double x, Double y, Double rotation){
+    public void driveRobotOriented(Double x, Double y, Double rotation) {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= MAX_ROTATION;
         driveRobotOriented(new Translation2d(x, y), rotation);
-    }   
+    }
 
-    
     private double speedToVoltage(double speed) {
         return MathUtil.clamp(speed / MAX_SPEED, -1.0, 1.0) * 12.0;
     }
@@ -223,12 +244,11 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         frontRightModule.set(speedToVoltage(states[1].speedMetersPerSecond), states[1].angle.getRadians());
         backLeftModule.set(speedToVoltage(states[2].speedMetersPerSecond), states[2].angle.getRadians());
         backRightModule.set(speedToVoltage(states[3].speedMetersPerSecond), states[3].angle.getRadians());
-    
 
-       FLcommandedAngle = states[0].angle.getDegrees();
-       FRcommandedAngle = states[1].angle.getDegrees();
-       BLcommandedAngle = states[2].angle.getDegrees();
-       BRcommandedAngle = states[3].angle.getDegrees();     
+        FLcommandedAngle = states[0].angle.getDegrees();
+        FRcommandedAngle = states[1].angle.getDegrees();
+        BLcommandedAngle = states[2].angle.getDegrees();
+        BRcommandedAngle = states[3].angle.getDegrees();
     }
 
     public void setAll(double speed, double angleRadians) {
@@ -236,14 +256,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         frontRightModule.set(speed, angleRadians);
         backLeftModule.set(speed, angleRadians);
         backRightModule.set(speed, angleRadians);
-        // SmartDashboard.putNumber("Front Left Commanded Angle",
-        // Math.toDegrees(angleRadians));
-        // SmartDashboard.putNumber("Front Right Commanded Angle",
-        // Math.toDegrees(angleRadians));
-        // SmartDashboard.putNumber("Back Left Commanded Angle",
-        // Math.toDegrees(angleRadians));
-        // SmartDashboard.putNumber("Back Right Commanded Angle",
-        // Math.toDegrees(angleRadians));
     }
 
     public void resetGyroscope() {
@@ -277,8 +289,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return -ahrs.getRate();
     }
 
-    public Translation2d getVelocityVector(){
-        ChassisSpeeds chassisSpeeds =  getChassisSpeeds();
+    public Translation2d getVelocityVector() {
+        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
         return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
@@ -304,15 +316,15 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         backRightModule.set(0, Math.PI);
     }
 
-    public ChassisSpeeds getChassisSpeeds(){
+    public ChassisSpeeds getChassisSpeeds() {
         return kinematics.toChassisSpeeds(
-            frontLeftModule.getState(),
-            frontRightModule.getState(),
-            backLeftModule.getState(),
-            backRightModule.getState());
+                frontLeftModule.getState(),
+                frontRightModule.getState(),
+                backLeftModule.getState(),
+                backRightModule.getState());
     }
-    
-    public double getSpeed(){
+
+    public double getSpeed() {
         Translation2d velocityVector = getVelocityVector();
         return velocityVector.getNorm();
     }

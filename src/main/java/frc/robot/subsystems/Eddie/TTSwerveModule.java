@@ -30,6 +30,9 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import static com.swervedrivespecialties.swervelib.rev.RevUtils.checkNeoError;
 
+
+//TODO Confirm that both Relative and Absolute encoders are CCW+
+
 @SuppressWarnings("deprecation")
 public class TTSwerveModule implements SwerveModule {
 
@@ -107,7 +110,7 @@ public class TTSwerveModule implements SwerveModule {
             .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
 
         SparkMaxConfig steerConfig = new SparkMaxConfig();
-        steerConfig.inverted(!mechanicalConfiguration.isSteerInverted())
+        steerConfig.inverted(!mechanicalConfiguration.isSteerInverted()) //TODO should this be inverted here?
             .voltageCompensation(nominalVoltage)
             .smartCurrentLimit((int)currentLimit)
             .idleMode(IdleMode.kBrake)
