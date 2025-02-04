@@ -220,10 +220,10 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void drive(ChassisSpeeds speeds) {
 
         SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        frontLeftModule.set(speedToVoltage(states[0].speedMetersPerSecond), states[0].angle.getRadians());
-        frontRightModule.set(speedToVoltage(states[1].speedMetersPerSecond), states[1].angle.getRadians());
-        backLeftModule.set(speedToVoltage(states[2].speedMetersPerSecond), states[2].angle.getRadians());
-        backRightModule.set(speedToVoltage(states[3].speedMetersPerSecond), states[3].angle.getRadians());
+        frontLeftModule.setVelocity((states[0].speedMetersPerSecond), states[0].angle.getRadians());
+        frontRightModule.setVelocity((states[1].speedMetersPerSecond), states[1].angle.getRadians());
+        backLeftModule.setVelocity((states[2].speedMetersPerSecond), states[2].angle.getRadians());
+        backRightModule.setVelocity((states[3].speedMetersPerSecond), states[3].angle.getRadians());
     
 
        FLcommandedAngle = states[0].angle.getDegrees();
@@ -237,14 +237,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         frontRightModule.set(speed, angleRadians);
         backLeftModule.set(speed, angleRadians);
         backRightModule.set(speed, angleRadians);
-        // SmartDashboard.putNumber("Front Left Commanded Angle",
-        // Math.toDegrees(angleRadians));
-        // SmartDashboard.putNumber("Front Right Commanded Angle",
-        // Math.toDegrees(angleRadians));
-        // SmartDashboard.putNumber("Back Left Commanded Angle",
-        // Math.toDegrees(angleRadians));
-        // SmartDashboard.putNumber("Back Right Commanded Angle",
-        // Math.toDegrees(angleRadians));
     }
 
     public void resetGyroscope() {

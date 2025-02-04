@@ -38,34 +38,41 @@ public class TTSwerveModule implements SwerveModule {
     private Mk4ModuleConfiguration mModuleConfiguration;
 
     public TTSwerveModule(
-        ModuleConfiguration mechanicalConfiguration,
-        int driveMotorPort,
-        int steerMotorPort,
-        int steerEncoderPort,
-        double steerOffset
-    ){
+            ModuleConfiguration mechanicalConfiguration,
+            int driveMotorPort,
+            int steerMotorPort,
+            int steerEncoderPort,
+            double steerOffset) {
         mModuleConfiguration = new Mk4ModuleConfiguration();
 
         // make the drive controller. copied from NeoDriveControllerFactoryBuilder
 
         // Setup encoder
         EncoderConfig driveEncoderConfig = new EncoderConfig();
-        double positionConversionFactor = Math.PI * mechanicalConfiguration.getWheelDiameter() * mechanicalConfiguration.getDriveReduction();
+        double positionConversionFactor = Math.PI * mechanicalConfiguration.getWheelDiameter()
+                * mechanicalConfiguration.getDriveReduction();
         driveEncoderConfig.positionConversionFactor(positionConversionFactor);
         driveEncoderConfig.velocityConversionFactor(positionConversionFactor / 60.0);
+
+        ClosedLoopConfig driveClosedLoopConfig = new ClosedLoopConfig();
+        driveClosedLoopConfig.pid(DriveConstants.kP, DriveConstants.kI, DriveConstants.kD)
+                .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder)
+                .velocityFF(DriveConstants.drivingVelocityFeedForward)
+                .outputRange(-1, 1);   
 
         double nominalVoltage = mModuleConfiguration.getNominalVoltage();
         double currentLimit = mModuleConfiguration.getDriveCurrentLimit();
         SparkMaxConfig driveConfig = new SparkMaxConfig();
         driveConfig.inverted(mechanicalConfiguration.isDriveInverted())
-            .voltageCompensation(nominalVoltage)
-            .smartCurrentLimit((int)currentLimit)
-            .idleMode(IdleMode.kBrake)
-            .apply(driveEncoderConfig);
-    
+                .voltageCompensation(nominalVoltage)
+                .smartCurrentLimit((int) currentLimit)
+                .idleMode(IdleMode.kBrake)
+                .apply(driveEncoderConfig)
+                .apply(driveClosedLoopConfig);
+
         SparkMax driveMotor = new SparkMax(driveMotorPort, MotorType.kBrushless);
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);            
-    
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         RelativeEncoder driveEncoder = driveMotor.getEncoder();
         driveEncoder.setPosition(0);
         mDriveController = new DriveControllerImplementation(driveMotor, driveEncoder);
@@ -73,8 +80,8 @@ public class TTSwerveModule implements SwerveModule {
         // create steer controller. copied from NeoSteerControllerFactoryBuilder
 
         CanCoderAbsoluteConfiguration encoderconfig = new CanCoderAbsoluteConfiguration(steerEncoderPort, steerOffset);
-        NeoSteerConfiguration<CanCoderAbsoluteConfiguration> steerConfiguration = new NeoSteerConfiguration<>(steerMotorPort, encoderconfig);
-
+        NeoSteerConfiguration<CanCoderAbsoluteConfiguration> steerConfiguration = new NeoSteerConfiguration<>(
+                steerMotorPort, encoderconfig);
 
         CANCoderConfiguration config = new CANCoderConfiguration();
         config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
@@ -85,12 +92,12 @@ public class TTSwerveModule implements SwerveModule {
         CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
         System.out.println("encoder abs sensor range:" + encoder.configGetAbsoluteSensorRange().toString());
 
-        CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 100, 250), "Failed to configure CANCoder update rate");
+        CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 100, 250),
+                "Failed to configure CANCoder update rate");
 
         EncoderImplementation absoluteEncoder = new EncoderImplementation(encoder);
         absoluteEncoder.setInverted(true);
 
-        
         EncoderConfig steerEncoderConfig = new EncoderConfig();
         double steerPositionConversionFactor = 2.0 * Math.PI * mechanicalConfiguration.getSteerReduction();
         steerEncoderConfig.positionConversionFactor(steerPositionConversionFactor);
@@ -102,31 +109,29 @@ public class TTSwerveModule implements SwerveModule {
 
         ClosedLoopConfig steerPIDConfig = new ClosedLoopConfig();
         steerPIDConfig.p(pidProportional)
-            .i(pidIntegral)
-            .d(pidDerivative)
-            .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
+                .i(pidIntegral)
+                .d(pidDerivative)
+                .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
 
         SparkMaxConfig steerConfig = new SparkMaxConfig();
         steerConfig.inverted(!mechanicalConfiguration.isSteerInverted())
-            .voltageCompensation(nominalVoltage)
-            .smartCurrentLimit((int)currentLimit)
-            .idleMode(IdleMode.kBrake)
-            .apply(steerEncoderConfig)
-            .apply(steerPIDConfig);
+                .voltageCompensation(nominalVoltage)
+                .smartCurrentLimit((int) currentLimit)
+                .idleMode(IdleMode.kBrake)
+                .apply(steerEncoderConfig)
+                .apply(steerPIDConfig);
 
         SparkMax steerMotor = new SparkMax(steerConfiguration.getMotorPort(), MotorType.kBrushless);
         steerMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         RelativeEncoder integratedEncoder = steerMotor.getEncoder();
-        checkNeoError(integratedEncoder.setPosition(absoluteEncoder.getAbsoluteAngle()), "Failed to set NEO encoder position");
-
-        
-        
+        checkNeoError(integratedEncoder.setPosition(absoluteEncoder.getAbsoluteAngle()),
+                "Failed to set NEO encoder position");
 
         mSteerController = new SteerControllerImplementation(steerMotor, absoluteEncoder);
-    }            
+    }
 
-    public void calibrateSterrRelativeEncoder(){
+    public void calibrateSterrRelativeEncoder() {
 
         mSteerController.calibrateRelativeEncoder();
 
@@ -135,6 +140,7 @@ public class TTSwerveModule implements SwerveModule {
     private static class DriveControllerImplementation implements DriveController {
         private final SparkMax motor;
         private final RelativeEncoder encoder;
+        private boolean inverted = false;
 
         private DriveControllerImplementation(SparkMax motor, RelativeEncoder encoder) {
             this.motor = motor;
@@ -143,19 +149,28 @@ public class TTSwerveModule implements SwerveModule {
 
         @Override
         public void setReferenceVoltage(double voltage) {
-            motor.setVoltage(voltage);
+            motor.setVoltage(inverted ? -voltage : voltage);
         }
 
         @Override
         public double getStateVelocity() {
-            return encoder.getVelocity();
+            double v = encoder.getVelocity();
+            return inverted ? -v : v;
+        }
+
+        public void invert() {
+            inverted = !inverted;
+        }
+
+        public void setVelocity(double driveVelocity) {
+            double v = inverted ? -driveVelocity : driveVelocity;
+            motor.getClosedLoopController().setReference(v, ControlType.kVelocity);
         }
     }
-    
-    
+
     public static class SteerControllerImplementation implements SteerController {
 
-        @SuppressWarnings({"FieldCanBeLocal", "unused"})
+        @SuppressWarnings({ "FieldCanBeLocal", "unused" })
         private final SparkMax motor;
         private final RelativeEncoder motorEncoder;
         private final EncoderImplementation absoluteEncoder;
@@ -172,14 +187,11 @@ public class TTSwerveModule implements SwerveModule {
         public double getReferenceAngle() {
             return referenceAngleRadians;
         }
-        
-        public void calibrateRelativeEncoder(){
+
+        public void calibrateRelativeEncoder() {
             double absoluteAngle = absoluteEncoder.getAbsoluteAngle();
             motorEncoder.setPosition(absoluteAngle);
         }
-
-
-
 
         @Override
         public void setReferenceAngle(double referenceAngleRadians) {
@@ -190,7 +202,8 @@ public class TTSwerveModule implements SwerveModule {
                 currentAngleRadiansMod += 2.0 * Math.PI;
             }
 
-            // The reference angle has the range [0, 2pi) but the Neo's encoder can go above that
+            // The reference angle has the range [0, 2pi) but the Neo's encoder can go above
+            // that
             double adjustedReferenceAngleRadians = referenceAngleRadians + currentAngleRadians - currentAngleRadiansMod;
             if (referenceAngleRadians - currentAngleRadiansMod > Math.PI) {
                 adjustedReferenceAngleRadians -= 2.0 * Math.PI;
@@ -203,8 +216,6 @@ public class TTSwerveModule implements SwerveModule {
             motor.getClosedLoopController().setReference(adjustedReferenceAngleRadians, ControlType.kPosition);
         }
 
-
-
         @Override
         public double getStateAngle() {
             double motorAngleRadians = motorEncoder.getPosition();
@@ -216,7 +227,7 @@ public class TTSwerveModule implements SwerveModule {
             return motorAngleRadians;
         }
 
-        public double getAbsoluteAngle(){
+        public double getAbsoluteAngle() {
             return absoluteEncoder.getAbsoluteAngle();
         }
     }
@@ -248,34 +259,11 @@ public class TTSwerveModule implements SwerveModule {
             return encoder.getVelocity();
         }
 
-        // @Override
-        // public REVLibError setPositionConversionFactor(double factor) {
-        //     // TODO Auto-generated method stub
-        //     return REVLibError.kNotImplemented;
-        // }
-
-        // @Override
-        // public double getPositionConversionFactor() {
-        //     // TODO Auto-generated method stub
-        //     return 0;
-        // }
-
-        // @Override
-        // public REVLibError setVelocityConversionFactor(double factor) {
-        //     // TODO Auto-generated method stub
-        //     return REVLibError.kNotImplemented;
-        // }
-
-        // @Override
-        // public double getVelocityConversionFactor() {
-        //     // TODO Auto-generated method stub
-        //     return 0;
-        // }
 
         public REVLibError setInverted(boolean inverted) {
-            if( ErrorCode.OK == encoder.configSensorDirection(inverted)){
+            if (ErrorCode.OK == encoder.configSensorDirection(inverted)) {
                 return REVLibError.kOk;
-            } else { 
+            } else {
                 return REVLibError.kError;
             }
         }
@@ -286,24 +274,25 @@ public class TTSwerveModule implements SwerveModule {
 
         // @Override
         // public REVLibError setAverageDepth(int depth) {
-        //     // TODO Auto-generated method stub
-        //     return REVLibError.kNotImplemented;
+        // // TODO Auto-generated method stub
+        // return REVLibError.kNotImplemented;
         // }
 
         // @Override
         // public int getAverageDepth() {
-        //     // TODO Auto-generated method stub
-        //     return 0;
+        // // TODO Auto-generated method stub
+        // return 0;
         // }
 
         // @Override
         // public REVLibError setZeroOffset(double offset) {
-        //     return ErrorCode.OK == encoder.configMagnetOffset(offset) ? REVLibError.kOk : REVLibError.kError;
+        // return ErrorCode.OK == encoder.configMagnetOffset(offset) ? REVLibError.kOk :
+        // REVLibError.kError;
         // }
 
         // @Override
         // public double getZeroOffset() {
-        //     return encoder.configGetMagnetOffset();
+        // return encoder.configGetMagnetOffset();
         // }
     }
 
@@ -311,9 +300,6 @@ public class TTSwerveModule implements SwerveModule {
         CLOCKWISE,
         COUNTER_CLOCKWISE
     }
-
-
-
 
     @Override
     public double getDriveVelocity() {
@@ -325,15 +311,15 @@ public class TTSwerveModule implements SwerveModule {
         return mSteerController.getStateAngle();
     }
 
-    @Override
-    public void set(double driveVoltage, double steerAngle) {
+    public void setSteerAngle(double steerAngle) {
         steerAngle %= (2.0 * Math.PI);
         if (steerAngle < 0.0) {
             steerAngle += 2.0 * Math.PI;
         }
 
         double difference = steerAngle - getSteerAngle();
-        // Change the target angle so the difference is in the range [-pi, pi) instead of [0, 2pi)
+        // Change the target angle so the difference is in the range [-pi, pi) instead
+        // of [0, 2pi)
         if (difference >= Math.PI) {
             steerAngle -= 2.0 * Math.PI;
         } else if (difference < -Math.PI) {
@@ -341,12 +327,14 @@ public class TTSwerveModule implements SwerveModule {
         }
         difference = steerAngle - getSteerAngle(); // Recalculate difference
 
-        // If the difference is greater than 90 deg or less than -90 deg the drive can be inverted so the total
+        // If the difference is greater than 90 deg or less than -90 deg the drive can
+        // be inverted so the total
         // movement of the module is less than 90 deg
         if (difference > Math.PI / 2.0 || difference < -Math.PI / 2.0) {
-            // Only need to add 180 deg here because the target angle will be put back into the range [0, 2pi)
+            // Only need to add 180 deg here because the target angle will be put back into
+            // the range [0, 2pi)
             steerAngle += Math.PI;
-            driveVoltage *= -1.0;
+            mDriveController.invert();
         }
 
         // Put the target angle back into the range [0, 2pi)
@@ -355,23 +343,34 @@ public class TTSwerveModule implements SwerveModule {
             steerAngle += 2.0 * Math.PI;
         }
 
-        mDriveController.setReferenceVoltage(driveVoltage);
         mSteerController.setReferenceAngle(steerAngle);
-    }    
+    }
 
-    public double getAbsoluteAngle(){
+    @Override
+    public void set(double driveVoltage, double steerAngle) {
+
+        setSteerAngle(steerAngle);
+        mDriveController.setReferenceVoltage(driveVoltage);
+    }
+
+    public void setVelocity(double driveVelocity, double steerAngle){
+                setSteerAngle(steerAngle);
+                mDriveController.setVelocity(driveVelocity);
+    }
+
+    public double getAbsoluteAngle() {
         return mSteerController.getAbsoluteAngle();
     }
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            mDriveController.encoder.getPosition(),
-            new Rotation2d(getSteerAngle()));
+                mDriveController.encoder.getPosition(),
+                new Rotation2d(getSteerAngle()));
     }
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-            mDriveController.getStateVelocity(),
-            new Rotation2d(getSteerAngle()));
+                mDriveController.getStateVelocity(),
+                new Rotation2d(getSteerAngle()));
     }
 }

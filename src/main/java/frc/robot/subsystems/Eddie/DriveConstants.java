@@ -24,4 +24,8 @@ public class DriveConstants {
     
         public static final int DRIVETRAIN_DX_SENSOR = 0;
         public static final double kMaxSpeedMetersPerSecond = 4.0;
+        public static final double drivingVelocityFeedForward = 0.2;
+        public static final double kP = 0.04;
+        public static final double kI = 0;
+        public static final double kD = 0;
 }

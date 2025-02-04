@@ -65,9 +65,9 @@ public class RobotContainer {
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
-    m_startPosChooser.addOption("Left +30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(30.0)));
+    m_startPosChooser.addOption("Center Blue", new Pose2d(0.5, 4.0, Rotation2d.fromDegrees(0.0)));
     m_startPosChooser.addOption("Right -30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(-30.0)));
-   // m_shuffleboardTab.add("Start Position", m_startPosChooser);
+    SmartDashboard.putData("Auton Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
