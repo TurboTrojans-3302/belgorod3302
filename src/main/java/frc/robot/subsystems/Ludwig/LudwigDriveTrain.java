@@ -104,6 +104,8 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
 
   @Override
   public void periodic() {
+    setMaxSpeed();
+
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getAngle()),
@@ -232,7 +234,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return m_odometry.getPoseMeters().getRotation().getDegrees();
+    return m_odometry.getPoseMeters().getRotation().getDegrees(); //todo why isn't this readind the gyro?
   }
 
   /**

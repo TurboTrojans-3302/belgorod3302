@@ -29,7 +29,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SerialPort;
@@ -163,6 +162,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     @Override
     public void periodic() {
+        setMaxSpeed();
+
         // Get the rotation of the robot from the gyro.
         var gyroAngle = Rotation2d.fromRadians(getAngleRad());
 
@@ -200,7 +201,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= MAX_ROTATION;
-        driveFieldOriented(new Translation2d(x, y), rotation);
+        driveFieldOriented(translation, rotation);
     }   
 
 
@@ -208,7 +209,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= MAX_ROTATION;
-        driveRobotOriented(new Translation2d(x, y), rotation);
+        driveRobotOriented(translation, rotation);
     }   
 
     
