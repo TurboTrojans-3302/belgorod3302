@@ -40,6 +40,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public static final double TRACKWIDTH = 19.5 * 0.0254; //distance between the left and right wheels
     public static final double WHEELBASE = 23.5 * 0.0254; //front to back distance
     public static final double MAX_SPEED = 5.0; // m/s 
+    public static final double MAX_ROTATION = 4.0;
     public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
     private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(209.787-180.0);
@@ -181,7 +182,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void driveFieldOriented(Double x, Double y, Double rotation){
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
-        rotation *= 2.0 / Math.hypot(WHEELBASE, TRACKWIDTH);
+        rotation *= MAX_ROTATION;
         driveFieldOriented(new Translation2d(x, y), rotation);
     }   
 
@@ -189,7 +190,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void driveRobotOriented(Double x, Double y, Double rotation){
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
-        rotation *= 2.0 / Math.hypot(WHEELBASE, TRACKWIDTH);
+        rotation *= MAX_ROTATION;
         driveRobotOriented(new Translation2d(x, y), rotation);
     }   
 

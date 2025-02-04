@@ -39,13 +39,13 @@ public class TeleopDrive extends Command {
 
     if(m_driverController.getRightBumperButton()) {
       m_robotDrive.driveRobotOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
         stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
+        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
         stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
     } else {
       m_robotDrive.driveFieldOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
         stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
+        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
         stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
     }
     
