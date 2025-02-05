@@ -21,20 +21,25 @@ public class DriveToAprilTag extends Command {
   DriveSubsystem m_drive;
   int m_targetTag;
   boolean targetFound = false;
+  boolean translationFinished = false;
   RawFiducial detectedTarget;
-
+  Pose3d targetPose; //relative to target
+  double ySpeedRobot = 0.0;
+ 
   public static final double TurnTolerance = 1.5;
   public static final double TurnFactor = 1.0;
   public static final double ForwardSpeed = 0.2;
+  public static final double SidewaysSpeed = 0.2;
   public static final double TargetDistance = 0.09; //meters
+  public static final double alignmentTolerance = 0.25; // for x-direction camera pose in relation to target
 
   /** Creates a new TurnToAprilTag. */
   public DriveToAprilTag(DriveSubsystem drive, int apriltag) {
     m_drive = drive;
     m_targetTag = apriltag;
-    
     addRequirements(m_drive);
     // Use addRequirements() here to declare subsystem dependencies.
+    
   }
 
   // Called when the command is initially scheduled.
@@ -55,16 +60,31 @@ public class DriveToAprilTag extends Command {
         
     }
 
-    m_drive.driveHeadingRobot(new Translation2d(ForwardSpeed, 0.0), heading);
+    //camera coordinates use X for left and right, unlike the translation which uses Y
+    if (getX() > alignmentTolerance){
+      //if camera is to the right of target
+      ySpeedRobot = -SidewaysSpeed;
+    } else if (getX() < -alignmentTolerance){
+      //to the left
+      ySpeedRobot = SidewaysSpeed;
+    } else {
+      //within tolerance
+      ySpeedRobot = 0.0;
+      translationFinished = true;
+
+    }
+
+    m_drive.driveHeadingRobot(new Translation2d(ForwardSpeed, ySpeedRobot), heading);
     SmartDashboard.putNumber("Target Angle", getAngleToTarget());
     SmartDashboard.putNumber("Commanded heading", heading);
     SmartDashboard.putNumber("Target Distance", getDistance());
+    SmartDashboard.putNumber("x alignment to target", getX());
     SmartDashboard.putBoolean("Target Found", isTargetFound());
 
 
 
   }
-  
+ 
 
   // Called once the command ends or is interrupted.
   @Override
@@ -73,7 +93,12 @@ public class DriveToAprilTag extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() { 
-    return m_drive.getDistanceToObjectMeters() < TargetDistance; 
+    if ((m_drive.getDistanceToObjectMeters() < TargetDistance) && translationFinished){
+      return true;
+    } else {
+      return false;
+    }
+    
   }
 
   boolean isTargetFound() {
@@ -84,11 +109,20 @@ public class DriveToAprilTag extends Command {
     return LimelightHelpers.getTX(cameraName);
   }
 
+
+
   public double getDistance(){
-    Pose3d targetPose = LimelightHelpers.getTargetPose3d_CameraSpace(cameraName);
+    targetPose = LimelightHelpers.getTargetPose3d_CameraSpace(cameraName);
     double distance = targetPose.getTranslation().getNorm();
     System.out.println("Distance:" + distance);
    
     return distance;
+  }
+
+  //positive x in a camera pose means camera is to the right of the tag
+  public double getX(){
+    targetPose = LimelightHelpers.getTargetPose3d_CameraSpace(cameraName);
+    return targetPose.getX();
+
   }
 }
