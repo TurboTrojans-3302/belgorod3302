@@ -216,9 +216,13 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return MathUtil.clamp(speed / MAX_SPEED, -1.0, 1.0) * 12.0;
     }
 
-    public void drive(ChassisSpeeds speeds) {
+    public void drive(ChassisSpeeds speeds){
+        drive(speeds, Translation2d.kZero);
+    }
 
-        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+    public void drive(ChassisSpeeds speeds, Translation2d centerOfRotationMeters) {
+
+        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds, centerOfRotationMeters);
         frontLeftModule.set(speedToVoltage(states[0].speedMetersPerSecond), states[0].angle.getRadians());
         frontRightModule.set(speedToVoltage(states[1].speedMetersPerSecond), states[1].angle.getRadians());
         backLeftModule.set(speedToVoltage(states[2].speedMetersPerSecond), states[2].angle.getRadians());
@@ -348,4 +352,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return DriveConstants.kMaxSpeedMetersPerSecond;
     }
 
+    public void orbit(double orbitSpeed) {
+        final Translation2d center = new Translation2d(1.0, 0.0);
+        drive(new ChassisSpeeds(0, 0, orbitSpeed), center);
+    }
 }

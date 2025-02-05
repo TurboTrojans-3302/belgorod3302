@@ -31,24 +31,26 @@ public class TeleopDrive extends Command {
   @Override
   public void execute() {
     double speedScale;
-    if (m_driverController.getRightTriggerAxis() < 0.5) {
-      speedScale = 1;
-    } else {
+    if (m_driverController.getLeftBumperButton()) {
       speedScale = 0.5;
-    }
-
-    if(m_driverController.getRightBumperButton()) {
-      m_robotDrive.driveRobotOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
     } else {
-      m_robotDrive.driveFieldOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+      speedScale = 1.0;
     }
     
+    double forward = stick2speed(speedScale * -1.0 * m_driverController.getLeftY());
+    double leftward = stick2speed(speedScale * -1.0 * m_driverController.getLeftX());
+    double rotate = stick2speed(speedScale * -1.0 * m_driverController.getRightX());
+
+    if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
+      double orbitSpeed = stick2speed(speedScale * (m_driverController.getLeftTriggerAxis() - m_driverController.getRightTriggerAxis()));
+      m_robotDrive.orbit(orbitSpeed);
+    } else {
+      if(m_driverController.getRightBumperButton()) {
+        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
+      } else {
+        m_robotDrive.driveFieldOriented(forward, leftward, rotate);
+      }
+    }
   }
 
   // applies deadband and scaling to raw stick value
