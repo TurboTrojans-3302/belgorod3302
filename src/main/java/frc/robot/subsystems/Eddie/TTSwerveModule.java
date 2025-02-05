@@ -92,7 +92,7 @@ public class TTSwerveModule implements SwerveModule {
             CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 100, 250), "Failed to configure CANCoder update rate");
     
             EncoderImplementation absoluteEncoder = new EncoderImplementation(encoder);
-            absoluteEncoder.setInverted(true);
+            absoluteEncoder.setInverted(true); //TODO does this need to be fixed too?
     
             
             EncoderConfig steerEncoderConfig = new EncoderConfig();

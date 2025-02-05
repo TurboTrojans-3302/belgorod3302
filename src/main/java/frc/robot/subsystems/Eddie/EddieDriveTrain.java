@@ -107,7 +107,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
             DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
             BACK_RIGHT_ANGLE_OFFSET);
 
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(//TODO this look flipped front/back
             new Translation2d(-WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left
             new Translation2d(-WHEELBASE / 2.0, -TRACKWIDTH / 2.0), // front right
             new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // back left
