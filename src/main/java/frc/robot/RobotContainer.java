@@ -17,6 +17,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TestDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -56,7 +57,8 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
+    //m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
+    m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
 
     //m_shuffleboardTab = Shuffleboard.getTab("Game");

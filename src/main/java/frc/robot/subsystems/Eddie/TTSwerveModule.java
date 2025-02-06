@@ -207,7 +207,9 @@ public class TTSwerveModule implements SwerveModule {
                 motor.getClosedLoopController().setReference(adjustedReferenceAngleRadians, ControlType.kPosition);
             }
     
-    
+            public void testSetAngleRadians(double angleRadians){
+                motor.getClosedLoopController().setReference(angleRadians, ControlType.kPosition);
+            }
     
             @Override
             public double getStateAngle() {
@@ -252,30 +254,7 @@ public class TTSwerveModule implements SwerveModule {
                 return encoder.getVelocity();
             }
     
-            // @Override
-            // public REVLibError setPositionConversionFactor(double factor) {
-            //     // TODO Auto-generated method stub
-            //     return REVLibError.kNotImplemented;
-            // }
-    
-            // @Override
-            // public double getPositionConversionFactor() {
-            //     // TODO Auto-generated method stub
-            //     return 0;
-            // }
-    
-            // @Override
-            // public REVLibError setVelocityConversionFactor(double factor) {
-            //     // TODO Auto-generated method stub
-            //     return REVLibError.kNotImplemented;
-            // }
-    
-            // @Override
-            // public double getVelocityConversionFactor() {
-            //     // TODO Auto-generated method stub
-            //     return 0;
-            // }
-    
+  
             public REVLibError setInverted(boolean inverted) {
                 if( ErrorCode.OK == encoder.configSensorDirection(inverted)){
                     return REVLibError.kOk;
@@ -288,27 +267,6 @@ public class TTSwerveModule implements SwerveModule {
                 return encoder.configGetSensorDirection();
             }
     
-            // @Override
-            // public REVLibError setAverageDepth(int depth) {
-            //     // TODO Auto-generated method stub
-            //     return REVLibError.kNotImplemented;
-            // }
-    
-            // @Override
-            // public int getAverageDepth() {
-            //     // TODO Auto-generated method stub
-            //     return 0;
-            // }
-    
-            // @Override
-            // public REVLibError setZeroOffset(double offset) {
-            //     return ErrorCode.OK == encoder.configMagnetOffset(offset) ? REVLibError.kOk : REVLibError.kError;
-            // }
-    
-            // @Override
-            // public double getZeroOffset() {
-            //     return encoder.configGetMagnetOffset();
-            // }
         }
     
         public enum Direction {
@@ -381,5 +339,10 @@ public class TTSwerveModule implements SwerveModule {
         return new SwerveModuleState(
             mDriveController.getStateVelocity(),
             new Rotation2d(getSteerAngle()));
+    }
+
+    public void testSet(double voltage, double angleRadians){
+        mDriveController.setReferenceVoltage(voltage);
+        mSteerController.testSetAngleRadians(angleRadians);
     }
 }

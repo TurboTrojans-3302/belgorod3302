@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -186,11 +187,11 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
-  public void setAll(double speed, double angle) {
-    m_frontLeft.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(angle)));
-    m_frontRight.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(angle)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(angle)));
-    m_rearRight.setDesiredState(new SwerveModuleState(speed, Rotation2d.fromDegrees(angle)));
+  public void testSetAll(double voltage, double angle) {
+    m_frontLeft.testSet(voltage, angle);
+    m_frontRight.testSet(voltage, angle);
+    m_rearLeft.testSet(voltage, angle);
+    m_rearRight.testSet(voltage, angle);
   }
 
   /**
@@ -235,13 +236,12 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  public double getSpeed() {
-    ChassisSpeeds chassisSpeeds = DriveConstants.kinematics.toChassisSpeeds(
-        m_frontLeft.getState(),
-        m_frontRight.getState(),
-        m_rearLeft.getState(),
-        m_rearRight.getState());
-    return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  public ChassisSpeeds getChassisSpeeds(){
+    return DriveConstants.kinematics.toChassisSpeeds(
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState());
   }
 
   public void setP(double val) {

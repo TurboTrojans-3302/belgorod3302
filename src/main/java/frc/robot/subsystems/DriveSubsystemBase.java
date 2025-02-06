@@ -69,7 +69,7 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract double getTurnRate();
 
-    public abstract double getSpeed();
+    public abstract ChassisSpeeds getChassisSpeeds();
 
     public abstract Double getDistanceToObjectMeters();
 
@@ -115,6 +115,16 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     public void driveRobotOriented(Translation2d translation, double rotation) {
         ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), -translation.getY(), rotation);
         drive(speeds);
+    }
+
+    public double getSpeed() {
+        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
+        return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+      }
+    
+      public Translation2d getVelocityVector() {
+        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
+        return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
 }
