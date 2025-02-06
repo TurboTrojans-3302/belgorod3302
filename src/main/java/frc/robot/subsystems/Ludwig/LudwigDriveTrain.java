@@ -8,6 +8,7 @@ import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -91,16 +92,15 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     headingPidController.setTolerance(2.0);
 
     // Odometry class for tracking robot pose
-    mOdometry = new SwerveDriveOdometry(
+    mOdometry = new SwerveDrivePoseEstimator(
         DriveConstants.kinematics,
         Rotation2d.fromDegrees(m_gyro.getAngle()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-
-        });
+            m_rearRight.getPosition() },
+            defaultStartPosition);
   }
 
   @Override

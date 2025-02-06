@@ -4,11 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,12 +16,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 /** Add your docs here. */
 public abstract class DriveSubsystemBase extends SubsystemBase {
 
+    public static final Pose2d defaultStartPosition = new Pose2d(Translation2d.kZero, Rotation2d.kZero);
+
     private double m_maxSpeed = 0.0;
 
-    protected SwerveDriveOdometry mOdometry;
+    //todo upload the field map to the camera?
+    protected SwerveDrivePoseEstimator mOdometry;
 
     public Pose2d getPose() {
-        return mOdometry.getPoseMeters();
+        return mOdometry.getEstimatedPosition();
     }
 
     public void updateOdometry(SwerveModulePosition[] positions) {

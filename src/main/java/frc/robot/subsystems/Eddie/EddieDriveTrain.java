@@ -19,12 +19,11 @@ import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -33,6 +32,9 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
@@ -42,7 +44,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     public static final double MAX_SPEED = 5.0; // m/s
     public static final double MAX_ROTATION = 4.0;
-    public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
     private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(209.787 - 180.0);
     private static final double FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(151.43);
@@ -98,6 +99,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     private final AHRS ahrs = new AHRS(SerialPort.Port.kUSB);
 
+    private Timer stillTime = new Timer();
+
     // dashboard stuff
     DoublePublisher speedPub;
     DoublePublisher headingPub;
@@ -110,7 +113,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
         ahrs.reset();
 
-        mOdometry = new SwerveDriveOdometry(
+        mOdometry = new SwerveDrivePoseEstimator(
                 DriveConstants.kinematics, Rotation2d.fromRadians(getAngleRad()),
                 new SwerveModulePosition[] {
                         frontLeftModule.getPosition(),
@@ -153,6 +156,20 @@ public class EddieDriveTrain extends DriveSubsystemBase {
                 frontLeftModule.getPosition(), frontRightModule.getPosition(),
                 backLeftModule.getPosition(), backRightModule.getPosition()
         });
+
+        if(Math.abs(getSpeed()) > 1e-6 && Math.abs(getTurnRate()) > 1e-6) {
+            stillTime.restart();
+        }
+
+        //todo is this necessary? to wait for a still interval before getting a vision estimate?
+        if(stillTime.get() > 0.5){
+            PoseEstimate est = LimelightHelpers.getBotPoseEstimate_wpiBlue("limeLight");
+            //todo choose the coordinate system (red/blue)
+            //todo is this necessary? how often is the estimate invalid?
+            if(LimelightHelpers.validPoseEstimate(est)){
+                mOdometry.addVisionMeasurement(est.pose, est.timestampSeconds);
+            }
+        }
 
         speedPub.set(getSpeed());
         maxSpeedPub.set(getMaxSpeed());
