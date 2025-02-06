@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.utils.SwerveUtils;
 
@@ -67,7 +68,8 @@ public class GoToCommand extends Command {
       Rotation2d dest_rotation = m_drive.getPose().getRotation().plus(m_delta.getRotation());
       m_dest = new Pose2d(dest_translation, dest_rotation);
     }
-    System.out.println("Starting go to: " + m_dest + " from: " + m_drive.getPose());
+    System.out.println("Starting go to: " + m_dest);
+    RobotContainer.getInstance().m_field.getObject("dest").setPose(m_dest);
   }
 
   private Translation2d translation2dest(){
@@ -83,10 +85,16 @@ public class GoToCommand extends Command {
   }
 
   private double speedTowardTarget(){
-    Double botDirection = m_drive.getVelocityVector().getAngle().getRadians();
-    Double targetDirection = translation2dest().getAngle().getRadians();
-    Double difference = targetDirection - botDirection;
+    Translation2d botDirection = m_drive.getVelocityVector();
+    Translation2d targetDirection = translation2dest();
 
+    if(botDirection.getNorm() <= 1e-6) {
+      return 0.0;
+    } else if(targetDirection.getNorm() <= 1e-6){
+      return -m_drive.getSpeed();
+    }
+
+    Double difference = targetDirection.getAngle().getRadians() - botDirection.getAngle().getRadians();
     return m_drive.getSpeed() * Math.cos(difference);
   }
   
