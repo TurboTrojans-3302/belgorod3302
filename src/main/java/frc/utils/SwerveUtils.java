@@ -66,6 +66,21 @@ public class SwerveUtils {
     }
 
     /**
+     * Finds the (unsigned) minimum difference between two angles including calculating across 0.
+     * @param _angleA An angle (in degrees).
+     * @param _angleB An angle (in degrees).
+     * @return The (unsigned) minimum difference between the two angles (in radians).
+     */
+    public static double angleDeltaDeg(double src, double dest) {
+        double delta = (dest - src) % 360.0;
+        if (Math.abs(delta) > 180) {
+            delta = delta - (Math.signum(delta) * 360);
+        }
+        return delta;
+    }
+
+
+    /**
      * Wraps an angle until it lies within the range from 0 to 2*PI (exclusive).
      * @param _angle The angle (in radians) to wrap.  Can be positive or negative and can lie multiple wraps outside the output range.
      * @return An angle (in radians) from 0 and 2*PI (exclusive).

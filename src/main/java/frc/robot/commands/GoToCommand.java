@@ -13,25 +13,28 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.utils.SwerveUtils;
 
 public class GoToCommand extends Command {
 
   private final double DISTANCE_TOLERANCE = 0.050;
   private final double HEADING_TOLERANCE = 2.0;
+  private final double dT = Robot.kDefaultPeriod;
 
   private Pose2d m_dest;
   private Transform2d m_delta;
   private DriveSubsystem m_drive;
-  private TrapezoidProfile m_trapezoid = new TrapezoidProfile(new Constraints(Constants.DriveConstants.kMaxSpeedMetersPerSecond  / 2.0,
-                                                       Constants.DriveConstants.kMaxSpeedMetersPerSecond )); //todo use full speed;
-  private State m_goal = new State(0.0, 0.0);
-  private double m_startTimeMillis;
+  private TrapezoidProfile m_trapezoid;
   private boolean m_relativeFlag;
 
   private GoToCommand(DriveSubsystem drive){
     m_drive = drive;
     addRequirements(m_drive);
+    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedLimit() * 0.5,
+                                                       m_drive.getMaxSpeedLimit() * 1.0 )); //todo use full speed;
   }
 
   public GoToCommand(DriveSubsystem drive, Pose2d dest){
@@ -59,13 +62,14 @@ public class GoToCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_startTimeMillis = System.currentTimeMillis();
+
     if(m_relativeFlag){
       Translation2d dest_translation = m_delta.getTranslation();
       Rotation2d dest_rotation = m_drive.getPose().getRotation().plus(m_delta.getRotation());
       m_dest = new Pose2d(dest_translation, dest_rotation);
     }
     System.out.println("Starting go to: " + m_dest);
+    RobotContainer.getInstance().m_field.getObject("dest").setPose(m_dest);
   }
 
   private Translation2d translation2dest(){
@@ -77,23 +81,38 @@ public class GoToCommand extends Command {
   }
 
   private double deltaHeading(){
-    return translation2dest().getAngle().getDegrees();
+    return SwerveUtils.angleDeltaDeg(m_drive.getHeading(), m_dest.getRotation().getDegrees());
   }
 
-  private double calculateSpeed(){
-    State currentState = new State(distance(), m_drive.getSpeed());
-    return -m_trapezoid.calculate(t(), currentState, m_goal).velocity;
-  }
+  private double speedTowardTarget(){
+    Translation2d botDirection = m_drive.getVelocityVector();
+    Translation2d targetDirection = translation2dest();
 
+    if(botDirection.getNorm() <= 1e-6) {
+      return 0.0;
+    } else if(targetDirection.getNorm() <= 1e-6){
+      return -m_drive.getSpeed();
+    }
+
+    Double difference = targetDirection.getAngle().getRadians() - botDirection.getAngle().getRadians();
+    return m_drive.getSpeed() * Math.cos(difference);
+  }
+  
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double speed = calculateSpeed();
+    //System.out.println("Speed: " + m_drive.getSpeed() + " translation2dest(): " + translation2dest());
+
+    State currentState = new State(0.0, speedTowardTarget());
+    State goalState = new State(distance(), 0.0);
+    
+    double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
+
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
     double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
 
 
-    m_drive.drive(unitTranslation.times(speed), turn);
+    m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }
 
   // Called once the command ends or is interrupted.
@@ -109,7 +128,5 @@ public class GoToCommand extends Command {
     return distance() < DISTANCE_TOLERANCE && 
            Math.abs(deltaHeading()) < HEADING_TOLERANCE;
   }
-
-  private double t(){ return (System.currentTimeMillis() - m_startTimeMillis) / 1000.0; }
 
 }
