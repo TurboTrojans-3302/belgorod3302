@@ -7,16 +7,18 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.DriveToAprilTag;
+import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.commands.DriveToAprilTag;
 
  
 
@@ -27,9 +29,13 @@ import frc.robot.commands.DriveToAprilTag;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  private static RobotContainer instance;
+
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  
+  public Field2d m_field = new Field2d();
+
   //private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
@@ -44,6 +50,8 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    instance = this;
+    
     // Configure the button bindings
     configureButtonBindings();
 
@@ -58,6 +66,8 @@ public class RobotContainer {
     m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
     m_autonomousChooser.addOption("turn to april tag 11", new TurnToAprilTag(m_robotDrive, 11));
     m_autonomousChooser.addOption("Drive to april tag 1", new DriveToAprilTag(m_robotDrive, 1));
+    m_autonomousChooser.addOption("GoTo 1, 0, 0", GoToCommand.absolute(m_robotDrive, 1.0, 0, 0));
+    m_autonomousChooser.addOption("GoTo 1, 1, 0", GoToCommand.absolute(m_robotDrive, 1.0, 1.0, 0));
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
@@ -71,6 +81,9 @@ public class RobotContainer {
 
   }
 
+  public static RobotContainer getInstance() { return instance; }
+
+  
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by

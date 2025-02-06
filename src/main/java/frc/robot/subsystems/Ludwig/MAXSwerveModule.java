@@ -14,12 +14,11 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-//missing file
-import frc.robot.Configs;
 
-public class MAXSwerveModule {
+public class MAXSwerveModule implements SwerveModule {
   private final SparkMax m_drivingSpark;
   private final SparkMax m_turningSpark;
 
@@ -112,13 +111,29 @@ public class MAXSwerveModule {
     m_drivingEncoder.setPosition(0);
   }
 
-  //replacement for the original get instance function???
-public static MAXSwerveModule getInstance(int drivingID, int turningID, double chassisAngularOffset){
+  // replacement for the original get instance function???
+  public static MAXSwerveModule getInstance(int drivingID, int turningID, double chassisAngularOffset) {
 
-  MAXSwerveModule m_swerveModule = new MAXSwerveModule(drivingID, turningID, chassisAngularOffset);
+    MAXSwerveModule m_swerveModule = new MAXSwerveModule(drivingID, turningID, chassisAngularOffset);
 
-  return m_swerveModule;
+    return m_swerveModule;
 
-}
-  
+  }
+
+  @Override
+  public double getDriveVelocity() {
+    return m_drivingEncoder.getVelocity();
+  }
+
+  @Override
+  public double getSteerAngle() {
+    return getPosition().angle.getRadians();
+  }
+
+  @Override
+  public void set(double voltage, double steerAngle) {
+    m_drivingSpark.setVoltage(voltage);
+    m_turningClosedLoopController.setReference(steerAngle, ControlType.kPosition);
+  }
+
 }

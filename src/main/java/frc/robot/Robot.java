@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -68,6 +69,9 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    m_robotContainer.m_field.setRobotPose(m_robotContainer.m_robotDrive.getPose());
+    SmartDashboard.putData("Field", m_robotContainer.m_field);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -87,9 +91,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     setLED(LEDmode.Auton);
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    System.out.println("Auton: " + m_autonomousCommand.getName());
     m_robotContainer.setStartPosition();
+    System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_robotDrive.getPose());
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    System.out.println("Starting command: " + m_autonomousCommand.getName());
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
