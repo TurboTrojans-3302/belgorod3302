@@ -19,14 +19,14 @@ import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -35,6 +35,9 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
@@ -42,8 +45,6 @@ import frc.robot.subsystems.DriveSubsystemBase;
  */
 public class EddieDriveTrain extends DriveSubsystemBase {
 
-    public static final double TRACKWIDTH = 19.5 * 0.0254; // distance between the left and right wheels
-    public static final double WHEELBASE = 23.5 * 0.0254; // front to back distance
     public static final double MAX_SPEED = 5.0; // m/s
     public static final double MAX_ROTATION = 4.0;
     public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
@@ -55,16 +56,10 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     private static final double BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(-342.33);
     private static final double kPgain = 0.080;
     private static final double kDgain = 0;
-    public double FLcommandedAngle;
-    public double BLcommandedAngle;
-    public double BRcommandedAngle;
-    public double FRcommandedAngle;
 
     private LaserCan dxSensor = new LaserCan(DriveConstants.DRIVETRAIN_DX_SENSOR);
 
     private static EddieDriveTrain m_instance;
-
-    private SwerveDriveOdometry mOdometry;
 
     ModuleConfiguration rightSideConfiguration = new ModuleConfiguration(
             0.10033,
@@ -107,15 +102,9 @@ public class EddieDriveTrain extends DriveSubsystemBase {
             DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
             BACK_RIGHT_ANGLE_OFFSET);
 
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(//TODO this look flipped front/back
-            new Translation2d(-WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left
-            new Translation2d(-WHEELBASE / 2.0, -TRACKWIDTH / 2.0), // front right
-            new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // back left
-            new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0) // back right
-    );
-
     private final AHRS ahrs = new AHRS(SerialPort.Port.kUSB);
-    private Pose2d m_pose;
+
+    private Timer stillTime = new Timer();
 
     // dashboard stuff
     DoublePublisher speedPub;
@@ -129,8 +118,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
         ahrs.reset();
 
-        mOdometry = new SwerveDriveOdometry(
-                kinematics, Rotation2d.fromRadians(getAngleRad()),
+        mOdometry = new SwerveDrivePoseEstimator(
+                DriveConstants.kinematics, Rotation2d.fromRadians(getAngleRad()),
                 new SwerveModulePosition[] {
                         frontLeftModule.getPosition(),
                         frontRightModule.getPosition(),
@@ -165,15 +154,27 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     @Override
     public void periodic() {
-        // Get the rotation of the robot from the gyro.
-        var gyroAngle = Rotation2d.fromRadians(getAngleRad());
+        setMaxSpeed();
 
         // Update the pose
-        m_pose = mOdometry.update(gyroAngle,
-                new SwerveModulePosition[] {
-                        frontLeftModule.getPosition(), frontRightModule.getPosition(),
-                        backLeftModule.getPosition(), backRightModule.getPosition()
-                });
+        updateOdometry(new SwerveModulePosition[] {
+                frontLeftModule.getPosition(), frontRightModule.getPosition(),
+                backLeftModule.getPosition(), backRightModule.getPosition()
+        });
+
+        if(Math.abs(getSpeed()) > 1e-6 && Math.abs(getTurnRate()) > 1e-6) {
+            stillTime.restart();
+        }
+
+        //todo is this necessary? to wait for a still interval before getting a vision estimate?
+        if(stillTime.get() > 0.5){
+            PoseEstimate est = LimelightHelpers.getBotPoseEstimate_wpiBlue("limeLight");
+            //todo choose the coordinate system (red/blue)
+            //todo is this necessary? how often is the estimate invalid?
+            if(LimelightHelpers.validPoseEstimate(est)){
+                mOdometry.addVisionMeasurement(est.pose, est.timestampSeconds);
+            }
+        }
 
         speedPub.set(getSpeed());
         maxSpeedPub.set(getMaxSpeed());
@@ -203,14 +204,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         });
     }
 
-    public Pose2d getPose() {
-        return m_pose;
-    }
-
-    public void setPose(Pose2d pose) {
-        m_pose = pose;
-    }
-
     public double turnToHeading(double heading) {
         double angle = getHeading();
         double currentAngularRate = getAngularRateDegPerSec();
@@ -223,14 +216,14 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= MAX_ROTATION;
-        driveFieldOriented(new Translation2d(x, y), rotation);
+        driveFieldOriented(translation, rotation);
     }
 
     public void driveRobotOriented(Double x, Double y, Double rotation) {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
         rotation *= MAX_ROTATION;
-        driveRobotOriented(new Translation2d(x, y), rotation);
+        driveRobotOriented(translation, rotation);
     }
 
     private double speedToVoltage(double speed) {
@@ -239,16 +232,12 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     public void drive(ChassisSpeeds speeds) {
 
-        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+        SwerveModuleState[] states = DriveConstants.kinematics.toSwerveModuleStates(speeds);
         frontLeftModule.set(speedToVoltage(states[0].speedMetersPerSecond), states[0].angle.getRadians());
         frontRightModule.set(speedToVoltage(states[1].speedMetersPerSecond), states[1].angle.getRadians());
         backLeftModule.set(speedToVoltage(states[2].speedMetersPerSecond), states[2].angle.getRadians());
         backRightModule.set(speedToVoltage(states[3].speedMetersPerSecond), states[3].angle.getRadians());
 
-        FLcommandedAngle = states[0].angle.getDegrees();
-        FRcommandedAngle = states[1].angle.getDegrees();
-        BLcommandedAngle = states[2].angle.getDegrees();
-        BRcommandedAngle = states[3].angle.getDegrees();
     }
 
     public void setAll(double speed, double angleRadians) {
@@ -266,8 +255,8 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return ahrs.getPitch();
     }
 
-    public double getHeading() {
-        return -ahrs.getAngle();
+    public double getGyroAngleRadians() {
+        return MathUtil.angleModulus(Units.degreesToRadians(-ahrs.getAngle()));
     }
 
     public double getTurnRate() {
@@ -317,7 +306,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public ChassisSpeeds getChassisSpeeds() {
-        return kinematics.toChassisSpeeds(
+        return DriveConstants.kinematics.toChassisSpeeds(
                 frontLeftModule.getState(),
                 frontRightModule.getState(),
                 backLeftModule.getState(),

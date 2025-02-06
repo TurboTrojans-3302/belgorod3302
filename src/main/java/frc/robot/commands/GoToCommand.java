@@ -33,8 +33,8 @@ public class GoToCommand extends Command {
   private GoToCommand(DriveSubsystem drive){
     m_drive = drive;
     addRequirements(m_drive);
-    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedLimit()  / 2.0,
-                                                       m_drive.getMaxSpeedLimit())); //todo use full speed;
+    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedLimit() * 0.5,
+                                                       m_drive.getMaxSpeedLimit() * 1.0 )); //todo use full speed;
   }
 
   public GoToCommand(DriveSubsystem drive, Pose2d dest){
@@ -101,12 +101,13 @@ public class GoToCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //System.out.println("Speed: " + m_drive.getSpeed() + " translation2dest(): " + translation2dest());
 
     State currentState = new State(0.0, speedTowardTarget());
     State goalState = new State(distance(), 0.0);
     
     double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
-  
+
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
     double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
 
