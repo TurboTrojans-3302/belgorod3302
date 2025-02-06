@@ -6,7 +6,9 @@ package frc.robot.subsystems.Ludwig;
 
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,16 +16,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.CalibrationTime;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.SPI;
 import frc.robot.subsystems.DriveSubsystemBase;
 
-
-public class LudwigDriveTrain extends DriveSubsystemBase  {
+public class LudwigDriveTrain extends DriveSubsystemBase {
   private LaserCan dxSensor = new LaserCan(DriveConstants.kDXSensorCanId);
-  
+
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = MAXSwerveModule.getInstance(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -68,6 +70,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
   private double m_currentTranslationDir = 0.0;
+
   public double getM_currentTranslationDir() {
     return m_currentTranslationDir;
   }
@@ -78,28 +81,26 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
     return m_currentTranslationMag;
   }
 
-  // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_gyro.getAngle()),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-
-      });
-
-
   private PIDController headingPidController;
 
   /** Creates a new DriveSubsystem. */
   public LudwigDriveTrain() {
     headingPidController = new PIDController(DriveConstants.headingP,
-                                             DriveConstants.headingI,
-                                             DriveConstants.headingD);
+        DriveConstants.headingI,
+        DriveConstants.headingD);
     headingPidController.enableContinuousInput(0.0, 360.0);
     headingPidController.setTolerance(2.0);
+
+    // Odometry class for tracking robot pose
+    mOdometry = new SwerveDrivePoseEstimator(
+        DriveConstants.kinematics,
+        Rotation2d.fromDegrees(m_gyro.getAngle()),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition() },
+            defaultStartPosition);
   }
 
   @Override
@@ -107,8 +108,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
     setMaxSpeed();
 
     // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
+    updateOdometry(
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -118,14 +118,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
 
   }
 
-  /**
-   * Returns the currently-estimated pose of the robot.
-   *
-   * @return The pose.
-   */
-  public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
-  }
 
   /**
    * Resets the odometry to the specified pose.
@@ -133,7 +125,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
+    mOdometry.resetPosition(
         Rotation2d.fromDegrees(m_gyro.getAngle()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
@@ -144,12 +136,12 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
         pose);
   }
 
-  public double turnToHeading(double targetHeading){
+  public double turnToHeading(double targetHeading) {
     double currentHeading = getHeading();
     double rotation = headingPidController.calculate(currentHeading, targetHeading);
     return rotation;
   }
-  
+
   public void driveRobotOriented(Double xSpeed, Double ySpeed, Double rot) {
 
     // Convert the commanded speeds into the correct units for the drivetrain
@@ -158,7 +150,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
-    
+
     drive(speeds);
   }
 
@@ -169,14 +161,14 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
-    ChassisSpeeds speeds =  ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(getHeading()));
-    
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
+        Rotation2d.fromDegrees(getHeading()));
+
     drive(speeds);
   }
-  
+
   public void drive(ChassisSpeeds speeds) {
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+    var swerveModuleStates = DriveConstants.kinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
@@ -228,14 +220,11 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
     m_gyro.reset();
   }
 
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
-  public double getHeading() {
-    return m_odometry.getPoseMeters().getRotation().getDegrees(); //todo why isn't this readind the gyro?
+  
+  public double getGyroAngleRadians() {
+    return MathUtil.angleModulus(Units.degreesToRadians(m_gyro.getAngle()));
   }
+
 
   /**
    * Returns the turn rate of the robot.
@@ -246,25 +235,33 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  public double getSpeed(){
-    ChassisSpeeds chassisSpeeds =  DriveConstants.kDriveKinematics.toChassisSpeeds(
-                                          m_frontLeft.getState(),
-                                          m_frontRight.getState(),
-                                          m_rearLeft.getState(),
-                                          m_rearRight.getState());
+  public double getSpeed() {
+    ChassisSpeeds chassisSpeeds = DriveConstants.kinematics.toChassisSpeeds(
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState());
     return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
   }
 
-  public void setP(double val){ headingPidController.setP(val); }
-  public void setI(double val){ headingPidController.setI(val); }
-  public void setD(double val){ headingPidController.setD(val); }
+  public void setP(double val) {
+    headingPidController.setP(val);
+  }
 
-  public Double getDistanceToObjectMeters(){
+  public void setI(double val) {
+    headingPidController.setI(val);
+  }
+
+  public void setD(double val) {
+    headingPidController.setD(val);
+  }
+
+  public Double getDistanceToObjectMeters() {
     Measurement m = dxSensor.getMeasurement();
     return m.distance_mm * 0.001;
   }
 
-  public boolean distanceMeasurmentGood(){
+  public boolean distanceMeasurmentGood() {
     Measurement m = dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
@@ -276,13 +273,13 @@ public class LudwigDriveTrain extends DriveSubsystemBase  {
 
   public void stop() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0.0,
-                                                      Rotation2d.fromRadians(Math.PI/4)));
+        Rotation2d.fromRadians(Math.PI / 4)));
     m_frontRight.setDesiredState(new SwerveModuleState(0.0,
-                                                      Rotation2d.fromRadians(-Math.PI/4)));
+        Rotation2d.fromRadians(-Math.PI / 4)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0.0,
-                                                      Rotation2d.fromRadians(-Math.PI/4)));
+        Rotation2d.fromRadians(-Math.PI / 4)));
     m_rearRight.setDesiredState(new SwerveModuleState(0.0,
-                                                      Rotation2d.fromRadians(Math.PI/4)));
-}
+        Rotation2d.fromRadians(Math.PI / 4)));
+  }
 
 }
