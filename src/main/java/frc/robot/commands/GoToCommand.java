@@ -118,7 +118,7 @@ public class GoToCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drive.setAll(0.0, 0.0);
+    m_drive.stop();
     System.out.println("End go to: " + m_drive.getPose());
   }
 

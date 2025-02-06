@@ -24,7 +24,7 @@ public class TeleopDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_robotDrive.setAll(0, 0);
+    m_robotDrive.stop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
