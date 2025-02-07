@@ -46,7 +46,16 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     //DataLogManager.start();
-    CanBridge.runTCP();
+    //CanBridge.runTCP();
+
+    LimelightHelpers.setCameraPose_RobotSpace(Constants.LimelightConstants.name,
+                                              Constants.LimelightConstants.Offset.forward,
+                                              Constants.LimelightConstants.Offset.side,
+                                              Constants.LimelightConstants.Offset.up,
+                                              Constants.LimelightConstants.Offset.roll,
+                                              Constants.LimelightConstants.Offset.pitch,
+                                              Constants.LimelightConstants.Offset.yaw
+                                            );
   }
 
   /**

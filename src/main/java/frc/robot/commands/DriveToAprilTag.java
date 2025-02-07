@@ -106,7 +106,10 @@ public class DriveToAprilTag extends Command {
   }
 
   Double getAngleToTarget() {
-    return LimelightHelpers.getTX(cameraName);
+    Translation2d target = LimelightHelpers.getTargetPose3d_RobotSpace(cameraName)
+                                           .getTranslation()
+                                           .toTranslation2d();
+    return target.getAngle().getDegrees();
   }
 
 
