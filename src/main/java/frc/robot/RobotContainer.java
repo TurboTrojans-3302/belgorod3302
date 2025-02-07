@@ -16,11 +16,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
+import frc.robot.commands.MoveElevator;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
-
- 
+import frc.robot.subsystems.Elevator;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -34,9 +34,13 @@ public class RobotContainer {
 
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final Elevator m_elevator = new Elevator(Constants.ElevatorConstants.kLeftMotorElevatorCanId,
+      Constants.ElevatorConstants.kRightMotorElevatorCanId,
+      Constants.ElevatorConstants.kElevatorHighLimitSwitchId,
+      Constants.ElevatorConstants.kElevatorLowLimitSwitchId);
   public Field2d m_field = new Field2d();
 
-  //private final ShuffleboardTab m_shuffleboardTab;
+  // private final ShuffleboardTab m_shuffleboardTab;
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
 
@@ -51,16 +55,15 @@ public class RobotContainer {
    */
   public RobotContainer() {
     instance = this;
-    
+
     // Configure the button bindings
     configureButtonBindings();
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
 
+    // m_shuffleboardTab = Shuffleboard.getTab("Game");
 
-    //m_shuffleboardTab = Shuffleboard.getTab("Game");
-    
     m_autonomousChooser = new SendableChooser<Command>();
     m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
     m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
@@ -74,16 +77,16 @@ public class RobotContainer {
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
     m_startPosChooser.addOption("Left +30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(30.0)));
     m_startPosChooser.addOption("Right -30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(-30.0)));
-   // m_shuffleboardTab.add("Start Position", m_startPosChooser);
+    // m_shuffleboardTab.add("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
-
   }
 
-  public static RobotContainer getInstance() { return instance; }
+  public static RobotContainer getInstance() {
+    return instance;
+  }
 
-  
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -103,16 +106,18 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    
-    
-    // new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-    //     .whileTrue(new RunCommand(() -> {
-    //                                       if(m_harvester.getArmAngle() > 90){
-    //                                           m_harvester.setIntakeSpeed(Constants.harvesterConstants.outSpeed);
-    //                                       }else{
-    //                                           m_harvester.setIntakeSpeed(Constants.harvesterConstants.outSpeedSlow);
-    //                                       }
-    //                                     }, m_harvester));                             
+    new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+
   }
 
   /**
