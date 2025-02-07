@@ -61,10 +61,10 @@ public class DriveToAprilTag extends Command {
     }
 
     //camera coordinates use X for left and right, unlike the translation which uses Y
-    if (getX() > alignmentTolerance){
+    if (getZ() > alignmentTolerance){
       //if camera is to the right of target
       ySpeedRobot = -SidewaysSpeed;
-    } else if (getX() < -alignmentTolerance){
+    } else if (getZ() < -alignmentTolerance){
       //to the left
       ySpeedRobot = SidewaysSpeed;
     } else {
@@ -78,7 +78,7 @@ public class DriveToAprilTag extends Command {
     SmartDashboard.putNumber("Target Angle", getAngleToTarget());
     SmartDashboard.putNumber("Commanded heading", heading);
     SmartDashboard.putNumber("Target Distance", getDistance());
-    SmartDashboard.putNumber("x alignment to target", getX());
+    SmartDashboard.putNumber("z alignment to target - radians", getZ());
     SmartDashboard.putBoolean("Target Found", isTargetFound());
 
 
@@ -120,9 +120,10 @@ public class DriveToAprilTag extends Command {
   }
 
   //positive x in a camera pose means camera is to the right of the tag
-  public double getX(){
-    targetPose = LimelightHelpers.getTargetPose3d_CameraSpace(cameraName);
-    return targetPose.getX();
+  //todo configure the camera space offset
+  public double getZ(){
+    targetPose = LimelightHelpers.getTargetPose3d_RobotSpace(cameraName);
+    return targetPose.getRotation().getZ(); //radians
 
   }
 }
