@@ -33,9 +33,9 @@ public class DriveConstants {
         public static final double kMaxSpeedMetersPerSecond = 4.0;
 
         public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-                        new Translation2d(-WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left
-                        new Translation2d(-WHEELBASE / 2.0, -TRACKWIDTH / 2.0), // front right
-                        new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // back left
-                        new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0) // back right
+                        new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left
+                        new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0), // front right
+                        new Translation2d(-WHEELBASE / 2.0, TRACKWIDTH / 2.0), // back left
+                        new Translation2d(-WHEELBASE / 2.0, -TRACKWIDTH / 2.0) // back right
         );
 }
