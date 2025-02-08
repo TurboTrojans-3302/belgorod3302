@@ -55,10 +55,10 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
     // TODO Calibrate these angle offsets if necessary
-    private static final double FRONT_LEFT_ANGLE_OFFSET = Math.toRadians(-29.787);
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = Math.toRadians(-151.43);
-    private static final double BACK_LEFT_ANGLE_OFFSET = Math.toRadians(-123.485);
-    private static final double BACK_RIGHT_ANGLE_OFFSET = Math.toRadians(-342.33);
+    private static final double FRONT_LEFT_ANGLE_OFFSET =  -Math.toRadians((329.59 - 360));
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(207.0 );
+    private static final double BACK_LEFT_ANGLE_OFFSET =   -Math.toRadians(54.58 - 180);
+    private static final double BACK_RIGHT_ANGLE_OFFSET =  -Math.toRadians(19.07);
     private static final double kPgain = 0.080;
     private static final double kDgain = 0;
 
@@ -147,6 +147,28 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         headingPub = tagsTable.getDoubleTopic("Heading").publish();
         dxPub = tagsTable.getDoubleTopic("DX Sensor").publish();
         dxGoodPub = tagsTable.getBooleanTopic("DX Good").publish();
+
+        // SmartDashboard.putData("Swerve Drive", new Sendable() {
+        //     @Override
+        //     public void initSendable(SendableBuilder builder) {
+        //         builder.setSmartDashboardType("SwerveDrive");
+
+        //         builder.addDoubleProperty("Front Left Angle", () -> frontLeftModule.getSteerAngle(), null);
+        //         builder.addDoubleProperty("Front Left Velocity", () -> frontLeftModule.getDriveVelocity(), null);
+
+        //         builder.addDoubleProperty("Front Right Angle", () -> frontRightModule.getSteerAngle(), null);
+        //         builder.addDoubleProperty("Front Right Velocity", () -> frontRightModule.getDriveVelocity(), null);
+
+        //         builder.addDoubleProperty("Back Left Angle", () -> backLeftModule.getSteerAngle(), null);
+        //         builder.addDoubleProperty("Back Left Velocity", () -> backLeftModule.getDriveVelocity(), null);
+
+        //         builder.addDoubleProperty("Back Right Angle", () -> backRightModule.getSteerAngle(), null);
+        //         builder.addDoubleProperty("Back Right Velocity", () -> backRightModule.getDriveVelocity(), null);
+
+        //         builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
+        //     }
+        // });
+
     }
 
     public static EddieDriveTrain getInstance() {
@@ -186,32 +208,17 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         headingPub.set(getHeading());
         dxGoodPub.set(distanceMeasurmentGood());
         dxPub.set(getDistanceToObjectMeters());
+        SmartDashboard.putString("Pose", getPose().toString());
 
-        SmartDashboard.putData("Swerve Drive", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.setSmartDashboardType("SwerveDrive");
 
-                builder.addDoubleProperty("Front Left Angle", () -> frontLeftModule.getSteerAngle(), null);
-                builder.addDoubleProperty("Front Left Velocity", () -> frontLeftModule.getDriveVelocity(), null);
-
-                builder.addDoubleProperty("Front Right Angle", () -> frontRightModule.getSteerAngle(), null);
-                builder.addDoubleProperty("Front Right Velocity", () -> frontRightModule.getDriveVelocity(), null);
-
-                builder.addDoubleProperty("Back Left Angle", () -> backLeftModule.getSteerAngle(), null);
-                builder.addDoubleProperty("Back Left Velocity", () -> backLeftModule.getDriveVelocity(), null);
-
-                builder.addDoubleProperty("Back Right Angle", () -> backRightModule.getSteerAngle(), null);
-                builder.addDoubleProperty("Back Right Velocity", () -> backRightModule.getDriveVelocity(), null);
-
-                builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
-            }
-        });
-
-        SmartDashboard.putNumber("FL Abs Angle", frontLeftModule.getAbsoluteAngle());
-        SmartDashboard.putNumber("FR Abs Angle", frontRightModule.getAbsoluteAngle());
-        SmartDashboard.putNumber("BL Abs Angle", backLeftModule.getAbsoluteAngle());
-        SmartDashboard.putNumber("BR Abs Angle", backRightModule.getAbsoluteAngle());
+        // SmartDashboard.putNumber("FL abs Angle", Math.toDegrees(frontLeftModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("FR abs Angle", Math.toDegrees(frontRightModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("BL abs Angle", Math.toDegrees(backLeftModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("BR abs Angle", Math.toDegrees(backRightModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("FL rel Angle", Math.toDegrees(frontLeftModule.getSteerAngle()));
+        // SmartDashboard.putNumber("FR rel Angle", Math.toDegrees(frontRightModule.getSteerAngle()));
+        // SmartDashboard.putNumber("BL rel Angle", Math.toDegrees(backLeftModule.getSteerAngle()));
+        // SmartDashboard.putNumber("BR rel Angle", Math.toDegrees(backRightModule.getSteerAngle()));
     }
 
     public double turnToHeading(double heading) {
