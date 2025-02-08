@@ -57,6 +57,7 @@ public class RobotContainer {
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
+    //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
 
     //m_shuffleboardTab = Shuffleboard.getTab("Game");

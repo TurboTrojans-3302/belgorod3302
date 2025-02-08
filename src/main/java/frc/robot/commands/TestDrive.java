@@ -31,8 +31,8 @@ public class TestDrive extends Command {
   @Override
   public void execute() {
     Translation2d command = new Translation2d(
-      -m_driverController.getLeftY(),
-      -m_driverController.getLeftX()
+      -m_driverController.getLeftY() * 0.2,
+      -m_driverController.getLeftX() * 0.2
     );
 
     m_robotDrive.testSetAll(12 * command.getNorm(), command.getAngle().getRadians());
