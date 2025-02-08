@@ -24,7 +24,7 @@ public class TeleopDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_robotDrive.setAll(0, 0);
+    m_robotDrive.stop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,12 +40,12 @@ public class TeleopDrive extends Command {
     if(m_driverController.getRightBumperButton()) {
       m_robotDrive.driveRobotOriented(
         stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
+        stick2speed(speedScale *  1.0 * m_driverController.getLeftX()),
         stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
     } else {
       m_robotDrive.driveFieldOriented(
         stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
+        stick2speed(speedScale *  1.0 * m_driverController.getLeftX()),
         stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
     }
     
