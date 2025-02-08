@@ -71,14 +71,14 @@ public class EddieDriveTrain extends DriveSubsystemBase {
             (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
             true,
             (9.0 / 24.0) * (14.0 / 72.0),
-            true);
+            false);
 
     ModuleConfiguration leftSideConfiguration = new ModuleConfiguration(
             0.10033,
             (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
             false,
             (9.0 / 24.0) * (14.0 / 72.0),
-            true);
+            false);
 
     private final TTSwerveModule frontLeftModule = new TTSwerveModule(
             leftSideConfiguration,
@@ -122,7 +122,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         m_instance = this;
 
         ahrs.reset();
-
+        calibrateSterrRelativeEncoder();
         mOdometry = new SwerveDrivePoseEstimator(
                 DriveConstants.kinematics, Rotation2d.fromRadians(getGyroAngleRadians()),
                 new SwerveModulePosition[] {
