@@ -12,12 +12,14 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.commands.GoToCommand;
 
 public class Navigation extends SubsystemBase {
   private static final String cameraName = "limelight";
@@ -82,6 +84,16 @@ public class Navigation extends SubsystemBase {
   public boolean dxMeasurmentGood() {
     Measurement m = m_dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
+  }
+
+  public Pose2d getTagPose2d(int tagId) {
+    return m_fieldLayout.getTagPose(tagId).get().toPose2d();
+  }
+
+  public Pose2d getPose2dInFrontOfTag(int tagId) {
+    Transform2d delta = new Transform2d(0.5, 0.0, Rotation2d.fromDegrees(180.0));
+    Pose2d tagPose = getTagPose2d(tagId);
+    return tagPose.plus(delta);
   }
 
 }

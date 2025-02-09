@@ -44,6 +44,10 @@ public class GoToCommand extends Command {
     m_relativeFlag = false;
   }
 
+  public static GoToCommand absolute(DriveSubsystem drive, Navigation nav, Pose2d dest) {
+    return new GoToCommand(drive, nav, dest);
+  }
+
   public static GoToCommand absolute(DriveSubsystem drive, Navigation nav, double x, double y, double heading) {
     Pose2d dest = new Pose2d(x, y, Rotation2d.fromDegrees(heading));
     return new GoToCommand(drive, nav, dest);
@@ -53,7 +57,7 @@ public class GoToCommand extends Command {
     Transform2d delta = new Transform2d(x, y, Rotation2d.fromDegrees(theta));
     return new GoToCommand(drive, nav, delta);
   }
-
+  
   public GoToCommand(DriveSubsystem drive, Navigation nav, Transform2d delta) {
     this(drive, nav);
     m_delta = delta;

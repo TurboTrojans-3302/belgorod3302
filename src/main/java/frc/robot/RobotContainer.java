@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
@@ -62,8 +63,8 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
     //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
-
-    //m_shuffleboardTab = Shuffleboard.getTab("Game");
+    Command oneMeterTurnRight = GoToCommand.relative(m_robotDrive, m_nav, 1.0, 0, -90);
+    Command oneMeterSquare = oneMeterTurnRight.andThen(oneMeterTurnRight).andThen(oneMeterTurnRight).andThen(oneMeterTurnRight);
     
     m_autonomousChooser = new SendableChooser<Command>();
     m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
@@ -72,13 +73,20 @@ public class RobotContainer {
     m_autonomousChooser.addOption("Drive to april tag 1", new DriveToAprilTag(m_robotDrive, m_nav, 1));
     m_autonomousChooser.addOption("GoTo 1, 0, 0", GoToCommand.absolute(m_robotDrive, m_nav, 1.0, 0, 0));
     m_autonomousChooser.addOption("GoTo 1, 1, 0", GoToCommand.absolute(m_robotDrive, m_nav, 1.0, 1.0, 0));
+    m_autonomousChooser.addOption("Nav to tag 10", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(10)));
+    m_autonomousChooser.addOption("Nav to tag 17", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(17)));
+    m_autonomousChooser.addOption("Nav to tag 18", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(18)));
+    m_autonomousChooser.addOption("Nav to tag 19", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(19)));
+    m_autonomousChooser.addOption("one meter square", oneMeterSquare);
+
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
-    m_startPosChooser.addOption("Left +30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(30.0)));
-    m_startPosChooser.addOption("Right -30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(-30.0)));
-   // m_shuffleboardTab.add("Start Position", m_startPosChooser);
+    m_startPosChooser.addOption("Left IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.leftIceCream);
+    m_startPosChooser.addOption("Middle IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.middleIceCream);
+    m_startPosChooser.addOption("Right IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.rightIceCream);
+    SmartDashboard.putData("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
