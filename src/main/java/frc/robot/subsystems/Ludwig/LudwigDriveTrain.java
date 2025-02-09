@@ -4,17 +4,11 @@
 
 package frc.robot.subsystems.Ludwig;
 
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -25,7 +19,6 @@ import edu.wpi.first.wpilibj.SPI;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 public class LudwigDriveTrain extends DriveSubsystemBase {
-  private LaserCan dxSensor = new LaserCan(DriveConstants.kDXSensorCanId);
 
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = MAXSwerveModule.getInstance(
@@ -91,50 +84,12 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
         DriveConstants.headingD);
     headingPidController.enableContinuousInput(0.0, 360.0);
     headingPidController.setTolerance(2.0);
-
-    // Odometry class for tracking robot pose
-    mOdometry = new SwerveDrivePoseEstimator(
-        DriveConstants.kinematics,
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition() },
-            defaultStartPosition);
   }
 
   @Override
   public void periodic() {
     setMaxSpeed();
 
-    // Update the odometry in the periodic block
-    updateOdometry(
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
-
-  }
-
-
-  /**
-   * Resets the odometry to the specified pose.
-   *
-   * @param pose The pose to which to set the odometry.
-   */
-  public void resetOdometry(Pose2d pose) {
-    mOdometry.resetPosition(
-        Rotation2d.fromDegrees(m_gyro.getAngle()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
-        pose);
   }
 
   public double turnToHeading(double targetHeading) {
@@ -221,11 +176,9 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_gyro.reset();
   }
 
-  
   public double getGyroAngleRadians() {
     return MathUtil.angleModulus(Units.degreesToRadians(m_gyro.getAngle()));
   }
-
 
   /**
    * Returns the turn rate of the robot.
@@ -236,12 +189,12 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  public ChassisSpeeds getChassisSpeeds(){
+  public ChassisSpeeds getChassisSpeeds() {
     return DriveConstants.kinematics.toChassisSpeeds(
-      m_frontLeft.getState(),
-      m_frontRight.getState(),
-      m_rearLeft.getState(),
-      m_rearRight.getState());
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState());
   }
 
   public void setP(double val) {
@@ -254,16 +207,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
 
   public void setD(double val) {
     headingPidController.setD(val);
-  }
-
-  public Double getDistanceToObjectMeters() {
-    Measurement m = dxSensor.getMeasurement();
-    return m.distance_mm * 0.001;
-  }
-
-  public boolean distanceMeasurmentGood() {
-    Measurement m = dxSensor.getMeasurement();
-    return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 
   @Override
@@ -280,6 +223,20 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
         Rotation2d.fromRadians(-Math.PI / 4)));
     m_rearRight.setDesiredState(new SwerveModuleState(0.0,
         Rotation2d.fromRadians(Math.PI / 4)));
+  }
+
+  @Override
+  public SwerveModulePosition[] getSwerveModulePositions() {
+    return new SwerveModulePosition[] { m_frontLeft.getPosition(),
+                                        m_frontRight.getPosition(),
+                                        m_rearLeft.getPosition(),
+                                        m_rearRight.getPosition()
+                                      };
+  };
+
+  @Override
+  public SwerveDriveKinematics getKinematics() {
+    return DriveConstants.kinematics;
   }
 
 }

@@ -15,15 +15,10 @@ package frc.robot.subsystems.Eddie;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 
-import au.grapplerobotics.ConfigurationFailedException;
-import au.grapplerobotics.LaserCan;
-import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -31,13 +26,8 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.LimelightHelpers;
-import frc.robot.LimelightHelpers.PoseEstimate;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
@@ -52,17 +42,16 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     public static final double MAX_SPEED = 5.0; // m/s
     public static final double MAX_ROTATION = 4.0;
-    public static final Pose2d defaultStartPosition = new Pose2d(0, 0, Rotation2d.fromDegrees(0));
 
-    // TODO Calibrate these angle offsets if necessary
-    private static final double FRONT_LEFT_ANGLE_OFFSET =  -Math.toRadians((329.59 - 360));
-    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(207.0 );
-    private static final double BACK_LEFT_ANGLE_OFFSET =   -Math.toRadians(54.58 - 180);
-    private static final double BACK_RIGHT_ANGLE_OFFSET =  -Math.toRadians(19.07);
+    private final SwerveDriveKinematics kinematics = DriveConstants.kinematics;
+
+    private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians((329.59 - 360));
+    private static final double FRONT_RIGHT_ANGLE_OFFSET = -Math.toRadians(207.0);
+    private static final double BACK_LEFT_ANGLE_OFFSET = -Math.toRadians(54.58 - 180);
+    private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(19.07);
     private static final double kPgain = 0.080;
     private static final double kDgain = 0;
 
-    private LaserCan dxSensor = new LaserCan(DriveConstants.DRIVETRAIN_DX_SENSOR);
 
     private static EddieDriveTrain m_instance;
 
@@ -123,50 +112,41 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
         ahrs.reset();
         calibrateSterrRelativeEncoder();
-        mOdometry = new SwerveDrivePoseEstimator(
-                DriveConstants.kinematics, Rotation2d.fromRadians(getGyroAngleRadians()),
-                new SwerveModulePosition[] {
-                        frontLeftModule.getPosition(),
-                        frontRightModule.getPosition(),
-                        backLeftModule.getPosition(),
-                        backRightModule.getPosition()
-                }, defaultStartPosition);
-
-        try {
-            dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
-            dxSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
-            dxSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
-        } catch (ConfigurationFailedException e) {
-            System.out.println("LaserCan Configuration failed! " + e);
-        }
 
         // dashboard stuff
         NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("DriveTrain");
         speedPub = tagsTable.getDoubleTopic("Speed").publish();
         maxSpeedPub = tagsTable.getDoubleTopic("MaxSpeed").publish();
         headingPub = tagsTable.getDoubleTopic("Heading").publish();
-        dxPub = tagsTable.getDoubleTopic("DX Sensor").publish();
-        dxGoodPub = tagsTable.getBooleanTopic("DX Good").publish();
 
+        // todo add the swerve drive to the dashboard
         // SmartDashboard.putData("Swerve Drive", new Sendable() {
-        //     @Override
-        //     public void initSendable(SendableBuilder builder) {
-        //         builder.setSmartDashboardType("SwerveDrive");
+        // @Override
+        // public void initSendable(SendableBuilder builder) {
+        // builder.setSmartDashboardType("SwerveDrive");
 
-        //         builder.addDoubleProperty("Front Left Angle", () -> frontLeftModule.getSteerAngle(), null);
-        //         builder.addDoubleProperty("Front Left Velocity", () -> frontLeftModule.getDriveVelocity(), null);
+        // builder.addDoubleProperty("Front Left Angle", () ->
+        // frontLeftModule.getSteerAngle(), null);
+        // builder.addDoubleProperty("Front Left Velocity", () ->
+        // frontLeftModule.getDriveVelocity(), null);
 
-        //         builder.addDoubleProperty("Front Right Angle", () -> frontRightModule.getSteerAngle(), null);
-        //         builder.addDoubleProperty("Front Right Velocity", () -> frontRightModule.getDriveVelocity(), null);
+        // builder.addDoubleProperty("Front Right Angle", () ->
+        // frontRightModule.getSteerAngle(), null);
+        // builder.addDoubleProperty("Front Right Velocity", () ->
+        // frontRightModule.getDriveVelocity(), null);
 
-        //         builder.addDoubleProperty("Back Left Angle", () -> backLeftModule.getSteerAngle(), null);
-        //         builder.addDoubleProperty("Back Left Velocity", () -> backLeftModule.getDriveVelocity(), null);
+        // builder.addDoubleProperty("Back Left Angle", () ->
+        // backLeftModule.getSteerAngle(), null);
+        // builder.addDoubleProperty("Back Left Velocity", () ->
+        // backLeftModule.getDriveVelocity(), null);
 
-        //         builder.addDoubleProperty("Back Right Angle", () -> backRightModule.getSteerAngle(), null);
-        //         builder.addDoubleProperty("Back Right Velocity", () -> backRightModule.getDriveVelocity(), null);
+        // builder.addDoubleProperty("Back Right Angle", () ->
+        // backRightModule.getSteerAngle(), null);
+        // builder.addDoubleProperty("Back Right Velocity", () ->
+        // backRightModule.getDriveVelocity(), null);
 
-        //         builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
-        //     }
+        // builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
+        // }
         // });
 
     }
@@ -183,42 +163,30 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void periodic() {
         setMaxSpeed();
 
-        // Update the pose
-        updateOdometry(new SwerveModulePosition[] {
-                frontLeftModule.getPosition(), frontRightModule.getPosition(),
-                backLeftModule.getPosition(), backRightModule.getPosition()
-        });
-
-        if(Math.abs(getSpeed()) > 1e-6 && Math.abs(getTurnRate()) > 1e-6) {
+        if (Math.abs(getSpeed()) > 1e-6 && Math.abs(getTurnRate()) > 1e-6) {
             stillTime.restart();
         }
 
-        //todo is this necessary? to wait for a still interval before getting a vision estimate?
-        if(stillTime.get() > 0.5){
-            PoseEstimate est = LimelightHelpers.getBotPoseEstimate_wpiBlue("limeLight");
-            //todo choose the coordinate system (red/blue)
-            //todo is this necessary? how often is the estimate invalid?
-            if(LimelightHelpers.validPoseEstimate(est)){
-                mOdometry.addVisionMeasurement(est.pose, est.timestampSeconds);
-            }
-        }
 
         speedPub.set(getSpeed());
         maxSpeedPub.set(getMaxSpeed());
         headingPub.set(getHeading());
-        dxGoodPub.set(distanceMeasurmentGood());
-        dxPub.set(getDistanceToObjectMeters());
-        SmartDashboard.putString("Pose", getPose().toString());
-
-
-        // SmartDashboard.putNumber("FL abs Angle", Math.toDegrees(frontLeftModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("FR abs Angle", Math.toDegrees(frontRightModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("BL abs Angle", Math.toDegrees(backLeftModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("BR abs Angle", Math.toDegrees(backRightModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("FL rel Angle", Math.toDegrees(frontLeftModule.getSteerAngle()));
-        // SmartDashboard.putNumber("FR rel Angle", Math.toDegrees(frontRightModule.getSteerAngle()));
-        // SmartDashboard.putNumber("BL rel Angle", Math.toDegrees(backLeftModule.getSteerAngle()));
-        // SmartDashboard.putNumber("BR rel Angle", Math.toDegrees(backRightModule.getSteerAngle()));
+        // SmartDashboard.putNumber("FL abs Angle",
+        // Math.toDegrees(frontLeftModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("FR abs Angle",
+        // Math.toDegrees(frontRightModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("BL abs Angle",
+        // Math.toDegrees(backLeftModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("BR abs Angle",
+        // Math.toDegrees(backRightModule.getAbsoluteAngle()));
+        // SmartDashboard.putNumber("FL rel Angle",
+        // Math.toDegrees(frontLeftModule.getSteerAngle()));
+        // SmartDashboard.putNumber("FR rel Angle",
+        // Math.toDegrees(frontRightModule.getSteerAngle()));
+        // SmartDashboard.putNumber("BL rel Angle",
+        // Math.toDegrees(backLeftModule.getSteerAngle()));
+        // SmartDashboard.putNumber("BR rel Angle",
+        // Math.toDegrees(backRightModule.getSteerAngle()));
     }
 
     public double turnToHeading(double heading) {
@@ -314,7 +282,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public ChassisSpeeds getChassisSpeeds() {
-        return DriveConstants.kinematics.toChassisSpeeds(
+        return kinematics.toChassisSpeeds(
                 frontLeftModule.getState(),
                 frontRightModule.getState(),
                 backLeftModule.getState(),
@@ -325,31 +293,22 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         stop();
     }
 
-    public void resetOdometry(Pose2d pose) {
-        mOdometry.resetPosition(
-                Rotation2d.fromDegrees(getHeading()),
-                new SwerveModulePosition[] {
-                        frontLeftModule.getPosition(),
-                        frontRightModule.getPosition(),
-                        backLeftModule.getPosition(),
-                        backRightModule.getPosition()
-                },
-                pose);
-    }
-
-    public Double getDistanceToObjectMeters() {
-        Measurement m = dxSensor.getMeasurement();
-        return m.distance_mm * 0.001;
-    }
-
-    public boolean distanceMeasurmentGood() {
-        Measurement m = dxSensor.getMeasurement();
-        return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
-    }
-
     @Override
     public double getMaxSpeedLimit() {
         return DriveConstants.kMaxSpeedMetersPerSecond;
+    }
+
+    @Override
+    public SwerveModulePosition[] getSwerveModulePositions() {
+        return new SwerveModulePosition[]{ frontLeftModule.getPosition(),
+                                           frontRightModule.getPosition(),
+                                           backLeftModule.getPosition(),
+                                           backRightModule.getPosition()};
+    }
+
+    @Override
+    public SwerveDriveKinematics getKinematics() {
+        return kinematics;
     }
 
 }

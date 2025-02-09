@@ -29,7 +29,6 @@ public class DriveConstants {
         public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER = 11;
         public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 5;
 
-        public static final int DRIVETRAIN_DX_SENSOR = 0;
         public static final double kMaxSpeedMetersPerSecond = 4.0;
 
         public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(

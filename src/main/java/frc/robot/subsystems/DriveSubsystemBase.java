@@ -4,11 +4,11 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,15 +21,7 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     private double m_maxSpeed = 0.0;
 
     //todo upload the field map to the camera?
-    protected SwerveDrivePoseEstimator mOdometry;
 
-    public Pose2d getPose() {
-        return mOdometry.getEstimatedPosition();
-    }
-
-    public void updateOdometry(SwerveModulePosition[] positions) {
-        mOdometry.update(Rotation2d.fromDegrees(getHeading()), positions);
-    }
 
     /**
      * X and Y directions are relative to the robot
@@ -71,13 +63,11 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract ChassisSpeeds getChassisSpeeds();
 
-    public abstract Double getDistanceToObjectMeters();
-
-    public abstract boolean distanceMeasurmentGood();
-
-    public abstract void resetOdometry(Pose2d pose);
-
     public abstract double getMaxSpeedLimit();
+
+    public abstract SwerveModulePosition[] getSwerveModulePositions();
+
+    public abstract SwerveDriveKinematics getKinematics();
 
     public double getMaxSpeed() {
         return m_maxSpeed;

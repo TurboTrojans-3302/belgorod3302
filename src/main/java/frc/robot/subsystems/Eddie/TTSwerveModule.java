@@ -31,8 +31,6 @@ import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import static com.swervedrivespecialties.swervelib.rev.RevUtils.checkNeoError;
 
 
-//TODO Confirm that both Relative and Absolute encoders are CCW+
-
 @SuppressWarnings("deprecation")
 public class TTSwerveModule implements SwerveModule {
 
