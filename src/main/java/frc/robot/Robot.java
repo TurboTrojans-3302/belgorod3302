@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -28,11 +26,21 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+  private static Robot instance;
+  public static DriverStation.Alliance alliance;
+
   private Command m_autonomousCommand;
-  
+
   private RobotContainer m_robotContainer;
 
-  
+  Robot(double period) {
+    super(period);
+    instance = this;
+  }
+
+  public static Robot getInstance() {
+    return instance;
+  }
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -45,7 +53,7 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    //DataLogManager.start();
+    // DataLogManager.start();
     CanBridge.runTCP();
     m_robotContainer.m_robotDrive.calibrateSterrRelativeEncoder();
   }
@@ -83,6 +91,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+
+    Optional<Alliance> a = DriverStation.getAlliance();
+    if (a.isPresent()) {
+      alliance = a.get();
+    }
   }
 
   /**
@@ -123,17 +136,15 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-   
 
-    if(30.0 > DriverStation.getMatchTime() && DriverStation.getMatchTime() > 29.0){
+    if (30.0 > DriverStation.getMatchTime() && DriverStation.getMatchTime() > 29.0) {
       m_robotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 1.0);
       m_robotContainer.m_copilotController.setRumble(RumbleType.kBothRumble, 1.0);
-    }else{
+    } else {
       m_robotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 0.0);
       m_robotContainer.m_copilotController.setRumble(RumbleType.kBothRumble, 0.0);
     }
-    
-        
+
   }
 
   @Override
@@ -144,7 +155,8 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   private enum LEDmode {
     Auton,
@@ -154,23 +166,20 @@ public class Robot extends TimedRobot {
   }
 
   Map<Alliance, Map<LEDmode, Double>> ledPatternMap = Map.of(
-    Alliance.Red, Map.of(
-      LEDmode.Auton, REVBlinkinLED.Pattern.COLOR1_LARSON_SCANNER,
-      LEDmode.Teleop, REVBlinkinLED.Pattern.SOLID_RED,
-      LEDmode.HaveNote, REVBlinkinLED.Pattern.COLOR1_HEARTBEAT_MEDIUM,
-      LEDmode.Ready2Shoot, REVBlinkinLED.Pattern.COLOR1_HEARTBEAT_FAST
-    ),
-    Alliance.Blue, Map.of(
-      LEDmode.Auton, REVBlinkinLED.Pattern.COLOR2_LARSON_SCANNER,
-      LEDmode.Teleop, REVBlinkinLED.Pattern.SOLID_BLUE,
-      LEDmode.HaveNote, REVBlinkinLED.Pattern.COLOR2_HEARTBEAT_MEDIUM,
-      LEDmode.Ready2Shoot, REVBlinkinLED.Pattern.COLOR2_HEARTBEAT_FAST
-    )
-  );
+      Alliance.Red, Map.of(
+          LEDmode.Auton, REVBlinkinLED.Pattern.COLOR1_LARSON_SCANNER,
+          LEDmode.Teleop, REVBlinkinLED.Pattern.SOLID_RED,
+          LEDmode.HaveNote, REVBlinkinLED.Pattern.COLOR1_HEARTBEAT_MEDIUM,
+          LEDmode.Ready2Shoot, REVBlinkinLED.Pattern.COLOR1_HEARTBEAT_FAST),
+      Alliance.Blue, Map.of(
+          LEDmode.Auton, REVBlinkinLED.Pattern.COLOR2_LARSON_SCANNER,
+          LEDmode.Teleop, REVBlinkinLED.Pattern.SOLID_BLUE,
+          LEDmode.HaveNote, REVBlinkinLED.Pattern.COLOR2_HEARTBEAT_MEDIUM,
+          LEDmode.Ready2Shoot, REVBlinkinLED.Pattern.COLOR2_HEARTBEAT_FAST));
 
-  private void setLED(LEDmode mode){
+  private void setLED(LEDmode mode) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
-    if(alliance.isPresent()){
+    if (alliance.isPresent()) {
       m_robotContainer.setLED(ledPatternMap.get(alliance.get()).get(mode));
     } else {
       m_robotContainer.setLED(REVBlinkinLED.Pattern.COLOR1_AND_2_TWINKLES_COLOR1_AND_2);
