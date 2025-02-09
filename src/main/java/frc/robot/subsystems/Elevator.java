@@ -105,27 +105,27 @@ public class Elevator extends SubsystemBase {
 //sets automatic speed to either positive or negative based on where the elevator is in relation to target
 //also slows down if it is within a range and stops when position is close to being reached
 //input a position value from constants to get it to go to a certain level
-  public void setPosition(double setPosition) {
+  public void setPosition(double setPosition, double speed) {
   
-    
-    
+    //you can change the speed reduction within tolerance here
+    final double speedFactor = 0.75;
     double elevatorPosition = getElevatorPosition();
 
     
     if(setPosition > (elevatorPosition + kMediumTolerance)){
-      setMotorSpeed(-Constants.ElevatorConstants.kElevatorAutoSpeed);
+      setMotorSpeed(-speed);
 
     } else if(setPosition > (elevatorPosition + kSmallTolerance)){
-      setMotorSpeed(-Constants.ElevatorConstants.kElevatorAutoSpeed * 0.75);
+      setMotorSpeed(-speed * speedFactor);
 
     } else if(setPosition > (elevatorPosition - kSmallTolerance)){
       setMotorSpeed(0.0);
 
     } else if(setPosition > (elevatorPosition - kMediumTolerance)){
-      setMotorSpeed(Constants.ElevatorConstants.kElevatorAutoSpeed * 0.75);
+      setMotorSpeed(speed * speedFactor);
       
     } else {
-      setMotorSpeed(Constants.ElevatorConstants.kElevatorAutoSpeed);
+      setMotorSpeed(speed);
     }
 
 

@@ -61,7 +61,8 @@ public final class Constants {
     //honestly the processor probably wouldn't require the elevator to move at all from the start position, but if it is already up it could be useful to have a preset position
     public static final double kProcessor = 15;
 
-    public static final double kElevatorAutoSpeed = 0.25;
+    public static final double kElevatorPrecisionControlSpeed = 0.15;
+    public static final double kElevatorAutoSpeedToLevel = 0.4;
     public static final double kElevatorMaxSpeed = 0.75;
   }
 

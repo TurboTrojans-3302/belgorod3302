@@ -4,15 +4,20 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
@@ -107,18 +112,35 @@ public class RobotContainer {
             m_robotDrive));
 
     new JoystickButton(m_copilotController, XboxController.Button.kA.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough));
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
     new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
     new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
     new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-  }
+        //get dpad position as a boolean (they are automatically returned by getPOV() as an exact value)
+        BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
+        BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+
+      //convert booleansupplier into triggers so the whileTrue() method can be called upon them
+      Trigger elevatorUp = new Trigger(dpadUp);
+      Trigger elevatorDown = new Trigger(dpadDown);
+
+      //dpad causes the elevator to go up/down slowly during teleop
+      elevatorUp.whileTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+          
+        };
+        
+
+        
+        
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
