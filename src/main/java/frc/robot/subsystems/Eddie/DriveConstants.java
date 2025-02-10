@@ -38,4 +38,7 @@ public class DriveConstants {
                         new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // back left
                         new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0) // back right
         );
+
+        public static final double SLEW_LIMIT_TRANSLATION = 10.0; // m/s^2
+        public static final double SLEW_LIMIT_ROTATION =  10.0;  // rad/s^2     
 }
