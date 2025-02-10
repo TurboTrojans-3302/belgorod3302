@@ -64,7 +64,7 @@ public class RobotContainer {
     //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
     Command oneMeterTurnRight = GoToCommand.relative(m_robotDrive, m_nav, 1.0, 0, -90);
-    Command oneMeterSquare = oneMeterTurnRight.andThen(oneMeterTurnRight).andThen(oneMeterTurnRight).andThen(oneMeterTurnRight);
+    //Command oneMeterSquare = oneMeterTurnRight.andThen(oneMeterTurnRight).andThen(oneMeterTurnRight).andThen(oneMeterTurnRight);
     
     m_autonomousChooser = new SendableChooser<Command>();
     m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
@@ -77,7 +77,7 @@ public class RobotContainer {
     m_autonomousChooser.addOption("Nav to tag 17", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(17)));
     m_autonomousChooser.addOption("Nav to tag 18", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(18)));
     m_autonomousChooser.addOption("Nav to tag 19", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(19)));
-    m_autonomousChooser.addOption("one meter square", oneMeterSquare);
+    //m_autonomousChooser.addOption("one meter square", oneMeterSquare);
 
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
