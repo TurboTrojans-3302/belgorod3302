@@ -7,6 +7,7 @@
 package frc.robot.subsystems;
 
 import java.util.Timer;
+import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.revrobotics.RelativeEncoder;
@@ -146,6 +147,8 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putBoolean("level 2", MathUtil.isNear(Constants.ElevatorConstants.kLevel2, elevatorPosition, kSmallTolerance));
     SmartDashboard.putBoolean("level 3", MathUtil.isNear(Constants.ElevatorConstants.kLevel3, elevatorPosition, kSmallTolerance));
     SmartDashboard.putBoolean("level 4", MathUtil.isNear(Constants.ElevatorConstants.kLevel4, elevatorPosition, kSmallTolerance));
+    SmartDashboard.putBoolean("elevator high limit", !elevatorHighLimitSwitch.get());
+    SmartDashboard.putBoolean("elevator high limit", !elevatorLowLimitSwitch.get());
 
   }
 }

@@ -54,22 +54,22 @@ public final class Constants {
     public static final int kElevatorHighLimitSwitchId = 0;
     public static final int kElevatorLowLimitSwitchId = 1;
     //position in motor rotations for different levels of the reef, all random numbers that need to be tested of course
-    public static final double kLevel1Trough = 50;
-    public static final double kLevel2 = 75;
-    public static final double kLevel3 = 100;
-    public static final double kLevel4 = 125;
+    public static double kLevel1Trough = 50;
+    public static double kLevel2 = 75;
+    public static double kLevel3 = 100;
+    public static double kLevel4 = 125;
     //honestly the processor probably wouldn't require the elevator to move at all from the start position, but if it is already up it could be useful to have a preset position
-    public static final double kProcessor = 15;
+    public static double kProcessor = 15;
 
-    public static final double kElevatorPrecisionControlSpeed = 0.15;
-    public static final double kElevatorAutoSpeedToLevel = 0.4;
-    public static final double kElevatorMaxSpeed = 0.75;
+    public static double kElevatorPrecisionControlSpeed = 0.15;
+    public static double kElevatorAutoSpeedToLevel = 0.4;
+    public static double kElevatorMaxSpeed = 0.75;
   }
 
   public static final class IntakeConstants {
     public static final int intakeMotorID = 12;
     public static final int intakeLimitSwitchID = 2;
-    public static final double intakeSpeedMax = 0.75;
+    public static double intakeSpeedMax = 0.75;
     public static final double intakeSpeedMin = -0.75;
 
   }
@@ -78,8 +78,10 @@ public final class Constants {
     public static final int leftClimberID = 13;
     public static final int rightClimberID = 14;
     public static final int climberLimitSwitchID = 3;
-    public static final double climberMaxSpeed = 0.5;
-    public static final double climberAutoSpeed = 0.3;
+    public static double climberMaxSpeed = 0.5;
+    public static double climberAutoSpeed = 0.3;
+
+  
   }
 
 public static final int BLINKIN_LED_PWM_CHANNEL = 0;

@@ -5,12 +5,20 @@
 package frc.robot;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,6 +54,24 @@ public class RobotContainer {
   public Field2d m_field = new Field2d();
 
   // private final ShuffleboardTab m_shuffleboardTab;
+  public final ShuffleboardTab m_elevatorTab = Shuffleboard.getTab("Elevator");
+  public final ShuffleboardTab m_climbersTab = Shuffleboard.getTab("climbers and intake");
+ 
+
+  GenericEntry level1Position;
+  GenericEntry level2Position;
+  GenericEntry level3Position;
+  GenericEntry level4Position;
+  GenericEntry processorPosition;
+  GenericEntry elevatorMaxSpeed;
+  GenericEntry elevatorPrecisionSpeed;
+  GenericEntry elevatorAutoSpeed;
+  
+  GenericEntry climberMaxSpeed;
+  GenericEntry climberAutoSpeed;
+
+  GenericEntry intakeSpeedMax;
+
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
 
@@ -54,12 +80,49 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+  
+  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     instance = this;
+
+    //elevator stuff
+   /* DoubleSupplier elevatorAutoSpeed = () -> Constants.ElevatorConstants.kElevatorAutoSpeedToLevel;
+    *DoubleSupplier elevatorPrecisionSpeed = () -> Constants.ElevatorConstants.kElevatorPrecisionControlSpeed;
+    *DoubleSupplier elevatorMaxSpeed = () -> Constants.ElevatorConstants.kElevatorMaxSpeed;
+    *DoubleSupplier level1Position = () -> Constants.ElevatorConstants.kLevel1Trough;
+    *DoubleSupplier level2Position = () -> Constants.ElevatorConstants.kLevel2;
+    *DoubleSupplier level3Position = () -> Constants.ElevatorConstants.kLevel3;
+    *DoubleSupplier level4Position = () -> Constants.ElevatorConstants.kLevel4; 
+   m_elevatorTab.addDouble("Elevator Auto Speed", elevatorAutoSpeed);
+    m_elevatorTab.addDouble("Precision control speed", elevatorPrecisionSpeed);
+    m_elevatorTab.addDouble("max speed", elevatorMaxSpeed);
+    m_elevatorTab.addDouble("level 1 position", level1Position);
+    m_elevatorTab.addDouble("level 2 position", level2Position);
+    m_elevatorTab.addDouble("level 3 position", level3Position);
+    m_elevatorTab.addDouble("level 4 position", level4Position); */
+
+    
+  
+    level1Position = m_elevatorTab.add("level 1 position", Constants.ElevatorConstants.kLevel1Trough).getEntry();
+    level2Position = m_elevatorTab.add("level 2 position", Constants.ElevatorConstants.kLevel2).getEntry();
+    level3Position = m_elevatorTab.add("level 3 position", Constants.ElevatorConstants.kLevel3).getEntry();
+    level4Position = m_elevatorTab.add("level 4 position", Constants.ElevatorConstants.kLevel4).getEntry();
+    processorPosition = m_elevatorTab.add("processor position", Constants.ElevatorConstants.kProcessor).getEntry();
+  
+    elevatorMaxSpeed = m_elevatorTab.add("max speed", Constants.ElevatorConstants.kElevatorMaxSpeed).getEntry();
+    elevatorPrecisionSpeed = m_elevatorTab.add("level 4 position", Constants.ElevatorConstants.kElevatorPrecisionControlSpeed).getEntry();
+    elevatorAutoSpeed = m_elevatorTab.add("level 4 position", Constants.ElevatorConstants.kElevatorAutoSpeedToLevel).getEntry();
+
+    climberAutoSpeed = m_climbersTab.add("Climber auto speed", Constants.ClimberConstants.climberAutoSpeed).getEntry();
+    climberMaxSpeed = m_climbersTab.add("Climber auto speed", Constants.ClimberConstants.climberMaxSpeed).getEntry();
+  
+    intakeSpeedMax = m_climbersTab.add("intake speed max", Constants.IntakeConstants.intakeSpeedMax).getEntry();
+  
+  
 
     // Configure the button bindings
     configureButtonBindings();
@@ -86,11 +149,15 @@ public class RobotContainer {
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
+  
+
   }
 
   public static RobotContainer getInstance() {
     return instance;
   }
+
+
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -162,4 +229,6 @@ public class RobotContainer {
   public void setLED(double value) {
     m_BlinkinLED.set(value);
   }
+
+
 }
