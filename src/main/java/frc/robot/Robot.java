@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -54,9 +55,18 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    // DataLogManager.start();
-    CanBridge.runTCP();
+    //DataLogManager.start();
+    //CanBridge.runTCP();
     m_robotContainer.m_robotDrive.calibrateSterrRelativeEncoder();
+
+    LimelightHelpers.setCameraPose_RobotSpace(Constants.LimelightConstants.name,
+                                              Constants.LimelightConstants.Offset.forward,
+                                              Constants.LimelightConstants.Offset.side,
+                                              Constants.LimelightConstants.Offset.up,
+                                              Constants.LimelightConstants.Offset.roll,
+                                              Constants.LimelightConstants.Offset.pitch,
+                                              Constants.LimelightConstants.Offset.yaw
+                                            );
   }
 
   /**

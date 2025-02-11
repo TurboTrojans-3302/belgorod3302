@@ -28,6 +28,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
@@ -171,22 +172,14 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         speedPub.set(getSpeed());
         maxSpeedPub.set(getMaxSpeed());
         headingPub.set(getHeading());
-        // SmartDashboard.putNumber("FL abs Angle",
-        // Math.toDegrees(frontLeftModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("FR abs Angle",
-        // Math.toDegrees(frontRightModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("BL abs Angle",
-        // Math.toDegrees(backLeftModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("BR abs Angle",
-        // Math.toDegrees(backRightModule.getAbsoluteAngle()));
-        // SmartDashboard.putNumber("FL rel Angle",
-        // Math.toDegrees(frontLeftModule.getSteerAngle()));
-        // SmartDashboard.putNumber("FR rel Angle",
-        // Math.toDegrees(frontRightModule.getSteerAngle()));
-        // SmartDashboard.putNumber("BL rel Angle",
-        // Math.toDegrees(backLeftModule.getSteerAngle()));
-        // SmartDashboard.putNumber("BR rel Angle",
-        // Math.toDegrees(backRightModule.getSteerAngle()));
+        SmartDashboard.putNumber("FL abs Angle", Math.toDegrees(frontLeftModule.getAbsoluteAngle()));
+        SmartDashboard.putNumber("FR abs Angle", Math.toDegrees(frontRightModule.getAbsoluteAngle()));
+        SmartDashboard.putNumber("BL abs Angle", Math.toDegrees(backLeftModule.getAbsoluteAngle()));
+        SmartDashboard.putNumber("BR abs Angle", Math.toDegrees(backRightModule.getAbsoluteAngle()));
+        SmartDashboard.putNumber("FL rel Angle", Math.toDegrees(frontLeftModule.getSteerAngle()));
+        SmartDashboard.putNumber("FR rel Angle", Math.toDegrees(frontRightModule.getSteerAngle()));
+        SmartDashboard.putNumber("BL rel Angle", Math.toDegrees(backLeftModule.getSteerAngle()));
+        SmartDashboard.putNumber("BR rel Angle", Math.toDegrees(backRightModule.getSteerAngle()));
     }
 
     public double turnToHeading(double heading) {
