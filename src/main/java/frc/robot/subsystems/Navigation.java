@@ -92,8 +92,8 @@ public class Navigation extends SubsystemBase {
     return m_fieldLayout.getTagPose(tagId).get().toPose2d();
   }
 
-  public Pose2d getPose2dInFrontOfTag(int tagId) {
-    Transform2d delta = new Transform2d(0.5, 0.0, Rotation2d.fromDegrees(180.0));
+  public Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
+    Transform2d delta = new Transform2d(distance, 0.0, Rotation2d.fromDegrees(180.0));
     Pose2d tagPose = getTagPose2d(tagId);
     return tagPose.plus(delta);
   }

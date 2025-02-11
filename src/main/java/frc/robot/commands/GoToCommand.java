@@ -69,9 +69,8 @@ public class GoToCommand extends Command {
   public void initialize() {
 
     if (m_relativeFlag) {
-      Translation2d dest_translation = m_delta.getTranslation();
-      Rotation2d dest_rotation = m_nav.getPose().getRotation().plus(m_delta.getRotation());
-      m_dest = new Pose2d(dest_translation, dest_rotation);
+      Pose2d currPose2d = m_nav.getPose();
+      m_dest = currPose2d.plus(m_delta);
     }
     System.out.println("Starting go to: " + m_dest);
     m_nav.m_dashboardField.getObject("dest").setPose(m_dest);
@@ -106,8 +105,6 @@ public class GoToCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // System.out.println("Speed: " + m_drive.getSpeed() + " translation2dest(): " +
-    // translation2dest());
 
     State currentState = new State(0.0, speedTowardTarget());
     State goalState = new State(distance(), 0.0);

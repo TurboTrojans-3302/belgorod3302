@@ -29,7 +29,7 @@ public class DriveConstants {
         public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER = 11;
         public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 5;
 
-        public static final double kMaxSpeedMetersPerSecond = 4.0;
+        public static final double kMaxSpeedMetersPerSecond = 12.0;
 
         public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
                         new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left

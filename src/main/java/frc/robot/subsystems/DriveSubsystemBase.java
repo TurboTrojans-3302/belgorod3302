@@ -97,13 +97,13 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     }
 
     public void driveFieldOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), -translation.getY(),
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
                 rotation, Rotation2d.fromDegrees(getHeading()));
         drive(speeds);
     }
 
     public void driveRobotOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), -translation.getY(), rotation);
+        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         drive(speeds);
     }
 
