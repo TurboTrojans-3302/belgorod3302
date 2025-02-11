@@ -12,10 +12,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Navigation;
 import frc.utils.SwerveUtils;
 
 public class GoToCommand extends Command {
@@ -29,32 +28,38 @@ public class GoToCommand extends Command {
   private DriveSubsystem m_drive;
   private TrapezoidProfile m_trapezoid;
   private boolean m_relativeFlag;
+  private Navigation m_nav;
 
-  private GoToCommand(DriveSubsystem drive){
+  private GoToCommand(DriveSubsystem drive, Navigation nav) {
     m_drive = drive;
+    this.m_nav = nav;
     addRequirements(m_drive);
     m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedLimit() * 0.5,
-                                                       m_drive.getMaxSpeedLimit() * 1.0 )); //todo use full speed;
+        m_drive.getMaxSpeedLimit() * 1.0)); // todo use full speed;
   }
 
-  public GoToCommand(DriveSubsystem drive, Pose2d dest){
-    this(drive);
+  public GoToCommand(DriveSubsystem drive, Navigation nav, Pose2d dest) {
+    this(drive, nav);
     m_dest = dest;
     m_relativeFlag = false;
   }
 
-  public static GoToCommand absolute(DriveSubsystem drive, double x, double y, double heading){
+  public static GoToCommand absolute(DriveSubsystem drive, Navigation nav, Pose2d dest) {
+    return new GoToCommand(drive, nav, dest);
+  }
+
+  public static GoToCommand absolute(DriveSubsystem drive, Navigation nav, double x, double y, double heading) {
     Pose2d dest = new Pose2d(x, y, Rotation2d.fromDegrees(heading));
-    return new GoToCommand(drive, dest);
+    return new GoToCommand(drive, nav, dest);
   }
 
-  public static GoToCommand relative(DriveSubsystem drive, double x, double y, double theta){
+  public static GoToCommand relative(DriveSubsystem drive, Navigation nav, double x, double y, double theta) {
     Transform2d delta = new Transform2d(x, y, Rotation2d.fromDegrees(theta));
-    return new GoToCommand(drive, delta);
+    return new GoToCommand(drive, nav, delta);
   }
-
-  public GoToCommand(DriveSubsystem drive, Transform2d delta){
-    this(drive);
+  
+  public GoToCommand(DriveSubsystem drive, Navigation nav, Transform2d delta) {
+    this(drive, nav);
     m_delta = delta;
     m_relativeFlag = true;
   }
@@ -63,54 +68,51 @@ public class GoToCommand extends Command {
   @Override
   public void initialize() {
 
-    if(m_relativeFlag){
-      Translation2d dest_translation = m_delta.getTranslation();
-      Rotation2d dest_rotation = m_drive.getPose().getRotation().plus(m_delta.getRotation());
-      m_dest = new Pose2d(dest_translation, dest_rotation);
+    if (m_relativeFlag) {
+      Pose2d currPose2d = m_nav.getPose();
+      m_dest = currPose2d.plus(m_delta);
     }
     System.out.println("Starting go to: " + m_dest);
-    RobotContainer.getInstance().m_field.getObject("dest").setPose(m_dest);
+    m_nav.m_dashboardField.getObject("dest").setPose(m_dest);
   }
 
-  private Translation2d translation2dest(){
-    return m_dest.minus(m_drive.getPose()).getTranslation();
+  private Translation2d translation2dest() {
+    return m_dest.minus(m_nav.getPose()).getTranslation();
   }
 
-  private double distance(){
+  private double distance() {
     return translation2dest().getNorm();
   }
 
-  private double deltaHeading(){
-    return SwerveUtils.angleDeltaDeg(m_drive.getHeading(), m_dest.getRotation().getDegrees());
+  private double deltaHeading() {
+    return SwerveUtils.angleDeltaDeg(m_nav.getAngleDegrees(), m_dest.getRotation().getDegrees());
   }
 
-  private double speedTowardTarget(){
+  private double speedTowardTarget() {
     Translation2d botDirection = m_drive.getVelocityVector();
     Translation2d targetDirection = translation2dest();
 
-    if(botDirection.getNorm() <= 1e-6) {
+    if (botDirection.getNorm() <= 1e-6) {
       return 0.0;
-    } else if(targetDirection.getNorm() <= 1e-6){
+    } else if (targetDirection.getNorm() <= 1e-6) {
       return -m_drive.getSpeed();
     }
 
     Double difference = targetDirection.getAngle().getRadians() - botDirection.getAngle().getRadians();
     return m_drive.getSpeed() * Math.cos(difference);
   }
-  
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //System.out.println("Speed: " + m_drive.getSpeed() + " translation2dest(): " + translation2dest());
 
     State currentState = new State(0.0, speedTowardTarget());
     State goalState = new State(distance(), 0.0);
-    
+
     double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
 
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
-    double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
-
+    double turn = m_drive.turnToHeadingDegrees(m_dest.getRotation().getDegrees());
 
     m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }
@@ -119,14 +121,14 @@ public class GoToCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     m_drive.stop();
-    System.out.println("End go to: " + m_drive.getPose());
+    System.out.println("End go to: " + m_nav.getPose());
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return distance() < DISTANCE_TOLERANCE && 
-           Math.abs(deltaHeading()) < HEADING_TOLERANCE;
+    return distance() < DISTANCE_TOLERANCE &&
+        Math.abs(deltaHeading()) < HEADING_TOLERANCE;
   }
 
 }
