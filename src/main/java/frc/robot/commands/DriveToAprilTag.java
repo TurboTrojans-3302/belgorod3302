@@ -49,7 +49,7 @@ public class DriveToAprilTag extends Command {
   @Override
   public void execute() {
 
-    Double heading = m_drive.getHeading();
+    Double heading = m_drive.getGyroAngleDegrees();
 
     if (isTargetFound()) {
       Double errorAngle = getAngleToTarget();

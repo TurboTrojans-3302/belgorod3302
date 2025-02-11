@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Add your docs here. */
@@ -48,9 +47,9 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
      *
      * @return the robot's heading in degrees, from -180 to 180
      */
-    public double getHeading(){
-        return Units.degreesToRadians(getGyroAngleRadians());
-    }
+    public abstract double getGyroAngleDegrees();
+
+    public abstract void setGyroAngleDeg(double angle);
 
     /**
      * Returns the heading of the robot from the gyro.
@@ -80,25 +79,25 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
         }
     }
 
-    public abstract double turnToHeading(double heading);
+    public abstract double turnToHeadingDegrees(double heading);
 
     public abstract void drive(ChassisSpeeds speeds);
 
     public abstract void stop();
 
     public void driveHeadingField(Translation2d translationMetersPerSecond, double heading) {
-        double yawCommand = turnToHeading(heading);
+        double yawCommand = turnToHeadingDegrees(heading);
         driveFieldOriented(translationMetersPerSecond, yawCommand);
     }
 
     public void driveHeadingRobot(Translation2d translationMetersPerSecond, double heading) {
-        double yawCommand = turnToHeading(heading);
+        double yawCommand = turnToHeadingDegrees(heading);
         driveRobotOriented(translationMetersPerSecond, yawCommand);
     }
 
     public void driveFieldOriented(Translation2d translation, double rotation) {
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
-                rotation, Rotation2d.fromDegrees(getHeading()));
+                rotation, Rotation2d.fromDegrees(getGyroAngleDegrees()));
         drive(speeds);
     }
 

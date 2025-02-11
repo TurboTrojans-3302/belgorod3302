@@ -85,7 +85,7 @@ public class GoToCommand extends Command {
   }
 
   private double deltaHeading() {
-    return SwerveUtils.angleDeltaDeg(m_drive.getHeading(), m_dest.getRotation().getDegrees());
+    return SwerveUtils.angleDeltaDeg(m_nav.getAngleDegrees(), m_dest.getRotation().getDegrees());
   }
 
   private double speedTowardTarget() {
@@ -112,7 +112,7 @@ public class GoToCommand extends Command {
     double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
 
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
-    double turn = m_drive.turnToHeading(m_dest.getRotation().getDegrees());
+    double turn = m_drive.turnToHeadingDegrees(m_dest.getRotation().getDegrees());
 
     m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }

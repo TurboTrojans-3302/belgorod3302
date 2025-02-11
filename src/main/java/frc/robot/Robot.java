@@ -7,8 +7,6 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
-import au.grapplerobotics.CanBridge;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;

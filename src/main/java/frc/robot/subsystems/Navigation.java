@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
-import frc.robot.commands.GoToCommand;
 
 public class Navigation extends SubsystemBase {
   private static final String cameraName = "limelight";
@@ -36,7 +35,7 @@ public class Navigation extends SubsystemBase {
     this.m_drive = drive;
 
     m_odometry = new SwerveDrivePoseEstimator(
-        m_drive.getKinematics(), Rotation2d.fromDegrees(m_drive.getHeading()),
+        m_drive.getKinematics(), Rotation2d.fromDegrees(m_drive.getGyroAngleDegrees()),
         m_drive.getSwerveModulePositions(),
         Constants.FieldConstants.ZeroZero);
 
@@ -56,7 +55,7 @@ public class Navigation extends SubsystemBase {
     // This method will be called once per scheduler run
 
     SwerveModulePosition[] positions = m_drive.getSwerveModulePositions();
-    Double heading = m_drive.getHeading();
+    Double heading = m_drive.getGyroAngleDegrees();
     m_odometry.update(Rotation2d.fromDegrees(heading), positions);
 
     PoseEstimate est = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
@@ -73,7 +72,7 @@ public class Navigation extends SubsystemBase {
   }
 
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(Rotation2d.fromDegrees(m_drive.getHeading()),
+    m_odometry.resetPosition(Rotation2d.fromDegrees(m_drive.getGyroAngleDegrees()),
         m_drive.getSwerveModulePositions(),
         pose);
   }
@@ -96,6 +95,14 @@ public class Navigation extends SubsystemBase {
     Transform2d delta = new Transform2d(distance, 0.0, Rotation2d.fromDegrees(180.0));
     Pose2d tagPose = getTagPose2d(tagId);
     return tagPose.plus(delta);
+  }
+
+
+  /**
+   * @return heading angle of the bot, according to the odometry, in degrees
+   */
+  public double getAngleDegrees() {
+    return m_odometry.getEstimatedPosition().getRotation().getDegrees();
   }
 
 }

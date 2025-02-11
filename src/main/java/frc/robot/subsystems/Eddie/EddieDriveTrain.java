@@ -103,7 +103,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     // dashboard stuff
     DoublePublisher speedPub;
-    DoublePublisher headingPub;
+    DoublePublisher gyroheadingPub;
     DoublePublisher maxSpeedPub;
     DoublePublisher dxPub;
     BooleanPublisher dxGoodPub;
@@ -118,7 +118,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         NetworkTable tagsTable = NetworkTableInstance.getDefault().getTable("DriveTrain");
         speedPub = tagsTable.getDoubleTopic("Speed").publish();
         maxSpeedPub = tagsTable.getDoubleTopic("MaxSpeed").publish();
-        headingPub = tagsTable.getDoubleTopic("Heading").publish();
+        gyroheadingPub = tagsTable.getDoubleTopic("GyroHeading").publish();
 
         // todo add the swerve drive to the dashboard
         // SmartDashboard.putData("Swerve Drive", new Sendable() {
@@ -171,7 +171,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
         speedPub.set(getSpeed());
         maxSpeedPub.set(getMaxSpeed());
-        headingPub.set(getHeading());
+        gyroheadingPub.set(getGyroAngleDegrees());
         SmartDashboard.putNumber("FL abs Angle", Math.toDegrees(frontLeftModule.getAbsoluteAngle()));
         SmartDashboard.putNumber("FR abs Angle", Math.toDegrees(frontRightModule.getAbsoluteAngle()));
         SmartDashboard.putNumber("BL abs Angle", Math.toDegrees(backLeftModule.getAbsoluteAngle()));
@@ -182,14 +182,23 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         SmartDashboard.putNumber("BR rel Angle", Math.toDegrees(backRightModule.getSteerAngle()));
     }
 
-    public double turnToHeading(double heading) {
-        double angle = getHeading();
+    public double turnToHeadingDegrees(double headingDegrees) {
+        double angle = getGyroAngleDegrees();
         double currentAngularRate = getAngularRateDegPerSec();
-        double angle_error = angleDeltaDeg(heading, angle);
+        double angle_error = angleDeltaDeg(headingDegrees, angle);
         double yawCommand = -angle_error * kPgain - (currentAngularRate) * kDgain;
         return yawCommand;
     }
 
+    /*
+     * Drive the robot, relative to the field.
+     * All parameters are [-1, 1]
+     * 
+     * @param x speed in the "north" direction, forward if you're on the blue side
+     * @param y speed in the "east" direction, left if you're on the blue side
+     * @param rotation turn speed, positive is counter-clockwise
+     * 
+     */
     public void driveFieldOriented(Double x, Double y, Double rotation) {
         Translation2d translation = new Translation2d(x, y);
         translation = translation.times(MAX_SPEED);
@@ -225,23 +234,24 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         backRightModule.set(voltage, angleRadians);
     }
 
-    public void resetGyroscope() {
-        ahrs.setAngleAdjustment(ahrs.getAngle() - ahrs.getAngleAdjustment());
-    }
-
     public double getPitchDeg() {
         return ahrs.getPitch();
     }
 
     public double getGyroAngleRadians() {
-        return MathUtil.angleModulus(Units.degreesToRadians(-ahrs.getAngle()));
+        return MathUtil.angleModulus(Units.degreesToRadians(getGyroAngleDegrees()));
+    }
+
+    public double getGyroAngleDegrees(){
+        return -ahrs.getAngle();
     }
 
     public double getTurnRate() {
         return -ahrs.getRate(); // todo confirm the sign of this
     }
 
-    public void setAngleDeg(double robotangle) {
+    //todo test this! don't think its ever been used
+    public void setGyroAngleDeg(double robotangle) {
         double angle2 = -robotangle;
         double err = angle2 - ahrs.getAngle();
         double newAdj = err + ahrs.getAngleAdjustment();

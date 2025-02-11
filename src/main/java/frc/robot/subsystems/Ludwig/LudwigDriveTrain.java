@@ -60,6 +60,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   private final ADIS16448_IMU m_gyro = new ADIS16448_IMU(IMUAxis.kX, SPI.Port.kMXP, CalibrationTime._1s);
+  private double m_gyroOffsetDeg = 0.0;
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -92,8 +93,8 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
 
   }
 
-  public double turnToHeading(double targetHeading) {
-    double currentHeading = getHeading();
+  public double turnToHeadingDegrees(double targetHeading) {
+    double currentHeading = getGyroAngleDegrees();
     double rotation = headingPidController.calculate(currentHeading, targetHeading);
     return rotation;
   }
@@ -118,7 +119,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
 
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-        Rotation2d.fromDegrees(getHeading()));
+        Rotation2d.fromDegrees(getGyroAngleDegrees()));
 
     drive(speeds);
   }
@@ -171,13 +172,16 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_rearRight.resetEncoders();
   }
 
-  /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.reset();
+  public void setGyroAngleDeg(double angle) {
+    m_gyroOffsetDeg = angle - m_gyro.getAngle();
   }
 
   public double getGyroAngleRadians() {
-    return MathUtil.angleModulus(Units.degreesToRadians(m_gyro.getAngle()));
+    return MathUtil.angleModulus(Units.degreesToRadians(getGyroAngleDegrees()));
+  }
+
+  public double getGyroAngleDegrees(){
+    return m_gyro.getAngle() + m_gyroOffsetDeg;
   }
 
   /**
@@ -186,7 +190,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getRate();
   }
 
   public ChassisSpeeds getChassisSpeeds() {
