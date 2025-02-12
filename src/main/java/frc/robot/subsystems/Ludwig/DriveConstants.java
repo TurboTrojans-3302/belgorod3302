@@ -50,7 +50,6 @@ public class DriveConstants {
 
     public static final int kDXSensorCanId = 0;
 
-    public static final boolean kGyroReversed = false;
     public static final double headingP = 0.02;
     public static final double headingI = 0.0001;
     public static final double headingD = 0;

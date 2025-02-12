@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -42,9 +43,23 @@ public final class Constants {
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
+  public static final int DX_SENSOR_CAN_ID = 0;
+
   public static final class FieldConstants {
     public static final Pose2d ZeroZero = new Pose2d(0.0, 0.0, new Rotation2d());
   }
 
-public static final int BLINKIN_LED_PWM_CHANNEL = 0;
+  public static final class LimelightConstants {
+    public static final String name = "limelight";
+    public static final class Offset {
+      public static final double forward = 0.2985;
+      public static final double side    = 0.0;
+      public static final double up      = 0.5;
+      public static final double roll    = 0.0;
+      public static final double pitch   = 0.0;
+      public static final double yaw     = 0.0;
+    }
+  }
+
+  public static final int BLINKIN_LED_PWM_CHANNEL = 0;
 }
