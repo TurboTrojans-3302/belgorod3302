@@ -136,4 +136,8 @@ public class MAXSwerveModule implements SwerveModule {
     m_turningClosedLoopController.setReference(steerAngle, ControlType.kPosition);
   }
 
+  public void testSet(double voltage, double angleRadians){
+    m_drivingSpark.setVoltage(voltage);
+    m_turningClosedLoopController.setReference(angleRadians, ControlType.kPosition);
+}
 }
