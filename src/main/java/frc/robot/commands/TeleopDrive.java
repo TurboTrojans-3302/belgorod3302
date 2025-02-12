@@ -6,7 +6,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -39,21 +41,22 @@ public class TeleopDrive extends Command {
 
     if(m_driverController.getRightBumperButton()) {
       m_robotDrive.driveRobotOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+        stick2speed(speedScale * m_driverController.getLeftY()),
+        stick2speed(speedScale * m_driverController.getLeftX()),
+        stick2speed(speedScale * m_driverController.getRightX()));
     } else {
+      double reverse = (Robot.alliance == Alliance.Red) ? -1.0 : 1.0;
       m_robotDrive.driveFieldOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+        stick2speed(speedScale * reverse * m_driverController.getLeftY()),
+        stick2speed(speedScale * reverse * m_driverController.getLeftX()),
+        stick2speed(speedScale * m_driverController.getRightX()));
     }
     
   }
 
   // applies deadband and scaling to raw stick value
   private double stick2speed(double stickValue) {
-    return Math.signum(stickValue) * Math.pow(MathUtil.applyDeadband(stickValue, OIConstants.kDriveDeadband), 2);
+    return -Math.signum(stickValue) * Math.pow(MathUtil.applyDeadband(stickValue, OIConstants.kDriveDeadband), 2);
   }
 
   // Called once the command ends or is interrupted.
