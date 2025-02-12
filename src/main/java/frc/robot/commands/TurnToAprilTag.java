@@ -44,16 +44,16 @@ public class TurnToAprilTag extends Command {
   @Override
   public void execute() {
 
-    Double heading = m_drive.getHeading();
+    Double heading = m_drive.getGyroAngleDegrees();
 
     if(isTargetFound()) {
-        Double errorAngle = getAngleToTarget();
+        Double errorAngle = getAngleToTargetDegrees();
         heading = heading  - (errorAngle * TurnFactor);
         
     }
 
     m_drive.driveHeadingField(new Translation2d(0.0, 0.0), heading);
-    SmartDashboard.putNumber("Target Angle", getAngleToTarget());
+    SmartDashboard.putNumber("Target Angle", getAngleToTargetDegrees());
     SmartDashboard.putNumber("Commanded heading", heading);
     SmartDashboard.putBoolean("Target Found", isTargetFound());
 
@@ -73,7 +73,7 @@ public class TurnToAprilTag extends Command {
     return LimelightHelpers.getTV(cameraName);
   }
 
-  Double getAngleToTarget() {
+  Double getAngleToTargetDegrees() {
     return LimelightHelpers.getTX(cameraName);
   }
 }

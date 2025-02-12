@@ -4,13 +4,12 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Add your docs here. */
@@ -21,15 +20,7 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     private double m_maxSpeed = 0.0;
 
     //todo upload the field map to the camera?
-    protected SwerveDrivePoseEstimator mOdometry;
 
-    public Pose2d getPose() {
-        return mOdometry.getEstimatedPosition();
-    }
-
-    public void updateOdometry(SwerveModulePosition[] positions) {
-        mOdometry.update(Rotation2d.fromDegrees(getHeading()), positions);
-    }
 
     /**
      * X and Y directions are relative to the robot
@@ -56,9 +47,9 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
      *
      * @return the robot's heading in degrees, from -180 to 180
      */
-    public double getHeading(){
-        return Units.degreesToRadians(getGyroAngleRadians());
-    }
+    public abstract double getGyroAngleDegrees();
+
+    public abstract void setGyroAngleDeg(double angle);
 
     /**
      * Returns the heading of the robot from the gyro.
@@ -69,15 +60,13 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract double getTurnRate();
 
-    public abstract double getSpeed();
-
-    public abstract Double getDistanceToObjectMeters();
-
-    public abstract boolean distanceMeasurmentGood();
-
-    public abstract void resetOdometry(Pose2d pose);
+    public abstract ChassisSpeeds getChassisSpeeds();
 
     public abstract double getMaxSpeedLimit();
+
+    public abstract SwerveModulePosition[] getSwerveModulePositions();
+
+    public abstract SwerveDriveKinematics getKinematics();
 
     public double getMaxSpeed() {
         return m_maxSpeed;
@@ -90,31 +79,41 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
         }
     }
 
-    public abstract double turnToHeading(double heading);
+    public abstract double turnToHeadingDegrees(double heading);
 
     public abstract void drive(ChassisSpeeds speeds);
 
     public abstract void stop();
 
     public void driveHeadingField(Translation2d translationMetersPerSecond, double heading) {
-        double yawCommand = turnToHeading(heading);
+        double yawCommand = turnToHeadingDegrees(heading);
         driveFieldOriented(translationMetersPerSecond, yawCommand);
     }
 
     public void driveHeadingRobot(Translation2d translationMetersPerSecond, double heading) {
-        double yawCommand = turnToHeading(heading);
+        double yawCommand = turnToHeadingDegrees(heading);
         driveRobotOriented(translationMetersPerSecond, yawCommand);
     }
 
     public void driveFieldOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), -translation.getY(),
-                rotation, Rotation2d.fromDegrees(getHeading()));
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
+                rotation, Rotation2d.fromDegrees(getGyroAngleDegrees()));
         drive(speeds);
     }
 
     public void driveRobotOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), -translation.getY(), rotation);
+        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         drive(speeds);
+    }
+
+    public double getSpeed() {
+        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
+        return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+      }
+    
+      public Translation2d getVelocityVector() {
+        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
+        return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
 }
