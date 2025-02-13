@@ -59,6 +59,11 @@ public final class Constants {
       public static final double pitch   = 0.0;
       public static final double yaw     = 0.0;
     }
+    public static final class PipelineIdx {
+      public static final int AprilTag        = 0;
+      public static final int NeuralDetector  = 1;
+      public static final int NeuralClassifer = 2;
+    }
   }
 
   public static final int BLINKIN_LED_PWM_CHANNEL = 0;

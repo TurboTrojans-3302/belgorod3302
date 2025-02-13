@@ -26,6 +26,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,8 +43,8 @@ import frc.robot.subsystems.DriveSubsystemBase;
 
 public class EddieDriveTrain extends DriveSubsystemBase {
 
-    private double maxSpeed = DriveConstants.kMaxSpeedMetersPerSecond; // m/s
-    private double maxRotation = DriveConstants.kMaxRotation;
+    private double maxSpeedLimit = DriveConstants.kMaxSpeedMetersPerSecond; // m/s
+    private double maxRotationLimit = DriveConstants.kMaxRotation;
 
     private final SwerveDriveKinematics kinematics = DriveConstants.kinematics;
 
@@ -108,34 +109,26 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         calibrateSterrRelativeEncoder();
 
         // todo add the swerve drive to the dashboard
-        // SmartDashboard.putData("Swerve Drive", new Sendable() {
-        // @Override
-        // public void initSendable(SendableBuilder builder) {
-        // builder.setSmartDashboardType("SwerveDrive");
+        SmartDashboard.putData("Swerve Drive", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("SwerveDrive");
 
-        // builder.addDoubleProperty("Front Left Angle", () ->
-        // frontLeftModule.getSteerAngle(), null);
-        // builder.addDoubleProperty("Front Left Velocity", () ->
-        // frontLeftModule.getDriveVelocity(), null);
+                builder.addDoubleProperty("Front Left Angle", () -> frontLeftModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Front Left Velocity", () -> frontLeftModule.getDriveVelocity(), null);
 
-        // builder.addDoubleProperty("Front Right Angle", () ->
-        // frontRightModule.getSteerAngle(), null);
-        // builder.addDoubleProperty("Front Right Velocity", () ->
-        // frontRightModule.getDriveVelocity(), null);
+                builder.addDoubleProperty("Front Right Angle", () -> frontRightModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Front Right Velocity", () -> frontRightModule.getDriveVelocity(), null);
 
-        // builder.addDoubleProperty("Back Left Angle", () ->
-        // backLeftModule.getSteerAngle(), null);
-        // builder.addDoubleProperty("Back Left Velocity", () ->
-        // backLeftModule.getDriveVelocity(), null);
+                builder.addDoubleProperty("Back Left Angle", () -> backLeftModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Back Left Velocity", () -> backLeftModule.getDriveVelocity(), null);
 
-        // builder.addDoubleProperty("Back Right Angle", () ->
-        // backRightModule.getSteerAngle(), null);
-        // builder.addDoubleProperty("Back Right Velocity", () ->
-        // backRightModule.getDriveVelocity(), null);
+                builder.addDoubleProperty("Back Right Angle", () -> backRightModule.getSteerAngle(), null);
+                builder.addDoubleProperty("Back Right Velocity", () -> backRightModule.getDriveVelocity(), null);
 
-        // builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
-        // }
-        // });
+                builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
+            }
+        });
 
     }
 
@@ -178,20 +171,20 @@ public class EddieDriveTrain extends DriveSubsystemBase {
      */
     public void driveFieldOriented(Double x, Double y, Double rotation) {
         Translation2d translation = new Translation2d(x, y);
-        translation = translation.times(maxSpeed);
-        rotation *= maxRotation;
+        translation = translation.times(maxSpeedLimit);
+        rotation *= maxRotationLimit;
         driveFieldOriented(translation, rotation);
     }
 
     public void driveRobotOriented(Double x, Double y, Double rotation) {
         Translation2d translation = new Translation2d(x, y);
-        translation = translation.times(maxSpeed);
-        rotation *= maxRotation;
+        translation = translation.times(maxSpeedLimit);
+        rotation *= maxRotationLimit;
         driveRobotOriented(translation, rotation);
     }
 
     private double speedToVoltage(double speed) {
-        return MathUtil.clamp(speed / maxSpeed, -1.0, 1.0) * 12.0;
+        return MathUtil.clamp(speed / maxSpeedLimit, -1.0, 1.0) * 12.0;
     }
 
     public void drive(ChassisSpeeds speeds) {
@@ -295,8 +288,16 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         builder.addDoubleProperty("gyroAngleDegrees", this::getGyroAngleDegrees, this::setGyroAngleDeg);
-        builder.addDoubleProperty("maxSpeed", ()->{ return maxSpeed; }, (x)->{ maxSpeed = x;});
-        builder.addDoubleProperty("maxRotation", ()->{ return maxRotation; }, (x)->{ maxRotation = x;});
+        builder.addDoubleProperty("MaxSpeedLimit", () -> {
+            return maxSpeedLimit;
+        }, (x) -> {
+            maxSpeedLimit = x;
+        });
+        builder.addDoubleProperty("MaxRotationLimit", () -> {
+            return maxRotationLimit;
+        }, (x) -> {
+            maxRotationLimit = x;
+        });
     }
 
 }

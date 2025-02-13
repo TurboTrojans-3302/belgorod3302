@@ -13,10 +13,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
-import frc.robot.subsystems.Eddie.DriveConstants;
 import frc.utils.SwerveUtils;
 
 public class GoToCommand extends Command {
@@ -32,11 +32,10 @@ public class GoToCommand extends Command {
   private boolean m_relativeFlag;
   private Navigation m_nav;
 
-  static double speedLimit = DriveConstants.AutonSpeedLimit;
-  static double accelLimit = DriveConstants.AutonAccelLimit;
+  static double speedLimit = AutoConstants.kMaxSpeedMetersPerSecond;
+  static double accelLimit = AutoConstants.kMaxAccelerationMetersPerSecondSquared;
 
   private GoToCommand(DriveSubsystem drive, Navigation nav) {
-    speedLimit = m_drive.getMaxSpeedLimit();
     m_drive = drive;
     this.m_nav = nav;
     addRequirements(m_drive);
