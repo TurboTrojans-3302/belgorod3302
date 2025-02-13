@@ -12,16 +12,10 @@
 
 package frc.robot.subsystems.Eddie;
 
-import org.opencv.core.Mat;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.ModuleConfiguration;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -64,9 +58,9 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     private static EddieDriveTrain m_instance;
 
     // slew rate limiting filters
-    ChassisSpeedsSlewRateLimiter translateLimiter = new ChassisSpeedsSlewRateLimiter(DriveConstants.SLEW_LIMIT_TRANSLATION);
-    SlewRateLimiter rotLimiter = new SlewRateLimiter(DriveConstants.SLEW_LIMIT_ROTATION);
-
+    private ChassisSpeedsSlewRateLimiter slewRateLimiter = new ChassisSpeedsSlewRateLimiter(DriveConstants.SLEW_LIMIT_TRANSLATION,
+                                                                                     DriveConstants.SLEW_LIMIT_ROTATION);
+    
     ModuleConfiguration rightSideConfiguration = new ModuleConfiguration(
             0.10033,
             (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0),
@@ -229,12 +223,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     }
 
     public void drive(ChassisSpeeds speeds) {
-        Translation2d translation = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-        double rotation = speeds.omegaRadiansPerSecond;
-
-        translation = translateLimiter.calculate(translation);
-        rotation = rotLimiter.calculate(rotation);
-        ChassisSpeeds limitSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+        ChassisSpeeds limitSpeeds = slewRateLimiter.calculate(speeds);
 
         SwerveModuleState[] states = DriveConstants.kinematics.toSwerveModuleStates(limitSpeeds);
         frontLeftModule.set(speedToVoltage(states[0].speedMetersPerSecond), states[0].angle.getRadians());

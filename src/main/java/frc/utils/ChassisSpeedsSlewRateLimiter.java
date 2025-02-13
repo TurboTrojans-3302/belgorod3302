@@ -15,6 +15,7 @@ public class ChassisSpeedsSlewRateLimiter {
     private Translation2d lastTranslation;
     private SlewRateLimiter rotationLimiter;
     private double rateLimit;
+    private double rotateLimit;
     private double m_prevTime;
 
     public ChassisSpeedsSlewRateLimiter(double translateLimit, double rotateLimit) {
@@ -23,9 +24,8 @@ public class ChassisSpeedsSlewRateLimiter {
 
     public ChassisSpeedsSlewRateLimiter(double translateLimit, double rotateLimit, ChassisSpeeds initialValue) {
         this.rateLimit = translateLimit;
-        rotationLimiter = new SlewRateLimiter(rotateLimit, -rotateLimit, );
+        rotationLimiter = new SlewRateLimiter(rotateLimit, -rotateLimit, initialValue.omegaRadiansPerSecond);
         lastTranslation = new Translation2d(initialValue.vxMetersPerSecond, initialValue.vyMetersPerSecond);
-        lastRotation = initialValue.omegaRadiansPerSecond;
         m_prevTime = MathSharedStore.getTimestamp();
     }
 
@@ -40,10 +40,27 @@ public class ChassisSpeedsSlewRateLimiter {
         if (magnitude > 1e-6) {
             newTranslation = lastTranslation.plus(delta.times(newMagnitude / magnitude));
         }
-        double newRotation = 
+        double newRotation = rotationLimiter.calculate(input.omegaRadiansPerSecond);
 
         m_prevTime = currentTime;
         lastTranslation = newTranslation;
-        return result;
+        return new ChassisSpeeds(newTranslation.getX(), newTranslation.getY(), newRotation);
+    }
+
+    public double getRateLimit() {
+        return rateLimit;
+    }
+
+    public void setRateLimit(double rateLimit) {
+        this.rateLimit = rateLimit;
+    }
+
+    public double getRotateLimit() {
+        return rotateLimit;
+    }
+
+    public void setRotateLimit(double rotateLimit) {
+        this.rotateLimit = rotateLimit;
+        rotationLimiter = new SlewRateLimiter(rotateLimit);
     }
 }
