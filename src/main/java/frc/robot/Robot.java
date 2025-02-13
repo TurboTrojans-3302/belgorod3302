@@ -102,7 +102,7 @@ public class Robot extends TimedRobot {
     Constants.ClimberConstants.climberAutoSpeed = m_robotContainer.climberAutoSpeed.getDouble(0);
     Constants.ClimberConstants.climberMaxSpeed = m_robotContainer.climberMaxSpeed.getDouble(0);
 
-    Constants.IntakeConstants.intakeSpeedMax = m_robotContainer.intakeSpeedMax.getDouble(0);
+    //Constants.IntakeConstants.intakeSpeedMax = m_robotContainer.intakeSpeedMax.getDouble(0);
 
   }
 
