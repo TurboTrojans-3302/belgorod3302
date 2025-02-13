@@ -105,4 +105,11 @@ public class Navigation extends SubsystemBase {
     return m_odometry.getEstimatedPosition().getRotation().getDegrees();
   }
 
+/**
+   * @return heading angle of the bot, according to the odometry, in radians
+   */
+  public double getAngleRadians() {
+    return m_odometry.getEstimatedPosition().getRotation().getRadians();
+  }
+
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
@@ -22,6 +23,7 @@ public class GoToCommand extends Command {
   private final double DISTANCE_TOLERANCE = 0.050;
   private final double HEADING_TOLERANCE = 2.0;
   private final double dT = Robot.kDefaultPeriod;
+  private final double rotationRateLimit = Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond * dT;
 
   private Pose2d m_dest;
   private Transform2d m_delta;
@@ -112,7 +114,9 @@ public class GoToCommand extends Command {
     double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
 
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
-    double turn = m_drive.turnToHeadingDegrees(m_dest.getRotation().getDegrees());
+
+    double heading = SwerveUtils.StepTowardsCircular(m_nav.getAngleRadians(), m_dest.getRotation().getRadians(), rotationRateLimit);
+    double turn = m_drive.turnToHeadingDegrees(heading);
 
     m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }
