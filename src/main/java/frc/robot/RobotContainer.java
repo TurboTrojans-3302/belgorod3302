@@ -4,27 +4,26 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.DoNothing;
+import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
+import frc.robot.commands.MoveElevator;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.WaitCommand;
-import frc.robot.commands.GoToCommand;
-import frc.robot.subsystems.DriveDashboard;
+import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.utils.Elastic;
-import frc.robot.subsystems.AprilTagFinder;
- 
+import frc.robot.subsystems.Navigation;
+import frc.robot.subsystems.Elevator;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -33,50 +32,79 @@ import frc.robot.subsystems.AprilTagFinder;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  private static RobotContainer instance;
+
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final DriveDashboard mDriveDashboard = new DriveDashboard(m_robotDrive);  
+  public final Elevator m_elevator = new Elevator(Constants.ElevatorConstants.kLeftMotorElevatorCanId,
+      Constants.ElevatorConstants.kRightMotorElevatorCanId,
+      Constants.ElevatorConstants.kElevatorHighLimitSwitchId,
+      Constants.ElevatorConstants.kElevatorLowLimitSwitchId);
+  public final Navigation m_nav = new Navigation(m_robotDrive);
 
-  private final ShuffleboardTab m_shuffleboardTab;
+  public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
-
-  private final AprilTagFinder m_AprilTagFinder = new AprilTagFinder();
 
   private final REVBlinkinLED m_BlinkinLED;
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+  
+  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    instance = this;
+
     // Configure the button bindings
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController, mDriveDashboard));
+    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
+    //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
 
-    m_shuffleboardTab = Shuffleboard.getTab("Game");
-    
     m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("do nothing", new DoNothing());
-    
-    m_shuffleboardTab.add("Auton Command", m_autonomousChooser);
+    m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
+    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
+    m_autonomousChooser.addOption("turn to april tag 11", new TurnToAprilTag(m_robotDrive, 11));
+    m_autonomousChooser.addOption("Drive to april tag 1", new DriveToAprilTag(m_robotDrive, m_nav, 1));
+    m_autonomousChooser.addOption("GoTo 1, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, 0, 0));
+    m_autonomousChooser.addOption("GoTo 2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 2.0, 0, 0));
+    m_autonomousChooser.addOption("GoTo -2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, -2.0, 0, 0));
+    m_autonomousChooser.addOption("GoTo 1, -1, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, -1.0, 0));
+    m_autonomousChooser.addOption("Nav to tag 1", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(1, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 17", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(17, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 18", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(18, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 19", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(19, 0.5)));
+    //m_autonomousChooser.addOption("one meter square", oneMeterSquare);
+
+    SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
-    m_startPosChooser.addOption("Left +30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(30.0)));
-    m_startPosChooser.addOption("Right -30", new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(-30.0)));
-    m_shuffleboardTab.add("Start Position", m_startPosChooser);
+    m_startPosChooser.addOption("Left IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.leftIceCream);
+    m_startPosChooser.addOption("Middle IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.middleIceCream);
+    m_startPosChooser.addOption("Right IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.rightIceCream);
+    SmartDashboard.putData("Start Position", m_startPosChooser);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
-    m_AprilTagFinder.setTarget(1);
+  
+
   }
+
+  public static RobotContainer getInstance() {
+    return instance;
+  }
+
+
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -97,17 +125,36 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    
-    
-    // new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-    //     .whileTrue(new RunCommand(() -> {
-    //                                       if(m_harvester.getArmAngle() > 90){
-    //                                           m_harvester.setIntakeSpeed(Constants.harvesterConstants.outSpeed);
-    //                                       }else{
-    //                                           m_harvester.setIntakeSpeed(Constants.harvesterConstants.outSpeedSlow);
-    //                                       }
-    //                                     }, m_harvester));                             
-  }
+    new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+        //get dpad position as a boolean (they are automatically returned by getPOV() as an exact value)
+        BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
+        BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+
+      //convert booleansupplier into triggers so the whileTrue() method can be called upon them
+      Trigger elevatorUp = new Trigger(dpadUp);
+      Trigger elevatorDown = new Trigger(dpadDown);
+
+      //dpad causes the elevator to go up/down slowly during teleop
+      elevatorUp.whileTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+          
+        };
+        
+
+        
+        
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -122,11 +169,9 @@ public class RobotContainer {
     return m_startPosChooser.getSelected();
   }
 
-  public void setStartPosition() {
-    m_robotDrive.resetOdometry(getStartPosition());
-  }
-
   public void setLED(double value) {
     m_BlinkinLED.set(value);
   }
+
+
 }
