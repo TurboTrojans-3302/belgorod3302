@@ -44,7 +44,6 @@ public class MoveElevator extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return MathUtil.isNear(elevatorPosition, m_Elevator.getElevatorPosition(), m_Elevator.kSmallTolerance);
-  
+    return m_Elevator.isNear(elevatorPosition);
   }
 }

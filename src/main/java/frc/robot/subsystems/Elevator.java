@@ -6,32 +6,32 @@
 //TODO need to test what the high limit would be
 package frc.robot.subsystems;
 
-import java.util.Timer;
-import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import frc.robot.Constants;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
 
-  public final double kMediumTolerance = 5;
-  public final double kSmallTolerance = 1;
+  private double kMediumTolerance = 5;
+  private double kSmallTolerance = 1;
+  private double kElevatorMaxSpeed = ElevatorConstants.kElevatorMaxSpeed;
 
   public SparkMax leftElevatorMotor;
   public SparkMax rightElevatorMotor;
   public DigitalInput elevatorHighLimitSwitch;
   public DigitalInput elevatorLowLimitSwitch;
   public RelativeEncoder elevatorEncoder;
+
+  public double kLevel1Trough = ElevatorConstants.kLevel1Trough;
+  public double kLevel2 = ElevatorConstants.kLevel2;
+  public double kLevel3 = ElevatorConstants.kLevel3;
+  public double kLevel4 = ElevatorConstants.kLevel4;
 
   public Elevator(int leftMotorID, int rightMotorId, int highSwitchId, int lowSwitchId) {
     leftElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushless);
@@ -55,8 +55,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public double setMotorSpeed(double speed) {
-    double elevatorSpeed = MathUtil.clamp(speed, -Constants.ElevatorConstants.kElevatorMaxSpeed,
-        Constants.ElevatorConstants.kElevatorMaxSpeed);
+    double elevatorSpeed = MathUtil.clamp(speed, -kElevatorMaxSpeed, kElevatorMaxSpeed);
     leftElevatorMotor.set(elevatorSpeed);
     rightElevatorMotor.set(-elevatorSpeed);
     return elevatorSpeed;
@@ -98,39 +97,46 @@ public class Elevator extends SubsystemBase {
 
   // stopping without limit switches
 
+  // digital input false means it is actually true because digital input switches
+  // return a zero when closed which corresponds to false
 
-  
-  //digital input false means it is actually true because digital input switches return a zero when closed which corresponds to false
-  
-//position in motor rotations
-//sets automatic speed to either positive or negative based on where the elevator is in relation to target
-//also slows down if it is within a range and stops when position is close to being reached
-//input a position value from constants to get it to go to a certain level
+  // position in motor rotations
+  // sets automatic speed to either positive or negative based on where the
+  // elevator is in relation to target
+  // also slows down if it is within a range and stops when position is close to
+  // being reached
+  // input a position value from constants to get it to go to a certain level
   public void setPosition(double setPosition, double speed) {
-  
-    //you can change the speed reduction within tolerance here
+
+    // you can change the speed reduction within tolerance here
     final double speedFactor = 0.75;
     double elevatorPosition = getElevatorPosition();
 
-    
-    if(setPosition > (elevatorPosition + kMediumTolerance)){
+    if (setPosition > (elevatorPosition + kMediumTolerance)) {
       setMotorSpeed(-speed);
 
-    } else if(setPosition > (elevatorPosition + kSmallTolerance)){
+    } else if (setPosition > (elevatorPosition + kSmallTolerance)) {
       setMotorSpeed(-speed * speedFactor);
 
-    } else if(setPosition > (elevatorPosition - kSmallTolerance)){
+    } else if (setPosition > (elevatorPosition - kSmallTolerance)) {
       setMotorSpeed(0.0);
 
-    } else if(setPosition > (elevatorPosition - kMediumTolerance)){
+    } else if (setPosition > (elevatorPosition - kMediumTolerance)) {
       setMotorSpeed(speed * speedFactor);
-      
+
     } else {
       setMotorSpeed(speed);
     }
-
-
   }
+
+  public boolean isNear(double position) {
+    return MathUtil.isNear(position, getElevatorSpeed(), kSmallTolerance);
+  }
+
+  public boolean isNearLevel1(){ return isNear(kLevel1Trough); }
+  public boolean isNearLevel2(){ return isNear(kLevel2); }
+  public boolean isNearLevel3(){ return isNear(kLevel3); }
+  public boolean isNearLevel4(){ return isNear(kLevel4); }
 
   @Override
   public void periodic() {
@@ -140,15 +146,21 @@ public class Elevator extends SubsystemBase {
     // only runs if the limit check is true and the direction of planned travel is
     // towards the limit switch as well.
     checkLimits();
+  }
 
-    double elevatorPosition = getElevatorPosition();
-    SmartDashboard.putNumber("elevator position", elevatorPosition);
-    SmartDashboard.putBoolean("level 1 (trough)", MathUtil.isNear(Constants.ElevatorConstants.kLevel1Trough, elevatorPosition, kSmallTolerance));
-    SmartDashboard.putBoolean("level 2", MathUtil.isNear(Constants.ElevatorConstants.kLevel2, elevatorPosition, kSmallTolerance));
-    SmartDashboard.putBoolean("level 3", MathUtil.isNear(Constants.ElevatorConstants.kLevel3, elevatorPosition, kSmallTolerance));
-    SmartDashboard.putBoolean("level 4", MathUtil.isNear(Constants.ElevatorConstants.kLevel4, elevatorPosition, kSmallTolerance));
-    SmartDashboard.putBoolean("elevator high limit", !elevatorHighLimitSwitch.get());
-    SmartDashboard.putBoolean("elevator high limit", !elevatorLowLimitSwitch.get());
-
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addDoubleProperty("Position", this::getElevatorPosition, null);
+    builder.addDoubleProperty("MaxSpeed", () -> kElevatorMaxSpeed, (x) -> { kElevatorMaxSpeed = x; });
+    builder.addDoubleProperty("Tolerance", ()-> kSmallTolerance, (x)->{ kSmallTolerance=x; });
+    builder.addDoubleProperty("Level1Trough", () -> kLevel1Trough, (x) -> { kLevel1Trough = x; });
+    builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> { kLevel2 = x; });
+    builder.addDoubleProperty("Level3", () -> kLevel3, (x) -> { kLevel3 = x; });
+    builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> { kLevel4 = x; });
+    builder.addBooleanProperty("AtLevel1", this::isNearLevel1, null );
+    builder.addBooleanProperty("AtLevel1", this::isNearLevel2, null );
+    builder.addBooleanProperty("AtLevel1", this::isNearLevel3, null );
+    builder.addBooleanProperty("AtLevel1", this::isNearLevel4, null );
   }
 }

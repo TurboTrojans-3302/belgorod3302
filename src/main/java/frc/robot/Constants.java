@@ -2,10 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-//TODO find the values for the constants that arent final
 package frc.robot;
-
-import java.io.ObjectOutputStream.PutField;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -74,18 +71,18 @@ public final class Constants {
     public static final int kElevatorLowLimitSwitchId = 1;
     // position in motor rotations for different levels of the reef, all random
     // numbers that need to be tested of course
-    public static double kLevel1Trough = 50;
-    public static double kLevel2 = 75;
-    public static double kLevel3 = 100;
-    public static double kLevel4 = 125;
+    public static final double kLevel1Trough = 50;
+    public static final double kLevel2 = 75;
+    public static final double kLevel3 = 100;
+    public static final double kLevel4 = 125;
     // honestly the processor probably wouldn't require the elevator to move at all
     // from the start position, but if it is already up it could be useful to have a
     // preset position
-    public static double kProcessor = 15;
+    public static final double kProcessor = 15;
 
-    public static double kElevatorPrecisionControlSpeed = 0.15;
-    public static double kElevatorAutoSpeedToLevel = 0.4;
-    public static double kElevatorMaxSpeed = 0.75;
+    public static final double kElevatorPrecisionControlSpeed = 0.15;
+    public static final double kElevatorAutoSpeedToLevel = 0.4;
+    public static final double kElevatorMaxSpeed = 0.75;
   }
 
   public static final class IntakeConstants {
