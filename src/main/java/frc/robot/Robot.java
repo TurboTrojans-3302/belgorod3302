@@ -89,6 +89,21 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
+    //if any values return a zero it means no values are found
+    Constants.ElevatorConstants.kLevel1Trough = m_robotContainer.level1Position.getDouble(0);
+    Constants.ElevatorConstants.kLevel2 = m_robotContainer.level2Position.getDouble(0);
+    Constants.ElevatorConstants.kLevel3 = m_robotContainer.level3Position.getDouble(0);
+    Constants.ElevatorConstants.kLevel4 = m_robotContainer.level4Position.getDouble(0);
+    Constants.ElevatorConstants.kProcessor = m_robotContainer.processorPosition.getDouble(0);
+    Constants.ElevatorConstants.kElevatorAutoSpeedToLevel = m_robotContainer.elevatorAutoSpeed.getDouble(0);
+    Constants.ElevatorConstants.kElevatorPrecisionControlSpeed = m_robotContainer.elevatorPrecisionSpeed.getDouble(0);
+    Constants.ElevatorConstants.kElevatorMaxSpeed = m_robotContainer.elevatorMaxSpeed.getDouble(0);
+    
+    Constants.ClimberConstants.climberAutoSpeed = m_robotContainer.climberAutoSpeed.getDouble(0);
+    Constants.ClimberConstants.climberMaxSpeed = m_robotContainer.climberMaxSpeed.getDouble(0);
+
+    //Constants.IntakeConstants.intakeSpeedMax = m_robotContainer.intakeSpeedMax.getDouble(0);
+
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
