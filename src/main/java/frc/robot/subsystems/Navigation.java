@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +30,7 @@ public class Navigation extends SubsystemBase {
   private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.DX_SENSOR_CAN_ID);
+  private String limelightPipeline;
 
   /** Creates a new Navigation. */
   public Navigation(DriveSubsystem drive) {
@@ -46,6 +48,9 @@ public class Navigation extends SubsystemBase {
     } catch (ConfigurationFailedException e) {
       System.out.println("LaserCan Configuration failed! " + e);
     }
+
+    LimelightHelpers.setPipelineIndex(cameraName, Constants.LimelightConstants.PipelineIdx.AprilTag);
+    limelightPipeline = LimelightHelpers.getCurrentPipelineType(cameraName);
 
     SmartDashboard.putData(m_dashboardField);
   }
@@ -105,4 +110,15 @@ public class Navigation extends SubsystemBase {
     return m_odometry.getEstimatedPosition().getRotation().getDegrees();
   }
 
+  @Override
+  public void initSendable(SendableBuilder builder) {
+      super.initSendable(builder);
+      builder.addStringProperty("Pipeline", () -> limelightPipeline, null);
+      builder.addBooleanProperty("ValidTarget", () -> {return LimelightHelpers.getTV(cameraName);}, null);
+      builder.addIntegerProperty("ApriltagFound", () -> {return (int) LimelightHelpers.getFiducialID(cameraName);} , null);
+      builder.addStringProperty("DetectorFound", () -> {return LimelightHelpers.getDetectorClass(cameraName);}, null);
+      builder.addStringProperty("ClassiferFound", () -> {return LimelightHelpers.getClassifierClass(cameraName);}, null);
+      builder.addBooleanProperty("DxGood", this::dxMeasurmentGood, null);
+      builder.addDoubleProperty("DxSensor", this::getDxToObjectMeters, null);
+    }
 }
