@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,15 +14,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
+import frc.robot.commands.MoveElevator;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
-
- 
+import frc.robot.subsystems.Elevator;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -35,10 +37,14 @@ public class RobotContainer {
 
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final Elevator m_elevator = new Elevator(Constants.ElevatorConstants.kLeftMotorElevatorCanId,
+      Constants.ElevatorConstants.kRightMotorElevatorCanId,
+      Constants.ElevatorConstants.kElevatorHighLimitSwitchId,
+      Constants.ElevatorConstants.kElevatorLowLimitSwitchId);
   public final Navigation m_nav = new Navigation(m_robotDrive);
 
   public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-  //private final ShuffleboardTab m_shuffleboardTab;
+  
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
 
@@ -47,13 +53,15 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+  
+  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     instance = this;
-    
+
     // Configure the button bindings
     configureButtonBindings();
 
@@ -61,9 +69,7 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
     //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
-    Command oneMeterTurnRight = GoToCommand.relative(m_robotDrive, m_nav, 1.0, 0, -90);
-    //Command oneMeterSquare = oneMeterTurnRight.andThen(oneMeterTurnRight).andThen(oneMeterTurnRight).andThen(oneMeterTurnRight);
-    
+
     m_autonomousChooser = new SendableChooser<Command>();
     m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
     m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
@@ -90,12 +96,16 @@ public class RobotContainer {
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
+  
 
   }
 
-  public static RobotContainer getInstance() { return instance; }
+  public static RobotContainer getInstance() {
+    return instance;
+  }
 
-  
+
+
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -115,17 +125,36 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    
-    
-    // new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-    //     .whileTrue(new RunCommand(() -> {
-    //                                       if(m_harvester.getArmAngle() > 90){
-    //                                           m_harvester.setIntakeSpeed(Constants.harvesterConstants.outSpeed);
-    //                                       }else{
-    //                                           m_harvester.setIntakeSpeed(Constants.harvesterConstants.outSpeedSlow);
-    //                                       }
-    //                                     }, m_harvester));                             
-  }
+    new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+    new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+
+        //get dpad position as a boolean (they are automatically returned by getPOV() as an exact value)
+        BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
+        BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+
+      //convert booleansupplier into triggers so the whileTrue() method can be called upon them
+      Trigger elevatorUp = new Trigger(dpadUp);
+      Trigger elevatorDown = new Trigger(dpadDown);
+
+      //dpad causes the elevator to go up/down slowly during teleop
+      elevatorUp.whileTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+          
+        };
+        
+
+        
+        
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -143,4 +172,6 @@ public class RobotContainer {
   public void setLED(double value) {
     m_BlinkinLED.set(value);
   }
+
+
 }
