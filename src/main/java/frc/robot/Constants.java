@@ -117,7 +117,11 @@ public final class Constants {
     //only one speed necessary
     public static final double gripperMotorSpeed = 0.6;
     public static final double gripperExtensionSpeed = 0.5;
-
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double openPosition = 100.0;
+    public static final double closedPosition = 0.0;
   }
 public static final int BLINKIN_LED_PWM_CHANNEL = 0;
 }

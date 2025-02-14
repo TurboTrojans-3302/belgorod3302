@@ -30,7 +30,8 @@ public class MoveRobotAndElevator extends ParallelCommandGroup {
     elevatorPosition = elevatorSetpoint;
     commandedPose = pose;
     // or do I need to create a new parallel command instance instead?
-    addCommands(new GoToCommand(drive, nav, commandedPose)
-    .alongWith(new MoveElevator(elevator, elevatorPosition, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel)));
+    addCommands(new GoToCommand(drive, nav, commandedPose),
+                new MoveElevator(elevator, elevatorPosition, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel)
+               );
   }
 }

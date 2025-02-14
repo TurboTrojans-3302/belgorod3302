@@ -4,21 +4,13 @@
 
 package frc.robot.commands.Autonomous.Red;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.commands.CloseAndExtendGripper;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.ExtendGripper;
-import frc.robot.commands.GoToCommand;
-import frc.robot.commands.KeepGripperClosed;
-import frc.robot.commands.MoveElevator;
 import frc.robot.commands.MoveRobotAndElevator;
 import frc.robot.commands.OpenGripper;
-import frc.robot.commands.WaitCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Gripper;
@@ -42,20 +34,15 @@ public class ReefSideTestL1Red extends SequentialCommandGroup {
     m_nav = nav;
     m_gripper = gripper;
     m_elevator = elevator;
-    aprilTagPose = m_nav.getTagPose2d(aprilTag);
+    aprilTagPose = m_nav.getPose2dInFrontOfTag(aprilTag, 1.0);
 
-    //this is the simplest I could make the logic with the gripper always having to be closed in the code
-    addCommands(new KeepGripperClosed(m_gripper)
-    .raceWith(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPose, Constants.ElevatorConstants.kLevel1Trough))
-    //gripper closing runs at the same time as the main command
-    .andThen(new DriveToAprilTag(drive, nav, aprilTag))
-    .raceWith(new KeepGripperClosed(m_gripper))
-    //keep gripper closed runs at the same time as the main command
-    .andThen(new CloseAndExtendGripper(m_gripper))
-
-    .andThen(new KeepGripperClosed(m_gripper))
-    .raceWith(new WaitCommand(0.75))
-    //some time for the gripper extension to settle before dropping the coral
-    .andThen(new OpenGripper(m_gripper)));
+    
+    addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPose, Constants.ElevatorConstants.kLevel1Trough),
+                //gripper closing runs at the same time as the main command
+                new DriveToAprilTag(drive, nav, aprilTag),
+                //keep gripper closed runs at the same time as the main command
+                new ExtendGripper(m_gripper),
+                //some time for the gripper extension to settle before dropping the coral
+                new OpenGripper(m_gripper));
   }
 }
