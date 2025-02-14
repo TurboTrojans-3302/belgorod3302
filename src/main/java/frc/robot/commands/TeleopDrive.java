@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OIConstants;
@@ -60,6 +61,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class TeleopDrive extends Command {
   private DriveSubsystem m_robotDrive;
   private XboxController m_driverController;
+  private boolean m_fieldOrientedEnable = true;
 
   /** Creates a new TeleopDrive. */
   public TeleopDrive(DriveSubsystem robotDrive, XboxController driverController) {
@@ -84,7 +86,7 @@ public class TeleopDrive extends Command {
       speedScale = 0.5;
     }
 
-    if(m_driverController.getRightBumperButton()) {
+    if(m_driverController.getRightBumperButton() || !m_fieldOrientedEnable) {
       m_robotDrive.driveRobotOriented(
         stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
         stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
@@ -114,4 +116,8 @@ public class TeleopDrive extends Command {
     return false;
   }
 
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addBooleanProperty("FieldOrientedEnable", () -> m_fieldOrientedEnable, (x)->{m_fieldOrientedEnable = x;});
+  }
 }
