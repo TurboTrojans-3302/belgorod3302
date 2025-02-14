@@ -12,6 +12,53 @@ import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
+/*
+ * Driver Xbox Controller
+ * 
+ * Left stick press: toggle slow drive, press (planned)
+ * Right stick press: toggle field oriented, press (planned)
+ * 
+ * A button: 
+ * B button: 
+ * X button: 
+ * Y button: 
+ * 
+ * Up Arrow: Target April tag that is currently being looked at and sent to dashboard, press (planned)
+ * Down Arrow: move to target apriltag, if not found send dashboard notification, hold (planned)
+ * Right Arrow: orbit right, hold (CCW)
+ * Left Arrow: orbit left, hold (CW)
+ * 
+ * Left Bumper - hold for half-speed mode
+ * Right Bumper - hold for robot-oriented drive
+ * 
+ * Right Trigger - 
+ * Left Trigger - 
+ * 
+ */
+
+/* 
+ * Copilot Controller
+ *
+ * Left Stick 
+ * Right Stick
+ *
+ * A Button - Trough preset position
+ * B button
+ * X button 
+ * Y button - Level 4 elevator preset position
+ *  
+ *  Left Bumper - Load elevator routine (planned)
+ *  Right Bumper 
+ *
+ *  Right Trigger - 
+ *  Left Trigger
+ *  
+ *  hold DPad up - Elevator precision control up
+ *  hold Dpad down - Elevator precision control down
+ *
+ *
+ */
+
 public class TeleopDrive extends Command {
   private DriveSubsystem m_robotDrive;
   private XboxController m_driverController;
