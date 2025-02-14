@@ -112,15 +112,6 @@ public final class Constants {
 
   }
 
-  public static final class ArmConstants {
-    public static final double armMaxSpeed = 0.5;
-    public static final int armMotorID = 15;
-    public static final int limitSwitchID = 4;
-    //artifical value
-    public static final double armPositionElevator = 100.0;
-
-  }
-
   public static final class GripperConstants {
     public static final int gripperMotorID = 16;
     public static final int gripperExtensionMotorID = 17;
