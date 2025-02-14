@@ -69,7 +69,9 @@ public class Navigation extends SubsystemBase {
       m_odometry.addVisionMeasurement(est.pose, est.timestampSeconds);
     }
 
-    m_dashboardField.setRobotPose(getPose());
+    Pose2d pose = m_odometry.getEstimatedPosition();
+    LimelightHelpers.SetRobotOrientation(cameraName, pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    m_dashboardField.setRobotPose(pose);
   }
 
   public Pose2d getPose() {
