@@ -247,7 +247,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         backRightModule.calibrateSterrRelativeEncoder();
     }
 
-    public void stop() {
+    public void setX() {
         frontLeftModule.set(0, Math.PI / 4);
         frontRightModule.set(0, -Math.PI / 4);
         backLeftModule.set(0, -Math.PI / 4);
@@ -260,10 +260,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
                 frontRightModule.getState(),
                 backLeftModule.getState(),
                 backRightModule.getState());
-    }
-
-    public void setX() {
-        stop();
     }
 
     @Override

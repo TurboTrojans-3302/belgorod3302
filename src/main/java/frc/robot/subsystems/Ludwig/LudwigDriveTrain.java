@@ -178,20 +178,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_rearRight.testSet(voltage, angle);
   }
 
-  /**
-   * Sets the swerve ModuleStates.
-   *
-   * @param desiredStates The desired SwerveModule states.
-   */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, maxSpeedLimit);
-    m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
-    m_rearRight.setDesiredState(desiredStates[3]);
-  }
-
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
@@ -244,17 +230,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   @Override
   public double getMaxSpeedLimit() {
     return DriveConstants.kMaxSpeedMetersPerSecond;
-  }
-
-  public void stop() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(Math.PI / 4)));
-    m_frontRight.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(-Math.PI / 4)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(-Math.PI / 4)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(Math.PI / 4)));
   }
 
   @Override

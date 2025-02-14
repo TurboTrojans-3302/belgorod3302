@@ -83,7 +83,9 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract void drive(ChassisSpeeds speeds);
 
-    public abstract void stop();
+    public void stop(){
+        drive(new ChassisSpeeds(0, 0, 0));
+    };
 
     public void driveHeadingField(Translation2d translationMetersPerSecond, double heading) {
         double yawCommand = turnToHeadingDegrees(heading);
