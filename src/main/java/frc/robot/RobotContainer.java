@@ -66,7 +66,9 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    m_robotDrive.setDefaultCommand(new TeleopDrive(m_robotDrive, m_driverController));
+    Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
+    m_robotDrive.setDefaultCommand(teleopCommand);
+    SmartDashboard.putData("TeleopCommand", teleopCommand);
     //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
 
