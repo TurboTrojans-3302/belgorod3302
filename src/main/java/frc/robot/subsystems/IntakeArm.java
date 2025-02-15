@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.PrimitiveIterator;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -13,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import frc.robot.Robot;
 import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -25,9 +24,11 @@ public class IntakeArm extends SubsystemBase {
   private DutyCycleEncoder m_ArmEncoder;
   private double m_armAngleOffset = IntakeConstants.armAngleOffset;
   private PIDController m_PidController;
-  private double kP = IntakeConstants.kP;
-  private double kI = IntakeConstants.kI;
-  private double kD = IntakeConstants.kD;
+  private ArmFeedforward m_Feedforward;
+  private double kS = IntakeConstants.kS;
+  private double kG = IntakeConstants.kG;
+  private double kV = IntakeConstants.kV;
+  private double kA = IntakeConstants.kA;
 
   private LinearFilter m_velocityFilter;
   private double m_lastArmAngle;
@@ -39,10 +40,15 @@ public class IntakeArm extends SubsystemBase {
     m_armSpx.setNeutralMode(NeutralMode.Brake);
     m_armSpx.setInverted(true);
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
-    m_ArmEncoder.setDutyCycleRange(1.0/1025.0, 1024.0/1025.0);
-    m_PidController = new PIDController(kP, kI, kD);
+    m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
+    m_PidController = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
+    resetFeedForward();
     m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
     m_lastArmAngle = getArmAngleDegrees();
+  }
+
+  private void resetFeedForward() {
+    m_Feedforward = new ArmFeedforward(kS, kG, kV, kA);
   }
 
   @Override
@@ -53,32 +59,51 @@ public class IntakeArm extends SubsystemBase {
     m_armVelocity = m_velocityFilter.calculate(vel);
     m_lastArmAngle = newAngle;
 
-    double x = m_PidController.calculate(newAngle);
+    double pid = m_PidController.calculate(newAngle);
+    double ff = m_Feedforward.calculate(newAngle, m_armVelocity);
 
-    m_armSpx.set(VictorSPXControlMode.PercentOutput, x);
+    m_armSpx.set(VictorSPXControlMode.PercentOutput, pid + ff);
   }
 
-  public void setPositionAngleSetpoint(double angle){
+  public void setPositionAngleSetpoint(double angle) {
     double setpoint = MathUtil.clamp(angle, IntakeConstants.MinArmAngle, IntakeConstants.MaxArmAngle);
     m_PidController.setSetpoint(setpoint);
   }
 
-  public double getPositionAngleSetpoint(){
+  public double getPositionAngleSetpoint() {
     return m_PidController.getSetpoint();
   }
 
-  public double getArmAngleDegrees(){
+  public double getArmAngleDegrees() {
     return (m_ArmEncoder.get() * 360.0) + m_armAngleOffset;
   }
 
-  public double getArmAngleVelocity(){
+  public double getArmAngleVelocity() {
     return m_armVelocity;
   }
 
   @Override
-  public void initSendable(SendableBuilder builder){
+  public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty("ArmAngle", this::getArmAngleDegrees, null);
-    builder.addDoubleProperty("ArmAngleOffset", ()->m_armAngleOffset , (x)->{m_armAngleOffset = x;});
+    builder.addDoubleProperty("ArmAngleOffset", () -> m_armAngleOffset, (x) -> {
+      m_armAngleOffset = x;
+    });
+    builder.addDoubleProperty("kS", () -> kS, (x) -> {
+      kS = x;
+      resetFeedForward();
+    });
+    builder.addDoubleProperty("kG", () -> kG, (x) -> {
+      kG = x;
+      resetFeedForward();
+    });
+    builder.addDoubleProperty("kV", () -> kV, (x) -> {
+      kV = x;
+      resetFeedForward();
+    });
+    builder.addDoubleProperty("kA", () -> kA, (x) -> {
+      kA = x;
+      resetFeedForward();
+    });
   }
 }
