@@ -47,6 +47,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     private double maxSpeedLimit = DriveConstants.kMaxSpeedMetersPerSecond; // m/s
     private double maxRotationLimit = DriveConstants.kMaxRotation;
 
+
     private final SwerveDriveKinematics kinematics = DriveConstants.kinematics;
 
     private static final double FRONT_LEFT_ANGLE_OFFSET = -Math.toRadians((329.59 - 360));
@@ -55,12 +56,18 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     private static final double BACK_RIGHT_ANGLE_OFFSET = -Math.toRadians(19.07);
     private static final double kPgain = 0.080;
     private static final double kDgain = 0;
+    private double slewLimitTranslation = DriveConstants.SLEW_LIMIT_TRANSLATION;
+    private double slewLimitRotation = DriveConstants.SLEW_LIMIT_ROTATION;
 
     private static EddieDriveTrain m_instance;
 
     // slew rate limiting filters
-    private ChassisSpeedsSlewRateLimiter slewRateLimiter = new ChassisSpeedsSlewRateLimiter(DriveConstants.SLEW_LIMIT_TRANSLATION,
-                                                                                     DriveConstants.SLEW_LIMIT_ROTATION);
+    private ChassisSpeedsSlewRateLimiter slewRateLimiter = new ChassisSpeedsSlewRateLimiter(slewLimitTranslation,
+                                                                                     slewLimitRotation);
+
+    private void reloadSlewLimiter(){
+        slewRateLimiter = new ChassisSpeedsSlewRateLimiter(slewLimitTranslation, slewLimitRotation);                                                                         
+    }
     
     ModuleConfiguration rightSideConfiguration = new ModuleConfiguration(
             0.10033,
@@ -306,6 +313,14 @@ public class EddieDriveTrain extends DriveSubsystemBase {
             return maxRotationLimit;
         }, (x) -> {
             maxRotationLimit = x;
+        });
+        builder.addDoubleProperty("Slew Limit Translation", ()-> slewLimitTranslation, (x)->{
+            slewLimitTranslation = x;
+            reloadSlewLimiter();
+        });
+        builder.addDoubleProperty("Slew Limit Rotation", ()-> slewLimitRotation, (x)->{
+            slewLimitRotation = x;
+            reloadSlewLimiter();
         });
     }
 
