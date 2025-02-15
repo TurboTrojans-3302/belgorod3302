@@ -82,7 +82,12 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract double turnToHeadingDegrees(double heading);
 
-    public abstract void drive(ChassisSpeeds speeds);
+    public abstract void drive(ChassisSpeeds speeds, Translation2d centerOfRotation);
+
+    public void drive(ChassisSpeeds speeds){
+        drive(speeds, Translation2d.kZero);
+    }
+
 
     public void stop(){
         drive(new ChassisSpeeds(0, 0, 0));
@@ -117,6 +122,11 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
       public Translation2d getVelocityVector() {
         ChassisSpeeds chassisSpeeds = getChassisSpeeds();
         return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+    }
+
+    public void orbit(double orbitSpeed) {
+        final Translation2d center = new Translation2d(1.0, 0.0);
+        drive(new ChassisSpeeds(0, 0, orbitSpeed), center);
     }
 
     @Override

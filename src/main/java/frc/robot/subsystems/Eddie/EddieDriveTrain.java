@@ -106,7 +106,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         m_instance = this;
 
         ahrs.reset();
-        calibrateSterrRelativeEncoder();
+        calibrateSteerRelativeEncoder();
 
         // todo add the swerve drive to the dashboard
         SmartDashboard.putData("Swerve Drive", new Sendable() {
@@ -144,8 +144,12 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void periodic() {
         setMaxSpeed();
 
-        if (Math.abs(getSpeed()) > 1e-6 && Math.abs(getTurnRate()) > 1e-6) {
+        if (Math.abs(getSpeed()) > 1e-6 || Math.abs(getTurnRate()) > 1e-6) {
             stillTime.restart();
+        }
+
+        if(stillTime.get() > 2.0) {
+            calibrateSteerRelativeEncoder();
         }
 
     }
@@ -185,10 +189,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     private double speedToVoltage(double speed) {
         return MathUtil.clamp(speed / maxSpeedLimit, -1.0, 1.0) * 12.0;
-    }
-
-    public void drive(ChassisSpeeds speeds){
-        drive(speeds, Translation2d.kZero);
     }
 
     public void drive(ChassisSpeeds speeds, Translation2d centerOfRotationMeters) {
@@ -244,11 +244,11 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return delta;
     }
 
-    public void calibrateSterrRelativeEncoder() {
-        frontLeftModule.calibrateSterrRelativeEncoder();
-        frontRightModule.calibrateSterrRelativeEncoder();
-        backLeftModule.calibrateSterrRelativeEncoder();
-        backRightModule.calibrateSterrRelativeEncoder();
+    public void calibrateSteerRelativeEncoder() {
+        frontLeftModule.calibrateSteerRelativeEncoder();
+        frontRightModule.calibrateSteerRelativeEncoder();
+        backLeftModule.calibrateSteerRelativeEncoder();
+        backRightModule.calibrateSteerRelativeEncoder();
     }
 
     public void setX() {
@@ -271,10 +271,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return DriveConstants.kMaxSpeedMetersPerSecond;
     }
 
-    public void orbit(double orbitSpeed) {
-        final Translation2d center = new Translation2d(1.0, 0.0);
-        drive(new ChassisSpeeds(0, 0, orbitSpeed), center);
-    }
     @Override
     public SwerveModulePosition[] getSwerveModulePositions() {
         return new SwerveModulePosition[] { frontLeftModule.getPosition(),

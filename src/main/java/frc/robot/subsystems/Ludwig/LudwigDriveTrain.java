@@ -7,6 +7,7 @@ package frc.robot.subsystems.Ludwig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -32,55 +33,25 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
       DriveConstants.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
-  public MAXSwerveModule getM_frontLeft() {
-    return m_frontLeft;
-  }
-
   private final MAXSwerveModule m_frontRight = MAXSwerveModule.getInstance(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
-
-  public MAXSwerveModule getM_frontRight() {
-    return m_frontRight;
-  }
 
   private final MAXSwerveModule m_rearLeft = MAXSwerveModule.getInstance(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
-  public MAXSwerveModule getM_rearLeft() {
-    return m_rearLeft;
-  }
-
   private final MAXSwerveModule m_rearRight = MAXSwerveModule.getInstance(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-  public MAXSwerveModule getM_rearRight() {
-    return m_rearRight;
-  }
-
   // The gyro sensor
   // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
   private final ADIS16448_IMU m_gyro = new ADIS16448_IMU(IMUAxis.kX, SPI.Port.kMXP, CalibrationTime._1s);
   private double m_gyroOffsetDeg = 0.0;
-
-  // Slew rate filter variables for controlling lateral acceleration
-  private double m_currentRotation = 0.0;
-  private double m_currentTranslationDir = 0.0;
-
-  public double getM_currentTranslationDir() {
-    return m_currentTranslationDir;
-  }
-
-  private double m_currentTranslationMag = 0.0;
-
-  public double getM_currentTranslationMag() {
-    return m_currentTranslationMag;
-  }
 
   private PIDController headingPidController;
 
@@ -132,7 +103,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * maxSpeedLimit;
     double ySpeedDelivered = ySpeed * maxSpeedLimit;
-    double rotDelivered = m_currentRotation * maxRotationLimit;
+    double rotDelivered = rot * maxRotationLimit;
 
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
@@ -144,7 +115,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * maxSpeedLimit;
     double ySpeedDelivered = ySpeed * maxSpeedLimit;
-    double rotDelivered = m_currentRotation * maxRotationLimit;
+    double rotDelivered = rot * maxRotationLimit;
 
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
         Rotation2d.fromDegrees(getGyroAngleDegrees()));
@@ -152,8 +123,8 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     drive(speeds);
   }
 
-  public void drive(ChassisSpeeds speeds) {
-    var swerveModuleStates = DriveConstants.kinematics.toSwerveModuleStates(speeds);
+  public void drive(ChassisSpeeds speeds, Translation2d centerOfRotation) {
+    var swerveModuleStates = DriveConstants.kinematics.toSwerveModuleStates(speeds, centerOfRotation);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeedLimit);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);

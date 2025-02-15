@@ -55,8 +55,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     //DataLogManager.start();
     //CanBridge.runTCP();
-    m_robotContainer.m_robotDrive.calibrateSterrRelativeEncoder();
-
     LimelightHelpers.setCameraPose_RobotSpace(Constants.LimelightConstants.name,
                                               Constants.LimelightConstants.Offset.forward,
                                               Constants.LimelightConstants.Offset.side,

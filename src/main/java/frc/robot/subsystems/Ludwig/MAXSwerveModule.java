@@ -140,4 +140,8 @@ public class MAXSwerveModule implements SwerveModule {
     m_drivingSpark.setVoltage(voltage);
     m_turningClosedLoopController.setReference(angleRadians, ControlType.kPosition);
 }
+
+public void calibrateSteerRelativeEncoder() {
+    
+}
 }
