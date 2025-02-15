@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Eddie.DriveConstants;
 
 /*
  * Driver Xbox Controller
@@ -20,8 +21,8 @@ import frc.robot.subsystems.DriveSubsystem;
  * Right stick press: toggle field oriented, press (planned)
  * 
  * A button: 
- * B button: 
- * X button: 
+ * B button: hold to orbit CCW around reef (planned)
+ * X button: hold to orbit CW around reef (planned)
  * Y button: 
  * 
  * Up Arrow: Target April tag that is currently being looked at and sent to dashboard, press (planned)
@@ -29,11 +30,11 @@ import frc.robot.subsystems.DriveSubsystem;
  * Right Arrow: orbit right, hold (CCW)
  * Left Arrow: orbit left, hold (CW)
  * 
- * Left Bumper - hold for half-speed mode
- * Right Bumper - hold for robot-oriented drive
- * 
- * Right Trigger - 
  * Left Trigger - 
+ * Right Trigger - 
+ * 
+ * Right Bumper - intake in (planned)
+ * Left Bumper -  intake out (planned)
  * 
  */
 
@@ -64,6 +65,7 @@ public class TeleopDrive extends Command {
   private DriveSubsystem m_robotDrive;
   private XboxController m_driverController;
   private boolean m_fieldOrientedEnable = true;
+  private double orbitSpeed = DriveConstants.ORBIT_SPEED;
 
   /** Creates a new TeleopDrive. */
   public TeleopDrive(DriveSubsystem robotDrive, XboxController driverController) {
@@ -92,9 +94,18 @@ public class TeleopDrive extends Command {
     double leftward = stick2speed(speedScale * m_driverController.getLeftX());
     double rotate = stick2speed(speedScale * m_driverController.getRightX());
 
+
     if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
-      double orbitSpeed = stick2speed(speedScale * (m_driverController.getRightTriggerAxis() - m_driverController.getLeftTriggerAxis()));
-      m_robotDrive.orbit(orbitSpeed);
+
+      if(m_driverController.getPOV() == 90){
+        m_robotDrive.orbit(orbitSpeed * -speedScale);
+      }
+      else if(m_driverController.getPOV() == 270){
+        m_robotDrive.orbit(orbitSpeed * speedScale);
+      }else{
+        m_robotDrive.stop();
+      }
+
     } else {
       if(m_driverController.getRightBumperButton() || !m_fieldOrientedEnable) {
         m_robotDrive.driveRobotOriented(forward, leftward, rotate);
@@ -124,5 +135,6 @@ public class TeleopDrive extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addBooleanProperty("FieldOrientedEnable", () -> m_fieldOrientedEnable, (x)->{m_fieldOrientedEnable = x;});
+    builder.addDoubleProperty("Orbit Speed", ()-> orbitSpeed, (x)-> orbitSpeed = x);
   }
 }
