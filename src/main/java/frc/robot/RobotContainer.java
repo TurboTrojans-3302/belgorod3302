@@ -37,10 +37,10 @@ public class RobotContainer {
 
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  public final Elevator m_elevator = new Elevator(Constants.ElevatorConstants.kLeftMotorElevatorCanId,
-      Constants.ElevatorConstants.kRightMotorElevatorCanId,
-      Constants.ElevatorConstants.kElevatorHighLimitSwitchId,
-      Constants.ElevatorConstants.kElevatorLowLimitSwitchId);
+  // public final Elevator m_elevator = new Elevator(Constants.ElevatorConstants.kLeftMotorElevatorCanId,
+  //     Constants.ElevatorConstants.kRightMotorElevatorCanId,
+  //     Constants.ElevatorConstants.kElevatorHighLimitSwitchId,
+  //     Constants.ElevatorConstants.kElevatorLowLimitSwitchId);
   public final Navigation m_nav = new Navigation(m_robotDrive);
 
   public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
@@ -125,29 +125,29 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_copilotController, XboxController.Button.kA.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+    // new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+    //     .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel1Trough, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+    // new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+    //     .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+    // new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+    //     .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+    // new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+    //     .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-        //get dpad position as a boolean (they are automatically returned by getPOV() as an exact value)
-        BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
-        BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+        // //get dpad position as a boolean (they are automatically returned by getPOV() as an exact value)
+        // BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
+        // BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
 
-      //convert booleansupplier into triggers so the whileTrue() method can be called upon them
-      Trigger elevatorUp = new Trigger(dpadUp);
-      Trigger elevatorDown = new Trigger(dpadDown);
+      // //convert booleansupplier into triggers so the whileTrue() method can be called upon them
+      // Trigger elevatorUp = new Trigger(dpadUp);
+      // Trigger elevatorDown = new Trigger(dpadDown);
 
-      //dpad causes the elevator to go up/down slowly during teleop
-      elevatorUp.whileTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
-      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      // //dpad causes the elevator to go up/down slowly during teleop
+      // elevatorUp.whileTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      // elevatorDown.whileTrue(new MoveElevator(m_elevator, 0, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
           
         };
         
