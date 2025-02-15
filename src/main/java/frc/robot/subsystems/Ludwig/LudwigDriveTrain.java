@@ -12,13 +12,19 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.CalibrationTime;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 public class LudwigDriveTrain extends DriveSubsystemBase {
+  private double maxSpeedLimit = DriveConstants.kMaxSpeedMetersPerSecond; // m/s
+  private double maxRotationLimit = DriveConstants.kMaxAngularSpeed;
+
 
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = MAXSwerveModule.getInstance(
@@ -85,6 +91,28 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
         DriveConstants.headingD);
     headingPidController.enableContinuousInput(0.0, 360.0);
     headingPidController.setTolerance(2.0);
+  
+      // todo add the swerve drive to the dashboard
+        SmartDashboard.putData("Swerve Drive", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("SwerveDrive");
+
+                builder.addDoubleProperty("Front Left Angle", () -> m_frontLeft.getSteerAngle(), null);
+                builder.addDoubleProperty("Front Left Velocity", () -> m_frontLeft.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Front Right Angle", () -> m_frontRight.getSteerAngle(), null);
+                builder.addDoubleProperty("Front Right Velocity", () -> m_frontRight.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Back Left Angle", () -> m_rearLeft.getSteerAngle(), null);
+                builder.addDoubleProperty("Back Left Velocity", () -> m_rearLeft.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Back Right Angle", () -> m_rearRight.getSteerAngle(), null);
+                builder.addDoubleProperty("Back Right Velocity", () -> m_rearRight.getDriveVelocity(), null);
+
+                builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
+            }
+        });
   }
 
   @Override
@@ -102,9 +130,9 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   public void driveRobotOriented(Double xSpeed, Double ySpeed, Double rot) {
 
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
+    double xSpeedDelivered = xSpeed * maxSpeedLimit;
+    double ySpeedDelivered = ySpeed * maxSpeedLimit;
+    double rotDelivered = m_currentRotation * maxRotationLimit;
 
     ChassisSpeeds speeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
@@ -114,9 +142,9 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   public void driveFieldOriented(Double xSpeed, Double ySpeed, Double rot) {
 
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
+    double xSpeedDelivered = xSpeed * maxSpeedLimit;
+    double ySpeedDelivered = ySpeed * maxSpeedLimit;
+    double rotDelivered = m_currentRotation * maxRotationLimit;
 
     ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
         Rotation2d.fromDegrees(getGyroAngleDegrees()));
@@ -126,7 +154,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
 
   public void drive(ChassisSpeeds speeds) {
     var swerveModuleStates = DriveConstants.kinematics.toSwerveModuleStates(speeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeedLimit);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -148,20 +176,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_frontRight.testSet(voltage, angle);
     m_rearLeft.testSet(voltage, angle);
     m_rearRight.testSet(voltage, angle);
-  }
-
-  /**
-   * Sets the swerve ModuleStates.
-   *
-   * @param desiredStates The desired SwerveModule states.
-   */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(desiredStates[0]);
-    m_frontRight.setDesiredState(desiredStates[1]);
-    m_rearLeft.setDesiredState(desiredStates[2]);
-    m_rearRight.setDesiredState(desiredStates[3]);
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -218,17 +232,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     return DriveConstants.kMaxSpeedMetersPerSecond;
   }
 
-  public void stop() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(Math.PI / 4)));
-    m_frontRight.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(-Math.PI / 4)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(-Math.PI / 4)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0.0,
-        Rotation2d.fromRadians(Math.PI / 4)));
-  }
-
   @Override
   public SwerveModulePosition[] getSwerveModulePositions() {
     return new SwerveModulePosition[] { m_frontLeft.getPosition(),
@@ -243,4 +246,18 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     return DriveConstants.kinematics;
   }
 
-}
+  @Override
+  public void initSendable(SendableBuilder builder) {
+      super.initSendable(builder);
+      builder.addDoubleProperty("gyroAngleDegrees", this::getGyroAngleDegrees, this::setGyroAngleDeg);
+      builder.addDoubleProperty("MaxSpeedLimit", () -> {
+          return maxSpeedLimit;
+      }, (x) -> {
+          maxSpeedLimit = x;
+      });
+      builder.addDoubleProperty("MaxRotationLimit", () -> {
+          return maxRotationLimit;
+      }, (x) -> {
+          maxRotationLimit = x;
+      });
+  }}

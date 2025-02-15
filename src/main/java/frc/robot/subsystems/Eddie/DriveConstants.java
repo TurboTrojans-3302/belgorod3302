@@ -29,8 +29,6 @@ public class DriveConstants {
         public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER = 11;
         public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 5;
 
-        public static final double kMaxSpeedMetersPerSecond = 12.0;
-
         public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
                         new Translation2d(WHEELBASE / 2.0, TRACKWIDTH / 2.0), // front left
                         new Translation2d(WHEELBASE / 2.0, -TRACKWIDTH / 2.0), // front right
@@ -40,4 +38,8 @@ public class DriveConstants {
 
         public static final double SLEW_LIMIT_TRANSLATION = 10.0; // m/s^2
         public static final double SLEW_LIMIT_ROTATION =  10.0;  // rad/s^2     
+        public static final double AutonSpeedLimit = 4.0;
+        public static final double AutonAccelLimit = 2.0;
+        public static final double kMaxRotation = 8.0;
+        public static final double kMaxSpeedMetersPerSecond = 12.0;
 }

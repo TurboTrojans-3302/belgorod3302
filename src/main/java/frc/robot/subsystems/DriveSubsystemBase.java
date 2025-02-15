@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Add your docs here. */
@@ -83,7 +84,9 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract void drive(ChassisSpeeds speeds);
 
-    public abstract void stop();
+    public void stop(){
+        drive(new ChassisSpeeds(0, 0, 0));
+    };
 
     public void driveHeadingField(Translation2d translationMetersPerSecond, double heading) {
         double yawCommand = turnToHeadingDegrees(heading);
@@ -116,4 +119,9 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
         return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
+    @Override
+    public void initSendable(SendableBuilder builder){
+        super.initSendable(builder);
+        builder.addDoubleProperty("maxSpeed", this::getMaxSpeed, null);
+    }
 }

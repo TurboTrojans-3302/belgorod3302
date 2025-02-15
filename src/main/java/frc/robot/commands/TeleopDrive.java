@@ -5,8 +5,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -60,6 +63,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class TeleopDrive extends Command {
   private DriveSubsystem m_robotDrive;
   private XboxController m_driverController;
+  private boolean m_fieldOrientedEnable = true;
 
   /** Creates a new TeleopDrive. */
   public TeleopDrive(DriveSubsystem robotDrive, XboxController driverController) {
@@ -78,29 +82,32 @@ public class TeleopDrive extends Command {
   @Override
   public void execute() {
     double speedScale;
-    if (m_driverController.getRightTriggerAxis() < 0.5) {
-      speedScale = 1;
-    } else {
+    if (m_driverController.getLeftBumperButton()) {
       speedScale = 0.5;
+    } else {
+      speedScale = 1.0;
     }
 
-    if(m_driverController.getRightBumperButton()) {
-      m_robotDrive.driveRobotOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+    double forward = stick2speed(speedScale * m_driverController.getLeftY());
+    double leftward = stick2speed(speedScale * m_driverController.getLeftX());
+    double rotate = stick2speed(speedScale * m_driverController.getRightX());
+
+    if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
+      double orbitSpeed = stick2speed(speedScale * (m_driverController.getRightTriggerAxis() - m_driverController.getLeftTriggerAxis()));
+      m_robotDrive.orbit(orbitSpeed);
     } else {
-      m_robotDrive.driveFieldOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+      if(m_driverController.getRightBumperButton() || !m_fieldOrientedEnable) {
+        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
+      } else {
+        double reverse = (Robot.alliance == Alliance.Red) ? -1.0 : 1.0;
+        m_robotDrive.driveFieldOriented(reverse * forward, reverse * leftward, rotate);
+      }
     }
-    
   }
 
   // applies deadband and scaling to raw stick value
   private double stick2speed(double stickValue) {
-    return Math.signum(stickValue) * Math.pow(MathUtil.applyDeadband(stickValue, OIConstants.kDriveDeadband), 2);
+    return -Math.signum(stickValue) * Math.pow(MathUtil.applyDeadband(stickValue, OIConstants.kDriveDeadband), 2);
   }
 
   // Called once the command ends or is interrupted.
@@ -114,4 +121,8 @@ public class TeleopDrive extends Command {
     return false;
   }
 
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addBooleanProperty("FieldOrientedEnable", () -> m_fieldOrientedEnable, (x)->{m_fieldOrientedEnable = x;});
+  }
 }
