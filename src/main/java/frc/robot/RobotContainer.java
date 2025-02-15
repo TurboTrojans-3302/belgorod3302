@@ -94,6 +94,10 @@ public class RobotContainer {
     m_startPosChooser.addOption("Right IceCream", org.littletonrobotics.frc2025.FieldConstants.StagingPositions.rightIceCream);
     SmartDashboard.putData("Start Position", m_startPosChooser);
 
+    SmartDashboard.putData("DriveSubsystem", m_robotDrive);
+    SmartDashboard.putData("Navigation", m_nav);
+    SmartDashboard.putData("GoToCommand", new GoToCommand(m_robotDrive, m_nav, Pose2d.kZero));
+
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 
   

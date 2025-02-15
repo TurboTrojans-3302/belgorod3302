@@ -38,6 +38,6 @@ public class DriveConstants {
 
         public static final double AutonSpeedLimit = 4.0;
         public static final double AutonAccelLimit = 2.0;
-        public static final double kMaxRotation = 4.0;
+        public static final double kMaxRotation = 8.0;
         public static final double kMaxSpeedMetersPerSecond = 12.0;
 }
