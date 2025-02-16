@@ -27,7 +27,7 @@ public class Navigation extends SubsystemBase {
 
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
-  private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  private static AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
@@ -94,11 +94,11 @@ public class Navigation extends SubsystemBase {
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 
-  public Pose2d getTagPose2d(int tagId) {
+  public static Pose2d getTagPose2d(int tagId) {
     return m_fieldLayout.getTagPose(tagId).get().toPose2d();
   }
 
-  public Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
+  public static Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
     Transform2d delta = new Transform2d(distance, 0.0, Rotation2d.fromDegrees(180.0));
     Pose2d tagPose = getTagPose2d(tagId);
     return tagPose.plus(delta);
