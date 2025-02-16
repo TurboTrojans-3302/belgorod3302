@@ -144,7 +144,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void periodic() {
         setMaxSpeed();
 
-        if (Math.abs(getSpeed()) > 1e-6 || Math.abs(getTurnRate()) > 1e-6) {
+        if (Math.abs(getSpeed()) > 1e-6 || Math.abs(getTurnRateRadians()) > 1e-6) {
             stillTime.restart();
         }
 
@@ -220,8 +220,12 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return -ahrs.getAngle();
     }
 
-    public double getTurnRate() {
+    public double getTurnRateDeg() {
         return -ahrs.getRate(); // todo confirm the sign of this
+    }
+
+    public double getTurnRateRadians() {
+        return Math.toRadians(getTurnRateDeg());
     }
 
     // todo test this! don't think its ever been used

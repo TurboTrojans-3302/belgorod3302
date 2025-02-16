@@ -28,12 +28,13 @@ public class GoToCommand extends Command {
   private Pose2d m_dest;
   private Transform2d m_delta;
   private DriveSubsystem m_drive;
-  private TrapezoidProfile m_trapezoid;
+  private TrapezoidProfile m_speedProfile;
   private boolean m_relativeFlag;
   private Navigation m_nav;
 
   static double speedLimit = AutoConstants.kMaxSpeedMetersPerSecond;
   static double accelLimit = AutoConstants.kMaxAccelerationMetersPerSecondSquared;
+  static double turnLimit = AutoConstants.kMaxAngularSpeedRadiansPerSecond;
 
   private GoToCommand(DriveSubsystem drive, Navigation nav) {
     m_drive = drive;
@@ -70,7 +71,7 @@ public class GoToCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_trapezoid = new TrapezoidProfile(new Constraints(speedLimit, accelLimit));
+    m_speedProfile = new TrapezoidProfile(new Constraints(speedLimit, accelLimit));
 
     if (m_relativeFlag) {
       Pose2d currPose2d = m_nav.getPose();
@@ -113,12 +114,12 @@ public class GoToCommand extends Command {
     State currentState = new State(0.0, speedTowardTarget());
     State goalState = new State(distance(), 0.0);
 
-    double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
-
+    double speed = m_speedProfile.calculate(dT, currentState, goalState).velocity;
     Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
-    double turn = m_drive.turnToHeadingDegrees(m_dest.getRotation().getDegrees());
+    
+    double headingRadians = SwerveUtils.StepTowardsCircular(m_nav.getAngleRadians(), m_dest.getRotation().getRadians(), turnLimit * dT);
 
-    m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
+    m_drive.driveHeadingField(unitTranslation.times(speed), Math.toDegrees(headingRadians));
   }
 
   // Called once the command ends or is interrupted.
@@ -140,5 +141,6 @@ public class GoToCommand extends Command {
     super.initSendable(builder);
     builder.addDoubleProperty("speedLimit", () -> speedLimit, (x) -> speedLimit = x );
     builder.addDoubleProperty("accelLimit", () -> accelLimit, (x) -> accelLimit = x );
+    builder.addDoubleProperty("turnLimit", () -> turnLimit, (x) -> turnLimit = x );
   }
 }

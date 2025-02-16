@@ -59,7 +59,7 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
      */
     public abstract double getGyroAngleRadians();
 
-    public abstract double getTurnRate();
+    public abstract double getTurnRateDeg();
 
     public abstract ChassisSpeeds getChassisSpeeds();
 

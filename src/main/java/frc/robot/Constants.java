@@ -31,16 +31,11 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI/2.0;
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
-
-    // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
   public static final int DX_SENSOR_CAN_ID = 0;
@@ -60,9 +55,10 @@ public final class Constants {
       public static final double pitch = 0.0;
       public static final double yaw = 0.0;
     }
+
     public static final class PipelineIdx {
-      public static final int AprilTag        = 0;
-      public static final int NeuralDetector  = 1;
+      public static final int AprilTag = 0;
+      public static final int NeuralDetector = 1;
       public static final int NeuralClassifer = 2;
     }
   }
@@ -119,7 +115,7 @@ public final class Constants {
     public static final int gripperExtensionMotorID = 17;
     public static final int limitSwitchID = 5;
     public static final double gripperExtendedPosition = 100.0;
-    //only one speed necessary
+    // only one speed necessary
     public static final double gripperMotorSpeed = 0.6;
     public static final double gripperExtensionSpeed = 0.5;
     public static final double kP = 0;
@@ -128,5 +124,6 @@ public final class Constants {
     public static final double openPosition = 100.0;
     public static final double closedPosition = 0.0;
   }
-public static final int BLINKIN_LED_PWM_CHANNEL = 0;
+
+  public static final int BLINKIN_LED_PWM_CHANNEL = 0;
 }

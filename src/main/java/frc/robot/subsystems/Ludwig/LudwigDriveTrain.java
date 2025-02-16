@@ -181,7 +181,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
    *
    * @return The turn rate of the robot, in degrees per second
    */
-  public double getTurnRate() {
+  public double getTurnRateDeg() {
     return m_gyro.getRate();
   }
 
