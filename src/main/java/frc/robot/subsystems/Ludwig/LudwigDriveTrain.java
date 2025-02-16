@@ -63,6 +63,8 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     headingPidController.enableContinuousInput(0.0, 360.0);
     headingPidController.setTolerance(2.0);
   
+    SmartDashboard.putData("headingPIDcontroller", headingPidController);
+    
       // todo add the swerve drive to the dashboard
         SmartDashboard.putData("Swerve Drive", new Sendable() {
             @Override
@@ -84,6 +86,11 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
                 builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
             }
         });
+        SmartDashboard.putData("Left Front Module", m_frontLeft);
+        SmartDashboard.putData("Right Front Module", m_frontRight);
+        SmartDashboard.putData("Left Rear Module", m_rearLeft);
+        SmartDashboard.putData("Right Rear Module", m_rearRight);
+        
   }
 
   @Override
