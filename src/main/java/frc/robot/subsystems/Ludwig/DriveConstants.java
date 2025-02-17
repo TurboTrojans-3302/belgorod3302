@@ -37,19 +37,6 @@ public class DriveConstants {
     public static final double kBackLeftChassisAngularOffset = Math.toRadians(0.0);
     public static final double kBackRightChassisAngularOffset = Math.toRadians(58.0);
 
-    // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 4;
-    public static final int kRearLeftDrivingCanId = 6;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kRearRightDrivingCanId = 8;
-
-    public static final int kFrontLeftTurningCanId = 3;
-    public static final int kRearLeftTurningCanId = 5;
-    public static final int kFrontRightTurningCanId = 1;
-    public static final int kRearRightTurningCanId = 7;
-
-    public static final int kDXSensorCanId = 0;
-
     public static final double headingP = 0.02;
     public static final double headingI = 0.0001;
     public static final double headingD = 0;
