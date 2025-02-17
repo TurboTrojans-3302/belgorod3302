@@ -21,8 +21,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
 
-  private double kMediumTolerance = 5;
-  private double kSmallTolerance = 1;
+  private double kTolerance = ElevatorConstants.kTolerance;
   private double kElevatorMaxSpeed = ElevatorConstants.kElevatorMaxSpeed;
 
   public SparkMax leftElevatorMotor;
@@ -35,6 +34,10 @@ public class Elevator extends SubsystemBase {
   public DigitalInput elevatorLowLimitSwitch;
   public RelativeEncoder elevatorEncoder;
 
+  public double kLimitLow = ElevatorConstants.kLimitLow;
+  public double kLimitHigh = ElevatorConstants.kLimitHigh;
+  public double kSoftLimitLow = ElevatorConstants.kSoftLimitLow;
+  public double kSoftLimitHigh = ElevatorConstants.kSoftLimitHigh;
   public double kLevel1Trough = ElevatorConstants.kLevel1Trough;
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
@@ -54,16 +57,13 @@ public class Elevator extends SubsystemBase {
     // relative encoder if there isnt one
     // I would assume we only need one of the motors to use an encoder
     elevatorEncoder = leftElevatorMotor.getEncoder();
-    // Set position to starting position, where 0 equals the bottom of the elevator
-    elevatorEncoder.setPosition(0);
   }
-
 
   public double getElevatorSpeed() {
     return elevatorEncoder.getVelocity();
   }
 
-  public double setMotorSpeed(double speed) {
+  private double setMotorSpeed(double speed) {
     double elevatorSpeed = MathUtil.clamp(speed, -kElevatorMaxSpeed, kElevatorMaxSpeed);
     leftElevatorMotor.set(elevatorSpeed);
     rightElevatorMotor.set(-elevatorSpeed);
@@ -76,24 +76,37 @@ public class Elevator extends SubsystemBase {
     // starting position
 
     return elevatorEncoder.getPosition();
+  }
 
+  public void resetElevatorPositionEncoder(double position) {
+    elevatorEncoder.setPosition(position);
   }
 
   // stopping elevator with limit switches
   public void checkLimits() {
-    // see line 104 first
-    // after checking for closed limit switches, the elevator is stopped if the
-    // planned speed would bring it towards the limit
-    // if the elevator speed is not zero or going in the opposite direction of limit
-    // that has been triggered
-    // assuming negative speed is going down and vice versa
+    /*
+     * Checking the hard limits
+     */
     if (!elevatorHighLimitSwitch.get()) {
-      if (getMotorSpeed() > 0.0) {
-        setMotorSpeed(0.0);
-
+      if (getElevatorPosition() < kLimitHigh) {
+        resetElevatorPositionEncoder(kLimitHigh);
       }
     }
     if (!elevatorLowLimitSwitch.get()) {
+      if (getElevatorPosition() > kLimitLow) {
+        resetElevatorPositionEncoder(kLimitLow);
+      }
+    }
+
+    /*
+     * Checking the soft limits
+     */
+    if (getElevatorPosition() > kSoftLimitHigh) {
+      if (getMotorSpeed() > 0.0) {
+        setMotorSpeed(0.0);
+      }
+    }
+    if (getElevatorPosition() < kSoftLimitLow) {
       if (getMotorSpeed() < 0.0) {
         setMotorSpeed(0.0);
       }
@@ -104,86 +117,85 @@ public class Elevator extends SubsystemBase {
     return leftElevatorMotor.get();
   }
 
-  // stopping without limit switches
-
-  // digital input false means it is actually true because digital input switches
-  // return a zero when closed which corresponds to false
-
-  // position in motor rotations
-  // sets automatic speed to either positive or negative based on where the
-  // elevator is in relation to target
-  // also slows down if it is within a range and stops when position is close to
-  // being reached
-  // input a position value from constants to get it to go to a certain level
-  public void setPosition(double setPosition, double speed) {
-
-    // you can change the speed reduction within tolerance here
-    final double speedFactor = 0.75;
-    double elevatorPosition = getElevatorPosition();
-
-    if (setPosition > (elevatorPosition + kMediumTolerance)) {
-      setMotorSpeed(-speed);
-
-    } else if (setPosition > (elevatorPosition + kSmallTolerance)) {
-      setMotorSpeed(-speed * speedFactor);
-
-    } else if (setPosition > (elevatorPosition - kSmallTolerance)) {
-      setMotorSpeed(0.0);
-
-    } else if (setPosition > (elevatorPosition - kMediumTolerance)) {
-      setMotorSpeed(speed * speedFactor);
-
-    } else {
-      setMotorSpeed(speed);
-    }
+  public void setPosition(double setpoint) {
+    setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
+    elevatorPID.setSetpoint(setpoint);
   }
 
-  public void setPositionPID(double setpoint){
-     elevatorPID.setSetpoint(setpoint);
+  public boolean atSetpoint() {
+    return isNear(elevatorPID.getSetpoint());
   }
 
-  public boolean atSetpoint(){
-    return elevatorPID.atSetpoint();
+  public boolean isNear(double position) {
+    return MathUtil.isNear(position, getElevatorSpeed(), kTolerance);
   }
 
-   public boolean isNear(double position) {
-    return MathUtil.isNear(position, getElevatorSpeed(), kSmallTolerance);
-   }
+  public boolean isNearLevel1() {
+    return isNear(kLevel1Trough);
+  }
 
-   public boolean isNearLevel1(){ return isNear(kLevel1Trough); }
-   public boolean isNearLevel2(){ return isNear(kLevel2); }
-   public boolean isNearLevel3(){ return isNear(kLevel3); }
-   public boolean isNearLevel4(){ return isNear(kLevel4); }
+  public boolean isNearLevel2() {
+    return isNear(kLevel2);
+  }
+
+  public boolean isNearLevel3() {
+    return isNear(kLevel3);
+  }
+
+  public boolean isNearLevel4() {
+    return isNear(kLevel4);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     // checks for limit switches
 
-    // only runs if the limit check is true and the direction of planned travel is
-    // towards the limit switch as well.
-    checkLimits();
     double speedCalculation = elevatorPID.calculate(getElevatorPosition());
-     leftElevatorMotor.set(speedCalculation);
-     rightElevatorMotor.set(-speedCalculation);
+    setMotorSpeed(speedCalculation);
+
+    // important to check the limits after setting the speed
+    checkLimits();
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty("Position", this::getElevatorPosition, null);
-    builder.addDoubleProperty("MaxSpeed", () -> kElevatorMaxSpeed, (x) -> { kElevatorMaxSpeed = x; });
-    builder.addDoubleProperty("Tolerance", ()-> kSmallTolerance, (x)->{ kSmallTolerance=x; });
-    builder.addDoubleProperty("Level1Trough", () -> kLevel1Trough, (x) -> { kLevel1Trough = x; });
-    builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> { kLevel2 = x; });
-    builder.addDoubleProperty("Level3", () -> kLevel3, (x) -> { kLevel3 = x; });
-    builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> { kLevel4 = x; });
-    builder.addBooleanProperty("AtLevel1", this::isNearLevel1, null );
-    builder.addBooleanProperty("AtLevel2", this::isNearLevel2, null );
-    builder.addBooleanProperty("AtLevel3", this::isNearLevel3, null );
-    builder.addBooleanProperty("AtLevel4", this::isNearLevel4, null );
-    builder.addDoubleProperty("elevator kP", ()-> kP, (x) -> {kP = x;});
-    builder.addDoubleProperty("elevator kI", ()-> kI, (x) -> {kI = x;});
-    builder.addDoubleProperty("elevator kD", ()-> kD, (x) -> {kD = x;});
+    builder.addDoubleProperty("MaxSpeed", () -> kElevatorMaxSpeed, (x) -> {
+      kElevatorMaxSpeed = x;
+    });
+    builder.addDoubleProperty("Tolerance", () -> kTolerance, (x) -> {
+      kTolerance = x;
+    });
+    builder.addDoubleProperty("Level1Trough", () -> kLevel1Trough, (x) -> {
+      kLevel1Trough = x;
+    });
+    builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> {
+      kLevel2 = x;
+    });
+    builder.addDoubleProperty("Level3", () -> kLevel3, (x) -> {
+      kLevel3 = x;
+    });
+    builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> {
+      kLevel4 = x;
+    });
+    builder.addBooleanProperty("AtLevel1", this::isNearLevel1, null);
+    builder.addBooleanProperty("AtLevel2", this::isNearLevel2, null);
+    builder.addBooleanProperty("AtLevel3", this::isNearLevel3, null);
+    builder.addBooleanProperty("AtLevel4", this::isNearLevel4, null);
+    builder.addDoubleProperty("elevator kP", () -> kP, (x) -> {
+      kP = x;
+    });
+    builder.addDoubleProperty("elevator kI", () -> kI, (x) -> {
+      kI = x;
+    });
+    builder.addDoubleProperty("elevator kD", () -> kD, (x) -> {
+      kD = x;
+    });
+  }
+
+  public void stop() {
+    setPosition(getElevatorPosition());
   }
 }
