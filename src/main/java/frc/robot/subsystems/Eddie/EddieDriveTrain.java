@@ -22,15 +22,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
@@ -73,29 +70,29 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     private final TTSwerveModule frontLeftModule = new TTSwerveModule(
             leftSideConfiguration,
-            DriveConstants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
             FRONT_LEFT_ANGLE_OFFSET);
     private final TTSwerveModule frontRightModule = new TTSwerveModule(
             rightSideConfiguration,
-            DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
             FRONT_RIGHT_ANGLE_OFFSET);
 
     private final TTSwerveModule backLeftModule = new TTSwerveModule(
             leftSideConfiguration,
-            DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
             BACK_LEFT_ANGLE_OFFSET);
 
     private final TTSwerveModule backRightModule = new TTSwerveModule(
             rightSideConfiguration,
-            DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
             BACK_RIGHT_ANGLE_OFFSET);
 
     private final AHRS ahrs = new AHRS(SerialPort.Port.kUSB);
@@ -106,7 +103,7 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         m_instance = this;
 
         ahrs.reset();
-        calibrateSterrRelativeEncoder();
+        calibrateSteerRelativeEncoder();
 
         // todo add the swerve drive to the dashboard
         SmartDashboard.putData("Swerve Drive", new Sendable() {
@@ -144,8 +141,12 @@ public class EddieDriveTrain extends DriveSubsystemBase {
     public void periodic() {
         setMaxSpeed();
 
-        if (Math.abs(getSpeed()) > 1e-6 && Math.abs(getTurnRate()) > 1e-6) {
+        if (Math.abs(getSpeed()) > 1e-6 || Math.abs(getTurnRate()) > 1e-6) {
             stillTime.restart();
+        }
+
+        if(stillTime.get() > 2.0) {
+            calibrateSteerRelativeEncoder();
         }
 
     }
@@ -187,9 +188,9 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return MathUtil.clamp(speed / maxSpeedLimit, -1.0, 1.0) * 12.0;
     }
 
-    public void drive(ChassisSpeeds speeds) {
+    public void drive(ChassisSpeeds speeds, Translation2d centerOfRotationMeters) {
 
-        SwerveModuleState[] states = DriveConstants.kinematics.toSwerveModuleStates(speeds);
+        SwerveModuleState[] states = DriveConstants.kinematics.toSwerveModuleStates(speeds, centerOfRotationMeters);
         frontLeftModule.set(speedToVoltage(states[0].speedMetersPerSecond), states[0].angle.getRadians());
         frontRightModule.set(speedToVoltage(states[1].speedMetersPerSecond), states[1].angle.getRadians());
         backLeftModule.set(speedToVoltage(states[2].speedMetersPerSecond), states[2].angle.getRadians());
@@ -240,11 +241,11 @@ public class EddieDriveTrain extends DriveSubsystemBase {
         return delta;
     }
 
-    public void calibrateSterrRelativeEncoder() {
-        frontLeftModule.calibrateSterrRelativeEncoder();
-        frontRightModule.calibrateSterrRelativeEncoder();
-        backLeftModule.calibrateSterrRelativeEncoder();
-        backRightModule.calibrateSterrRelativeEncoder();
+    public void calibrateSteerRelativeEncoder() {
+        frontLeftModule.calibrateSteerRelativeEncoder();
+        frontRightModule.calibrateSteerRelativeEncoder();
+        backLeftModule.calibrateSteerRelativeEncoder();
+        backRightModule.calibrateSteerRelativeEncoder();
     }
 
     public void setX() {

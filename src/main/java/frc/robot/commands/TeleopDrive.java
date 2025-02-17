@@ -7,9 +7,12 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Eddie.DriveConstants;
 
 /*
  * Driver Xbox Controller
@@ -18,8 +21,8 @@ import frc.robot.subsystems.DriveSubsystem;
  * Right stick press: toggle field oriented, press (planned)
  * 
  * A button: 
- * B button: 
- * X button: 
+ * B button: hold to orbit CCW around reef (planned)
+ * X button: hold to orbit CW around reef (planned)
  * Y button: 
  * 
  * Up Arrow: Target April tag that is currently being looked at and sent to dashboard, press (planned)
@@ -27,11 +30,11 @@ import frc.robot.subsystems.DriveSubsystem;
  * Right Arrow: orbit right, hold (CCW)
  * Left Arrow: orbit left, hold (CW)
  * 
- * Left Bumper - hold for half-speed mode
- * Right Bumper - hold for robot-oriented drive
- * 
- * Right Trigger - 
  * Left Trigger - 
+ * Right Trigger - 
+ * 
+ * Right Bumper - intake in (planned)
+ * Left Bumper -  intake out (planned)
  * 
  */
 
@@ -62,6 +65,7 @@ public class TeleopDrive extends Command {
   private DriveSubsystem m_robotDrive;
   private XboxController m_driverController;
   private boolean m_fieldOrientedEnable = true;
+  private double orbitSpeed = DriveConstants.ORBIT_SPEED;
 
   /** Creates a new TeleopDrive. */
   public TeleopDrive(DriveSubsystem robotDrive, XboxController driverController) {
@@ -80,29 +84,41 @@ public class TeleopDrive extends Command {
   @Override
   public void execute() {
     double speedScale;
-    if (m_driverController.getRightTriggerAxis() < 0.5) {
-      speedScale = 1;
-    } else {
+    if (m_driverController.getLeftBumperButton()) {
       speedScale = 0.5;
+    } else {
+      speedScale = 1.0;
     }
 
-    if(m_driverController.getRightBumperButton() || !m_fieldOrientedEnable) {
-      m_robotDrive.driveRobotOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+    double forward = stick2speed(speedScale * m_driverController.getLeftY());
+    double leftward = stick2speed(speedScale * m_driverController.getLeftX());
+    double rotate = stick2speed(speedScale * m_driverController.getRightX());
+
+
+    if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
+
+      if(m_driverController.getPOV() == 90){
+        m_robotDrive.orbit(orbitSpeed * -speedScale);
+      }
+      else if(m_driverController.getPOV() == 270){
+        m_robotDrive.orbit(orbitSpeed * speedScale);
+      }else{
+        m_robotDrive.stop();
+      }
+
     } else {
-      m_robotDrive.driveFieldOriented(
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftY()),
-        stick2speed(speedScale * -1.0 * m_driverController.getLeftX()),
-        stick2speed(speedScale * -1.0 * m_driverController.getRightX()));
+      if(m_driverController.getRightBumperButton() || !m_fieldOrientedEnable) {
+        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
+      } else {
+        double reverse = (Robot.alliance == Alliance.Red) ? -1.0 : 1.0;
+        m_robotDrive.driveFieldOriented(reverse * forward, reverse * leftward, rotate);
+      }
     }
-    
   }
 
   // applies deadband and scaling to raw stick value
   private double stick2speed(double stickValue) {
-    return Math.signum(stickValue) * Math.pow(MathUtil.applyDeadband(stickValue, OIConstants.kDriveDeadband), 2);
+    return -Math.signum(stickValue) * Math.pow(MathUtil.applyDeadband(stickValue, OIConstants.kDriveDeadband), 2);
   }
 
   // Called once the command ends or is interrupted.
@@ -119,5 +135,6 @@ public class TeleopDrive extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addBooleanProperty("FieldOrientedEnable", () -> m_fieldOrientedEnable, (x)->{m_fieldOrientedEnable = x;});
+    builder.addDoubleProperty("Orbit Speed", ()-> orbitSpeed, (x)-> orbitSpeed = x);
   }
 }

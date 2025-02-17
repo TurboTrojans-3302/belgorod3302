@@ -8,8 +8,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import frc.robot.Robot;
-import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -17,6 +15,9 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Robot;
 
 public class IntakeArm extends SubsystemBase {
 
@@ -36,7 +37,7 @@ public class IntakeArm extends SubsystemBase {
 
   /** Creates a new IntakeArm. */
   public IntakeArm() {
-    m_armSpx = new VictorSPX(IntakeConstants.intakeArmMotorID);
+    m_armSpx = new VictorSPX(Constants.CanIds.intakeArmMotorID);
     m_armSpx.setNeutralMode(NeutralMode.Brake);
     m_armSpx.setInverted(true);
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
@@ -68,6 +69,10 @@ public class IntakeArm extends SubsystemBase {
   public void setPositionAngleSetpoint(double angle) {
     double setpoint = MathUtil.clamp(angle, IntakeConstants.MinArmAngle, IntakeConstants.MaxArmAngle);
     m_PidController.setSetpoint(setpoint);
+  }
+
+  public boolean atSetpoint(){
+    return m_PidController.atSetpoint();
   }
 
   public double getPositionAngleSetpoint() {
