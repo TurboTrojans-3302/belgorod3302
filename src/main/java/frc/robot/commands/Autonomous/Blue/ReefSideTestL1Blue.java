@@ -34,7 +34,7 @@ public class ReefSideTestL1Blue extends SequentialCommandGroup {
     m_nav = nav;
     m_gripper = gripper;
     m_elevator = elevator;
-    aprilTagPose = m_nav.getPose2dInFrontOfTag(aprilTag, 1.0);
+    aprilTagPose = Navigation.getPose2dInFrontOfTag(aprilTag, 1.0);
 
     
     addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPose, Constants.ElevatorConstants.kLevel1Trough),

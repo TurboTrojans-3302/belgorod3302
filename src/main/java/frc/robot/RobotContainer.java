@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,18 +11,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
-import frc.robot.commands.MoveElevator;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
-import frc.robot.subsystems.Elevator;
+import frc.utils.IntegerChange;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -53,6 +52,7 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+  ReefController m_reefController = new ReefController(OIConstants.kReefControllerPort);
   
   
 
@@ -81,10 +81,10 @@ public class RobotContainer {
     m_autonomousChooser.addOption("GoTo 2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 2.0, 0, 0));
     m_autonomousChooser.addOption("GoTo -2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, -2.0, 0, 0));
     m_autonomousChooser.addOption("GoTo 1, -1, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, -1.0, 0));
-    m_autonomousChooser.addOption("Nav to tag 1", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(1, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 17", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(17, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 18", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(18, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 19", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(19, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 1",  GoToCommand.absolute(m_robotDrive, m_nav, Navigation.getPose2dInFrontOfTag(1, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 17", GoToCommand.absolute(m_robotDrive, m_nav, Navigation.getPose2dInFrontOfTag(17, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 18", GoToCommand.absolute(m_robotDrive, m_nav, Navigation.getPose2dInFrontOfTag(18, 0.5)));
+    m_autonomousChooser.addOption("Nav to tag 19", GoToCommand.absolute(m_robotDrive, m_nav, Navigation.getPose2dInFrontOfTag(19, 0.5)));
     //m_autonomousChooser.addOption("one meter square", oneMeterSquare);
 
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
@@ -154,11 +154,13 @@ public class RobotContainer {
       // //dpad causes the elevator to go up/down slowly during teleop
       // elevatorUp.whileTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
       // elevatorDown.whileTrue(new MoveElevator(m_elevator, 0, Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
-          
-        };
         
-
-        
+      new Trigger(new IntegerChange(m_reefController::getSwitchPosition)).onTrue(new InstantCommand(() -> {
+        System.out.println("Reefcontroller switch position: " + m_reefController.getSwitchPosition());
+        Pose2d targetPose = m_reefController.getTargetPose2d();
+        m_nav.m_dashboardField.getObject("reefTarget").setPose(targetPose);
+      })); 
+    }
         
   
 

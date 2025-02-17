@@ -60,7 +60,7 @@ public class ReefController {
 
     }
 
-    private int getSwitchPosition(){
+    public int getSwitchPosition(){
         for(int i = 1; i < 13; i++){
             if(m_controller.getRawButton(i)){
                 value = i;
