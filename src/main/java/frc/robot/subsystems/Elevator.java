@@ -39,6 +39,7 @@ public class Elevator extends SubsystemBase {
   public double kSoftLimitLow = ElevatorConstants.kSoftLimitLow;
   public double kSoftLimitHigh = ElevatorConstants.kSoftLimitHigh;
   public double kLevel1Trough = ElevatorConstants.kLevel1Trough;
+  public double kPickupLevel = ElevatorConstants.kPickupLevel;
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
   public double kLevel4 = ElevatorConstants.kLevel4;
@@ -130,6 +131,10 @@ public class Elevator extends SubsystemBase {
     return MathUtil.isNear(position, getElevatorSpeed(), kTolerance);
   }
 
+  public boolean isNearPickupLevel() {
+    return isNear(kPickupLevel);
+  }
+
   public boolean isNearLevel1() {
     return isNear(kLevel1Trough);
   }
@@ -168,6 +173,9 @@ public class Elevator extends SubsystemBase {
     builder.addDoubleProperty("Tolerance", () -> kTolerance, (x) -> {
       kTolerance = x;
     });
+    builder.addDoubleProperty("PickupLevel", ()-> kPickupLevel, (x)-> {
+      kPickupLevel = x;
+    });
     builder.addDoubleProperty("Level1Trough", () -> kLevel1Trough, (x) -> {
       kLevel1Trough = x;
     });
@@ -180,6 +188,7 @@ public class Elevator extends SubsystemBase {
     builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> {
       kLevel4 = x;
     });
+    builder.addBooleanProperty("AtPickup", this::isNearPickupLevel, null);
     builder.addBooleanProperty("AtLevel1", this::isNearLevel1, null);
     builder.addBooleanProperty("AtLevel2", this::isNearLevel2, null);
     builder.addBooleanProperty("AtLevel3", this::isNearLevel3, null);
