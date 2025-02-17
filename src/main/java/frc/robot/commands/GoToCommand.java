@@ -11,8 +11,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
@@ -23,7 +24,7 @@ public class GoToCommand extends Command {
   private final double DISTANCE_TOLERANCE = 0.050;
   private final double HEADING_TOLERANCE = 2.0;
   private final double dT = Robot.kDefaultPeriod;
-  private final double rotationRateLimit = Constants.AutoConstants.kMaxAngularSpeedRadiansPerSecond * dT;
+  private final double rotationRateLimit = AutoConstants.kMaxAngularSpeedRadiansPerSecond * dT;
 
   private Pose2d m_dest;
   private Transform2d m_delta;
@@ -32,12 +33,13 @@ public class GoToCommand extends Command {
   private boolean m_relativeFlag;
   private Navigation m_nav;
 
+  static double speedLimit = AutoConstants.kMaxSpeedMetersPerSecond;
+  static double accelLimit = AutoConstants.kMaxAccelerationMetersPerSecondSquared;
+
   private GoToCommand(DriveSubsystem drive, Navigation nav) {
     m_drive = drive;
     this.m_nav = nav;
     addRequirements(m_drive);
-    m_trapezoid = new TrapezoidProfile(new Constraints(m_drive.getMaxSpeedLimit() * 0.5,
-        m_drive.getMaxSpeedLimit() * 1.0)); // todo use full speed;
   }
 
   public GoToCommand(DriveSubsystem drive, Navigation nav, Pose2d dest) {
@@ -69,6 +71,7 @@ public class GoToCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_trapezoid = new TrapezoidProfile(new Constraints(speedLimit, accelLimit));
 
     if (m_relativeFlag) {
       Pose2d currPose2d = m_nav.getPose();
@@ -135,4 +138,10 @@ public class GoToCommand extends Command {
         Math.abs(deltaHeading()) < HEADING_TOLERANCE;
   }
 
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    builder.addDoubleProperty("speedLimit", () -> speedLimit, (x) -> speedLimit = x );
+    builder.addDoubleProperty("accelLimit", () -> accelLimit, (x) -> accelLimit = x );
+  }
 }

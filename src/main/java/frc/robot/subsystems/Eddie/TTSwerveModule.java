@@ -140,7 +140,7 @@ public class TTSwerveModule implements SwerveModule {
             mSteerController = new SteerControllerImplementation(steerMotor, absoluteEncoder);
         }            
     
-        public void calibrateSterrRelativeEncoder(){
+        public void calibrateSteerRelativeEncoder(){
     
             mSteerController.calibrateRelativeEncoder();
     
