@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import org.littletonrobotics.frc2025.FieldConstants.Reef;
+
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
@@ -104,6 +106,9 @@ public class Navigation extends SubsystemBase {
     return tagPose.plus(delta);
   }
 
+  public Pose2d getPose2dInFrontOfTag(int tagId, double distance, ReefPole side) {
+    return getPose2dInFrontOfTag(tagId, 0.0).plus(side.transform);
+  }
 
   /**
    * @return heading angle of the bot, according to the odometry, in degrees
@@ -123,4 +128,15 @@ public class Navigation extends SubsystemBase {
       builder.addBooleanProperty("DxGood", this::dxMeasurmentGood, null);
       builder.addDoubleProperty("DxSensor", this::getDxToObjectMeters, null);
     }
+
+    static public enum ReefPole { 
+      left(new Transform2d(0.0, 0.165, Rotation2d.kZero)),
+      right(new Transform2d(0.0, -0.165, Rotation2d.kZero));
+  
+      public Transform2d transform;
+  
+      private ReefPole(Transform2d t) {
+        this.transform = t;
+      }
+    };
 }

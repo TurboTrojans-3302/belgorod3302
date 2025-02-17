@@ -100,6 +100,9 @@ public final class Constants {
     // for the station with april tag 13 these values both stay positive
     public static final double poseOffsetStationRightX = 0.5;
     public static final double poseOffsetStationRightY = 0.5;
+    //relative in the y-direction
+    public static final double yOffsetReefPoleLeft = 0.3;
+    public static final double yOffsetReefPoleRight = -0.3;
   }
 
   public static final class LimelightConstants {
