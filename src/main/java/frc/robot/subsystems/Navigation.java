@@ -106,7 +106,7 @@ public class Navigation extends SubsystemBase {
     return tagPose.plus(delta);
   }
 
-  public Pose2d getPose2dInFrontOfTag(int tagId, double distance, ReefPole side) {
+  public static Pose2d getPose2dInFrontOfTag(int tagId, double distance, ReefPole side) {
     return getPose2dInFrontOfTag(tagId, 0.0).plus(side.transform);
   }
 
