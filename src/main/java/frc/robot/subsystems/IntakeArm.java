@@ -63,6 +63,10 @@ public class IntakeArm extends SubsystemBase {
     m_PidController.setSetpoint(setpoint);
   }
 
+  public boolean atSetpoint(){
+    return m_PidController.atSetpoint();
+  }
+
   public double getPositionAngleSetpoint(){
     return m_PidController.getSetpoint();
   }

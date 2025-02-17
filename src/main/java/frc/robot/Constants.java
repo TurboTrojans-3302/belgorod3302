@@ -47,6 +47,9 @@ public final class Constants {
 
   public static final class FieldConstants {
     public static final Pose2d ZeroZero = new Pose2d(0.0, 0.0, new Rotation2d());
+    //for the station with april tag 13 these values both stay positive
+    public static final double poseOffsetStationRightX = 0.5;
+    public static final double poseOffsetStationRightY = 0.5;
   }
 
   public static final class LimelightConstants {
@@ -76,6 +79,7 @@ public final class Constants {
     public static final int kElevatorLowLimitSwitchId = 1;
     // position in motor rotations for different levels of the reef, all random
     // numbers that need to be tested of course
+    public static final double kGround = 0;
     public static final double kLevel1Trough = 50;
     public static final double kLevel2 = 75;
     public static final double kLevel3 = 100;
@@ -99,6 +103,7 @@ public final class Constants {
     public static final int intakeArmMotorID = 13;
     public static final int intakeLimitSwitchID = 2;
     public static final double intakeSpeedMax = 0.75;
+    public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.0;
     public static final double kP = 0.0;
     public static final double kD = 0.0;
