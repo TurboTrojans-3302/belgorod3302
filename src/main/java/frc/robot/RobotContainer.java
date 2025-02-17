@@ -61,8 +61,9 @@ public class RobotContainer {
                                           
   public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   
-  private final SendableChooser<Command> m_autonomousChooser;
-  private final SendableChooser<Pose2d> m_startPosChooser;
+  private SendableChooser<Command> m_autonomousChooser;
+  private SendableChooser<Pose2d> m_startPosChooser;
+  private AutonMenus m_autonMenus;
 
   private final REVBlinkinLED m_BlinkinLED;
 
@@ -77,7 +78,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
     instance = this;
-
+    m_autonMenus = new AutonMenus();
+    
     // Configure the button bindings
     configureButtonBindings();
 
@@ -85,25 +87,6 @@ public class RobotContainer {
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
     m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
-    //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
-
-
-    m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
-    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
-    m_autonomousChooser.addOption("turn to april tag 11", new TurnToAprilTag(m_robotDrive, 11));
-    m_autonomousChooser.addOption("Drive to april tag 1", new DriveToAprilTag(m_robotDrive, m_nav, 1));
-    m_autonomousChooser.addOption("GoTo 1, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, 0, 0));
-    m_autonomousChooser.addOption("GoTo 2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 2.0, 0, 0));
-    m_autonomousChooser.addOption("GoTo -2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, -2.0, 0, 0));
-    m_autonomousChooser.addOption("GoTo 1, -1, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, -1.0, 0));
-    m_autonomousChooser.addOption("Nav to tag 1", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(1, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 17", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(17, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 18", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(18, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 19", GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(19, 0.5)));
-    //m_autonomousChooser.addOption("one meter square", oneMeterSquare);
-
-    SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
     m_startPosChooser = new SendableChooser<Pose2d>();
     m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
@@ -193,6 +176,22 @@ public class RobotContainer {
 
   public void setLED(double value) {
     m_BlinkinLED.set(value);
+  }
+
+  /*
+   * called once when is set to Red by the DriverStation
+   */
+  public void initRed() {
+    m_autonomousChooser = m_autonMenus.redCommands;
+    SmartDashboard.putData("Auton Command", m_autonomousChooser);
+  }
+
+  /*
+   * called once when is set to Blue by the DriverStation
+   */
+  public void initBlue() {
+    m_autonomousChooser = m_autonMenus.blueCommands;
+    SmartDashboard.putData("Auton Command", m_autonomousChooser);
   }
 
 
