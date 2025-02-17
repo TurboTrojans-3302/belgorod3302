@@ -27,6 +27,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystemBase;
 
 /**
@@ -69,29 +70,29 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     private final TTSwerveModule frontLeftModule = new TTSwerveModule(
             leftSideConfiguration,
-            DriveConstants.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER,
             FRONT_LEFT_ANGLE_OFFSET);
     private final TTSwerveModule frontRightModule = new TTSwerveModule(
             rightSideConfiguration,
-            DriveConstants.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER,
             FRONT_RIGHT_ANGLE_OFFSET);
 
     private final TTSwerveModule backLeftModule = new TTSwerveModule(
             leftSideConfiguration,
-            DriveConstants.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER,
             BACK_LEFT_ANGLE_OFFSET);
 
     private final TTSwerveModule backRightModule = new TTSwerveModule(
             rightSideConfiguration,
-            DriveConstants.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
-            DriveConstants.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
+            Constants.CanIds.DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR,
+            Constants.CanIds.DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER,
             BACK_RIGHT_ANGLE_OFFSET);
 
     private final AHRS ahrs = new AHRS(SerialPort.Port.kUSB);

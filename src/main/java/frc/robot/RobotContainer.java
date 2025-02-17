@@ -16,13 +16,19 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.CanIds;
+import frc.robot.Constants.DigitalIO;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
+import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
 import frc.utils.IntegerChange;
+import frc.robot.subsystems.Gripper;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.IntakeArm;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -36,12 +42,22 @@ public class RobotContainer {
 
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  // public final Elevator m_elevator = new Elevator(Constants.ElevatorConstants.kLeftMotorElevatorCanId,
-  //     Constants.ElevatorConstants.kRightMotorElevatorCanId,
-  //     Constants.ElevatorConstants.kElevatorHighLimitSwitchId,
-  //     Constants.ElevatorConstants.kElevatorLowLimitSwitchId);
   public final Navigation m_nav = new Navigation(m_robotDrive);
-
+  // public final Elevator m_elevator = new Elevator(CanIds.kLeftMotorElevatorCanId,
+  //                                                 CanIds.kRightMotorElevatorCanId,
+  //                                                 DigitalIO.kElevatorHighLimitSwitchId,
+  //                                                 DigitalIO.kElevatorLowLimitSwitchId);
+  // public final Intake m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
+  // public final IntakeArm m_intakeArm = new IntakeArm();
+  // public final Gripper m_gripper = new Gripper(CanIds.kGripperMotorCanId,
+  //                                              CanIds.kGripperExtensionMotorCanId,
+  //                                              DigitalIO.kGripperClosedSwitchId,
+  //                                              DigitalIO.kGripperFullyRetractedSwitchId,
+  //                                              DigitalIO.kGripperObjectDetectedSwitchId);
+  // public final Climbers m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
+  //                                                 CanIds.kClimberRightMotorCanId,
+  //                                                 DigitalIO.kClimberLimitSwitchId);                                               
+                                          
   public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   
   private final SendableChooser<Command> m_autonomousChooser;

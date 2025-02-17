@@ -20,6 +20,7 @@ public class Gripper extends SubsystemBase {
   SparkMax gripperExtension;
   DigitalInput gripperClosedSwitch;
   DigitalInput gripperFullyRetracted;
+  DigitalInput gripperObjectDetected;
   RelativeEncoder extensionMotorEncoder;
   RelativeEncoder gripperEncoder;
   double gripperSpeed = Constants.GripperConstants.gripperMotorSpeed;
@@ -33,13 +34,14 @@ public class Gripper extends SubsystemBase {
   double kD = Constants.GripperConstants.kD;
 
   
-  public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID) {
+  public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID, int objectDetectionID) {
     gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
     gripperExtension = new SparkMax(gripperExtensionID, MotorType.kBrushless);
     extensionMotorEncoder = gripperExtension.getEncoder();
     gripperEncoder = gripperMotor.getEncoder();
     gripperClosedSwitch = new DigitalInput(closedSwitchID);
     gripperFullyRetracted = new DigitalInput(retractedSwitchID);
+    gripperObjectDetected = new DigitalInput(objectDetectionID);
     gripperPID = new PIDController(kP, kI, kD);
   }
 
@@ -99,6 +101,9 @@ public class Gripper extends SubsystemBase {
     return extensionMotorEncoder.getPosition();
   }
 
+  public boolean objectInGripper(){
+    return (!gripperObjectDetected.get());
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
