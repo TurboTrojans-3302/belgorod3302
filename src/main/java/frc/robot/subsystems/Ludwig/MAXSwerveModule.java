@@ -4,21 +4,24 @@
 
 package frc.robot.subsystems.Ludwig;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.swervedrivespecialties.swervelib.SwerveModule;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
 
-public class MAXSwerveModule implements SwerveModule {
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+
+public class MAXSwerveModule implements SwerveModule, Sendable {
   private final SparkMax m_drivingSpark;
   private final SparkMax m_turningSpark;
 
@@ -30,6 +33,8 @@ public class MAXSwerveModule implements SwerveModule {
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
+  private double steerP, steerI, steerD;
+  private double driveP, driveI, driveD;
 
   /**
    * Constructs a MAXSwerveModule and configures the driving and turning motor,
@@ -58,6 +63,13 @@ public class MAXSwerveModule implements SwerveModule {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
+
+    steerP = m_turningSpark.configAccessor.closedLoop.getP();
+    steerI = m_turningSpark.configAccessor.closedLoop.getI();
+    steerD = m_turningSpark.configAccessor.closedLoop.getD();
+    driveP = m_drivingSpark.configAccessor.closedLoop.getP();
+    driveI = m_drivingSpark.configAccessor.closedLoop.getI();
+    driveD = m_drivingSpark.configAccessor.closedLoop.getD();
   }
 
   /**
@@ -136,8 +148,59 @@ public class MAXSwerveModule implements SwerveModule {
     m_turningClosedLoopController.setReference(steerAngle, ControlType.kPosition);
   }
 
-  public void testSet(double voltage, double angleRadians){
+  public void testSet(double voltage, double angleRadians) {
     m_drivingSpark.setVoltage(voltage);
     m_turningClosedLoopController.setReference(angleRadians, ControlType.kPosition);
-}
+  }
+
+  private void setPIDConstants(SparkMax spark, double p, double i, double d) {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.closedLoop.pid(p, i, d);
+    spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Swerve Module " + m_drivingSpark.getDeviceId() + "/" + m_turningSpark.getDeviceId());
+    builder.addDoubleProperty("AngleOffset", () -> m_chassisAngularOffset, (x) -> {
+      m_chassisAngularOffset = x;
+    });
+    builder.addDoubleProperty("Steer P",
+        () -> steerP,
+        (x) -> {
+          steerP = x;
+          setPIDConstants(m_turningSpark, steerP, steerI, steerD);
+        });
+    builder.addDoubleProperty("Steer I",
+        () -> steerI,
+        (x) -> {
+          steerI = x;
+          setPIDConstants(m_turningSpark, steerP, steerI, steerD);
+        });
+    builder.addDoubleProperty("Steer D",
+        () -> steerD,
+        (x) -> {
+          steerD = x;
+          setPIDConstants(m_turningSpark, steerP, steerI, steerD);
+        });
+    builder.addDoubleProperty("Drive P",
+        () -> driveP,
+        (x) -> {
+          driveP = x;
+          setPIDConstants(m_drivingSpark, driveP, driveI, driveD);
+        });
+    builder.addDoubleProperty("Drive I",
+        () -> driveI,
+        (x) -> {
+          driveI = x;
+          setPIDConstants(m_drivingSpark, driveP, driveI, driveD);
+        });
+    builder.addDoubleProperty("Drive D",
+        () -> driveD,
+        (x) -> {
+          driveD = x;
+          setPIDConstants(m_drivingSpark, driveP, driveI, driveD);
+        });
+  }
+
 }
