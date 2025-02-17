@@ -44,20 +44,20 @@ public class RobotContainer {
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final Navigation m_nav = new Navigation(m_robotDrive);
-  // public final Elevator m_elevator = new Elevator(CanIds.kLeftMotorElevatorCanId,
-  //                                                 CanIds.kRightMotorElevatorCanId,
-  //                                                 DigitalIO.kElevatorHighLimitSwitchId,
-  //                                                 DigitalIO.kElevatorLowLimitSwitchId);
-  // public final Intake m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
-  // public final IntakeArm m_intakeArm = new IntakeArm();
-  // public final Gripper m_gripper = new Gripper(CanIds.kGripperMotorCanId,
-  //                                              CanIds.kGripperExtensionMotorCanId,
-  //                                              DigitalIO.kGripperClosedSwitchId,
-  //                                              DigitalIO.kGripperFullyRetractedSwitchId,
-  //                                              DigitalIO.kGripperObjectDetectedSwitchId);
-  // public final Climbers m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
-  //                                                 CanIds.kClimberRightMotorCanId,
-  //                                                 DigitalIO.kClimberLimitSwitchId);                                               
+  public final Elevator m_elevator = new Elevator(CanIds.kLeftMotorElevatorCanId,
+                                                  CanIds.kRightMotorElevatorCanId,
+                                                  DigitalIO.kElevatorHighLimitSwitchId,
+                                                  DigitalIO.kElevatorLowLimitSwitchId);
+  public final Intake m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
+  public final IntakeArm m_intakeArm = new IntakeArm();
+  public final Gripper m_gripper = new Gripper(CanIds.kGripperMotorCanId,
+                                               CanIds.kGripperExtensionMotorCanId,
+                                               DigitalIO.kGripperClosedSwitchId,
+                                               DigitalIO.kGripperFullyRetractedSwitchId,
+                                               DigitalIO.kGripperObjectDetectedSwitchId);
+  public final Climbers m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
+                                                  CanIds.kClimberRightMotorCanId,
+                                                  DigitalIO.kClimberLimitSwitchId);                                               
                                           
   public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   

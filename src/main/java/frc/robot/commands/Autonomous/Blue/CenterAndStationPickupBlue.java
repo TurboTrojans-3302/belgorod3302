@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.commands.AutoCoralPickupGround;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.ExtendGripper;
@@ -46,15 +47,15 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
   Pose2d aprilTagPoseReef;
   Pose2d aprilTagPoseStation;
 
-  public CenterAndStationPickupBlue(DriveSubsystem drive, Navigation nav, Gripper gripper, Elevator elevator, IntakeArm arm, Intake intake, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst) {
+  public CenterAndStationPickupBlue(RobotContainer bot, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    m_drive = drive;
-    m_nav = nav;
-    m_elevator = elevator;
-    m_gripper = gripper;
-    m_intakeArm = arm;
-    m_intake = intake;
+    m_drive = bot.m_robotDrive;
+    m_nav = bot.m_nav;
+    m_elevator = bot.m_elevator;
+    m_gripper = bot.m_gripper;
+    m_intakeArm = bot.m_intakeArm;
+    m_intake = bot.m_intake;
     //customisable scoring positions so we dont have to make so many commands
     position1 = elevatorScoringPosition1;
     position2 = elevatorScoringPosition2;
@@ -84,6 +85,6 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset2, 0.0),
                 new ExtendGripper(m_gripper),
                 new WaitCommand(0.2),
-                new OpenGripper(gripper));
+                new OpenGripper(m_gripper));
 }
 }
