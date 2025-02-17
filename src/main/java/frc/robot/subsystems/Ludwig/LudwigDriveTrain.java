@@ -21,31 +21,31 @@ import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystemBase;
+import frc.robot.Constants.CanIds;
 
 public class LudwigDriveTrain extends DriveSubsystemBase {
   private double maxSpeedLimit = DriveConstants.kMaxSpeedMetersPerSecond; // m/s
   private double maxRotationLimit = DriveConstants.kMaxAngularSpeed;
 
-
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = MAXSwerveModule.getInstance(
-      DriveConstants.kFrontLeftDrivingCanId,
-      DriveConstants.kFrontLeftTurningCanId,
+      CanIds.kFrontLeftDrivingCanId,
+      CanIds.kFrontLeftTurningCanId,
       DriveConstants.kFrontLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_frontRight = MAXSwerveModule.getInstance(
-      DriveConstants.kFrontRightDrivingCanId,
-      DriveConstants.kFrontRightTurningCanId,
+      CanIds.kFrontRightDrivingCanId,
+      CanIds.kFrontRightTurningCanId,
       DriveConstants.kFrontRightChassisAngularOffset);
 
   private final MAXSwerveModule m_rearLeft = MAXSwerveModule.getInstance(
-      DriveConstants.kRearLeftDrivingCanId,
-      DriveConstants.kRearLeftTurningCanId,
+      CanIds.kRearLeftDrivingCanId,
+      CanIds.kRearLeftTurningCanId,
       DriveConstants.kBackLeftChassisAngularOffset);
 
   private final MAXSwerveModule m_rearRight = MAXSwerveModule.getInstance(
-      DriveConstants.kRearRightDrivingCanId,
-      DriveConstants.kRearRightTurningCanId,
+      CanIds.kRearRightDrivingCanId,
+      CanIds.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
@@ -62,35 +62,35 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
         DriveConstants.headingD);
     headingPidController.enableContinuousInput(0.0, 360.0);
     headingPidController.setTolerance(2.0);
-  
+
     SmartDashboard.putData("headingPIDcontroller", headingPidController);
-    
-      // todo add the swerve drive to the dashboard
-        SmartDashboard.putData("Swerve Drive", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.setSmartDashboardType("SwerveDrive");
 
-                builder.addDoubleProperty("Front Left Angle", () -> m_frontLeft.getSteerAngle(), null);
-                builder.addDoubleProperty("Front Left Velocity", () -> m_frontLeft.getDriveVelocity(), null);
+    // todo add the swerve drive to the dashboard
+    SmartDashboard.putData("Swerve Drive", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
 
-                builder.addDoubleProperty("Front Right Angle", () -> m_frontRight.getSteerAngle(), null);
-                builder.addDoubleProperty("Front Right Velocity", () -> m_frontRight.getDriveVelocity(), null);
+        builder.addDoubleProperty("Front Left Angle", () -> m_frontLeft.getSteerAngle(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> m_frontLeft.getDriveVelocity(), null);
 
-                builder.addDoubleProperty("Back Left Angle", () -> m_rearLeft.getSteerAngle(), null);
-                builder.addDoubleProperty("Back Left Velocity", () -> m_rearLeft.getDriveVelocity(), null);
+        builder.addDoubleProperty("Front Right Angle", () -> m_frontRight.getSteerAngle(), null);
+        builder.addDoubleProperty("Front Right Velocity", () -> m_frontRight.getDriveVelocity(), null);
 
-                builder.addDoubleProperty("Back Right Angle", () -> m_rearRight.getSteerAngle(), null);
-                builder.addDoubleProperty("Back Right Velocity", () -> m_rearRight.getDriveVelocity(), null);
+        builder.addDoubleProperty("Back Left Angle", () -> m_rearLeft.getSteerAngle(), null);
+        builder.addDoubleProperty("Back Left Velocity", () -> m_rearLeft.getDriveVelocity(), null);
 
-                builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
-            }
-        });
-        SmartDashboard.putData("Left Front Module", m_frontLeft);
-        SmartDashboard.putData("Right Front Module", m_frontRight);
-        SmartDashboard.putData("Left Rear Module", m_rearLeft);
-        SmartDashboard.putData("Right Rear Module", m_rearRight);
-        
+        builder.addDoubleProperty("Back Right Angle", () -> m_rearRight.getSteerAngle(), null);
+        builder.addDoubleProperty("Back Right Velocity", () -> m_rearRight.getDriveVelocity(), null);
+
+        builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
+      }
+    });
+    SmartDashboard.putData("Left Front Module", m_frontLeft);
+    SmartDashboard.putData("Right Front Module", m_frontRight);
+    SmartDashboard.putData("Left Rear Module", m_rearLeft);
+    SmartDashboard.putData("Right Rear Module", m_rearRight);
+
   }
 
   @Override
@@ -172,7 +172,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     return MathUtil.angleModulus(Units.degreesToRadians(getGyroAngleDegrees()));
   }
 
-  public double getGyroAngleDegrees(){
+  public double getGyroAngleDegrees() {
     return m_gyro.getAngle() + m_gyroOffsetDeg;
   }
 
@@ -213,10 +213,10 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   @Override
   public SwerveModulePosition[] getSwerveModulePositions() {
     return new SwerveModulePosition[] { m_frontLeft.getPosition(),
-                                        m_frontRight.getPosition(),
-                                        m_rearLeft.getPosition(),
-                                        m_rearRight.getPosition()
-                                      };
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+    };
   };
 
   @Override
@@ -226,16 +226,17 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-      super.initSendable(builder);
-      builder.addDoubleProperty("gyroAngleDegrees", this::getGyroAngleDegrees, this::setGyroAngleDeg);
-      builder.addDoubleProperty("MaxSpeedLimit", () -> {
-          return maxSpeedLimit;
-      }, (x) -> {
-          maxSpeedLimit = x;
-      });
-      builder.addDoubleProperty("MaxRotationLimit", () -> {
-          return maxRotationLimit;
-      }, (x) -> {
-          maxRotationLimit = x;
-      });
-  }}
+    super.initSendable(builder);
+    builder.addDoubleProperty("gyroAngleDegrees", this::getGyroAngleDegrees, this::setGyroAngleDeg);
+    builder.addDoubleProperty("MaxSpeedLimit", () -> {
+      return maxSpeedLimit;
+    }, (x) -> {
+      maxSpeedLimit = x;
+    });
+    builder.addDoubleProperty("MaxRotationLimit", () -> {
+      return maxRotationLimit;
+    }, (x) -> {
+      maxRotationLimit = x;
+    });
+  }
+}
