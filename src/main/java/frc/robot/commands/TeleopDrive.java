@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.lang.reflect.Method;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Navigation;
 import frc.robot.subsystems.Eddie.DriveConstants;
+import frc.robot.commands.OrbitAroundReef;
 
 /*
  * Driver Xbox Controller
@@ -66,6 +70,8 @@ public class TeleopDrive extends Command {
   private XboxController m_driverController;
   private boolean m_fieldOrientedEnable = true;
   private double orbitSpeed = DriveConstants.ORBIT_SPEED;
+  DriveSubsystem drive;
+  Navigation nav;
 
   /** Creates a new TeleopDrive. */
   public TeleopDrive(DriveSubsystem robotDrive, XboxController driverController) {
@@ -84,6 +90,7 @@ public class TeleopDrive extends Command {
   @Override
   public void execute() {
     double speedScale;
+    
     if (m_driverController.getLeftBumperButton()) {
       speedScale = 0.5;
     } else {
@@ -94,10 +101,19 @@ public class TeleopDrive extends Command {
     double leftward = stick2speed(speedScale * m_driverController.getLeftX());
     double rotate = stick2speed(speedScale * m_driverController.getRightX());
 
-
     if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
 
-      if(m_driverController.getPOV() == 90){
+      if(m_driverController.getXButton()){
+        new OrbitAroundReef(drive, nav, -0.5 * speedScale);
+      }
+      else if(m_driverController.getBButton()){
+        new OrbitAroundReef(drive, nav, 0.5 * speedScale);
+      }
+      else{
+        m_robotDrive.stop();
+      }
+
+      if(m_driverController.getPOV() == 90 && m_driverController.getXButton() == false && m_driverController.getBButton() == false){
         m_robotDrive.orbit(orbitSpeed * -speedScale);
       }
       else if(m_driverController.getPOV() == 270){
