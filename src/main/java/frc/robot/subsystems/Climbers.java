@@ -15,7 +15,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.MAXMotionConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -38,7 +40,8 @@ public class Climbers extends SubsystemBase {
   double kD = ClimberConstants.kD;
   double kLowerLimit = ClimberConstants.kLowerLimit;
   double kUpperLimit = ClimberConstants.kUpperLimit;
-
+  double kMaxVelocity = ClimberConstants.kMaxVelocity;
+  double kMaxAcceleration = ClimberConstants.kMaxAcceleration;
 
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
@@ -60,7 +63,10 @@ public class Climbers extends SubsystemBase {
         .inverted(true)
         .apply(new EncoderConfig().inverted(true))
         .apply(new ClosedLoopConfig().pid(ClimberConstants.kP, ClimberConstants.kI,
-                                           ClimberConstants.kD));
+                                           ClimberConstants.kD)
+                                     .apply(new MAXMotionConfig().positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal)
+                                                                 .maxAcceleration(0)
+                                                                 .maxVelocity(0)));
       rightConfig.smartCurrentLimit(40)
         .idleMode(IdleMode.kBrake)
         .inverted(false)
@@ -74,9 +80,20 @@ public class Climbers extends SubsystemBase {
     return m_leftEncoder.getPosition();
   }
 
+  public boolean isNearPosition(double p){
+    return MathUtil.isNear(p, getPosition(), ClimberConstants.kPositionTolerance);
+  }
+
+  public boolean limitSwitch(){
+    return !limitSwitchClimber.get();
+  }
+
   //todo should handle the limit switch in here somewhere
   public void setPosition(double position){
     position = MathUtil.clamp(position, kLowerLimit, kUpperLimit);
+    if(limitSwitch()){
+      position = Math.min(position, getPosition());
+    }
     m_leftController.setReference(position, ControlType.kPosition);
     m_rightController.setReference(position, ControlType.kPosition);
   }
@@ -86,19 +103,25 @@ public class Climbers extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  private void setPIDConstants(){
+  private void updateConfig(){
     SparkMaxConfig newConfig = new SparkMaxConfig();
-    newConfig.apply(new ClosedLoopConfig().pid(kP, kI, kD));
+    newConfig.apply(new ClosedLoopConfig()
+                          .pid(kP, kI, kD).apply(new MAXMotionConfig()
+                                                      .maxAcceleration(kMaxAcceleration)
+                                                      .maxVelocity(kMaxVelocity)));
     m_leftClimber.configure(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
-    builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; setPIDConstants(); });
-    builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; setPIDConstants(); });
-    builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; setPIDConstants(); });
+    builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; updateConfig(); });
+    builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; updateConfig(); });
+    builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; updateConfig(); });
+    builder.addDoubleProperty("kMaxVelocity", ()->kMaxVelocity, (x)->{kMaxVelocity = x; updateConfig(); });
+    builder.addDoubleProperty("kMaxAcceleration", ()->kMaxAcceleration, (x)->{kMaxAcceleration = x; updateConfig(); });
     builder.addDoubleProperty("kLowerLimit", ()->kLowerLimit, (x)->{kLowerLimit = x;});
     builder.addDoubleProperty("kUpperLimit", ()->kUpperLimit, (x)->{kUpperLimit = x;});
+    builder.addBooleanProperty("limitSwitch", this::limitSwitch, null);
   }
 }

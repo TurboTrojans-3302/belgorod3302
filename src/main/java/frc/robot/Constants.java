@@ -38,6 +38,8 @@ public final class Constants {
     public static final int DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER = 10;
     public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER = 11;
     public static final int DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER = 12;
+    public static final int leftClimberID = 13;
+    public static final int rightClimberID = 14;
 
     // Ludwig DriveTrain
     public static final int kFrontRightTurningCanId = 1;
@@ -71,7 +73,7 @@ public final class Constants {
         public static final int kGripperFullyRetractedSwitchId = 5;
         public static final int kGripperObjectDetectedSwitchId = 6;
         public static final int kClimberLimitSwitchId = 7;
-  }
+      }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
@@ -160,16 +162,14 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final int leftClimberID = 13;
-    public static final int rightClimberID = 14;
-    public static final int climberLimitSwitchID = 3;
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static double climberMaxSpeed = 0.5;
-    public static double climberAutoSpeed = 0.3;
+    public static final double kMaxVelocity = 3000; //RPM
+    public static final double kMaxAcceleration = 1500; //RPM/s
     public static double kLowerLimit = 0;
     public static double kUpperLimit = 100;
+    public static double kPositionTolerance = 5;
   }
 
   public static final class GripperConstants {

@@ -55,9 +55,9 @@ public class RobotContainer {
   //                                              DigitalIO.kGripperClosedSwitchId,
   //                                              DigitalIO.kGripperFullyRetractedSwitchId,
   //                                              DigitalIO.kGripperObjectDetectedSwitchId);
-  // public final Climbers m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
-  //                                                 CanIds.kClimberRightMotorCanId,
-  //                                                 DigitalIO.kClimberLimitSwitchId);                                               
+  public final Climbers m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
+                                                  CanIds.kClimberRightMotorCanId,
+                                                  DigitalIO.kClimberLimitSwitchId);                                               
                                           
   public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   
