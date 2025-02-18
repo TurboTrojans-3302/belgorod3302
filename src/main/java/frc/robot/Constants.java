@@ -140,9 +140,9 @@ public final class Constants {
     // preset position
     public static final double kProcessor = 15;
 
-    public static final double kElevatorPrecisionControlSpeed = 0.15;
     public static final double kElevatorAutoSpeedToLevel = 0.4;
     public static final double kElevatorMaxSpeed = 0.75;
+    public static final double kElevatorMaxAccel = 0.75;
 
     public static final double kP = 0.0;
     public static final double kI = 0.0;

@@ -15,6 +15,9 @@ import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -26,7 +29,7 @@ public class Elevator extends SubsystemBase {
 
   public SparkMax leftElevatorMotor;
   public SparkMax rightElevatorMotor;
-  public PIDController elevatorPID;
+  public ProfiledPIDController elevatorPID;
   double kP = Constants.ElevatorConstants.kP;
   double kI = Constants.ElevatorConstants.kI;
   double kD = Constants.ElevatorConstants.kD;
@@ -43,132 +46,140 @@ public class Elevator extends SubsystemBase {
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
   public double kLevel4 = ElevatorConstants.kLevel4;
+  private double kElevatorMaxAccel = ElevatorConstants.kElevatorMaxAccel;
+  
+    public Elevator(int leftMotorID, int rightMotorId, int highSwitchId, int lowSwitchId) {
+      leftElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushless);
+      rightElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushless);
+      elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
+      elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
+      updateCfg();
 
-  public Elevator(int leftMotorID, int rightMotorId, int highSwitchId, int lowSwitchId) {
-    leftElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushless);
-    rightElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushless);
-    elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
-    elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
-    elevatorPID = new PIDController(kP, kI, kD);
-    // true because elevator would start at lowest point
-
-    setMotorSpeed(0);
-
-    // getEncoder() is a function already in the SparkBase class that creates a
-    // relative encoder if there isnt one
-    // I would assume we only need one of the motors to use an encoder
-    elevatorEncoder = leftElevatorMotor.getEncoder();
-  }
-
-  public double getElevatorSpeed() {
-    return elevatorEncoder.getVelocity();
-  }
-
-  private double setMotorSpeed(double speed) {
-    double elevatorSpeed = MathUtil.clamp(speed, -kElevatorMaxSpeed, kElevatorMaxSpeed);
-    leftElevatorMotor.set(elevatorSpeed);
-    rightElevatorMotor.set(-elevatorSpeed);
-    return elevatorSpeed;
-  }
-
-  public double getElevatorPosition() {
-    // returns relative encoder position from one of the motors in full rotations
-    // TODO test how many rotations get the elevator to its fullest extent from a
-    // starting position
-
-    return elevatorEncoder.getPosition();
-  }
-
-  public void resetElevatorPositionEncoder(double position) {
-    elevatorEncoder.setPosition(position);
-  }
-
-  // stopping elevator with limit switches
-  public void checkLimits() {
-    /*
-     * Checking the hard limits
-     */
-    if (!elevatorHighLimitSwitch.get()) {
-      if (getElevatorPosition() < kLimitHigh) {
-        resetElevatorPositionEncoder(kLimitHigh);
-      }
+      // true because elevator would start at lowest point
+  
+      stop();
+  
+      // getEncoder() is a function already in the SparkBase class that creates a
+      // relative encoder if there isnt one
+      // I would assume we only need one of the motors to use an encoder
+      elevatorEncoder = leftElevatorMotor.getEncoder();
     }
-    if (!elevatorLowLimitSwitch.get()) {
-      if (getElevatorPosition() > kLimitLow) {
-        resetElevatorPositionEncoder(kLimitLow);
-      }
+  
+    private void updateCfg(){
+      elevatorPID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
+      elevatorPID.setTolerance(kTolerance);
+      elevatorPID.reset(getElevatorPosition());
     }
 
-    /*
-     * Checking the soft limits
-     */
-    if (getElevatorPosition() > kSoftLimitHigh) {
-      if (getMotorSpeed() > 0.0) {
-        setMotorSpeed(0.0);
+    public double getElevatorSpeed() {
+      return elevatorEncoder.getVelocity();
+    }
+  
+    private double setMotorSpeed(double speed) {
+      leftElevatorMotor.set(speed);
+      rightElevatorMotor.set(-speed);
+      return speed;
+    }
+  
+    public double getElevatorPosition() {
+      // returns relative encoder position from one of the motors in full rotations
+      // TODO test how many rotations get the elevator to its fullest extent from a
+      // starting position
+  
+      return elevatorEncoder.getPosition();
+    }
+  
+    public void resetElevatorPositionEncoder(double position) {
+      elevatorEncoder.setPosition(position);
+      updateCfg();
+    }
+  
+    // stopping elevator with limit switches
+    public void checkLimits() {
+      /*
+       * Checking the hard limits
+       */
+      if (!elevatorHighLimitSwitch.get()) {
+        if (getElevatorPosition() < kLimitHigh) {
+          resetElevatorPositionEncoder(kLimitHigh);
+        }
+      }
+      if (!elevatorLowLimitSwitch.get()) {
+        if (getElevatorPosition() > kLimitLow) {
+          resetElevatorPositionEncoder(kLimitLow);
+        }
+      }
+  
+      /*
+       * Checking the soft limits
+       */
+      if (getElevatorPosition() > kSoftLimitHigh) {
+        if (getMotorSpeed() > 0.0) {
+          setMotorSpeed(0.0);
+        }
+      }
+      if (getElevatorPosition() < kSoftLimitLow) {
+        if (getMotorSpeed() < 0.0) {
+          setMotorSpeed(0.0);
+        }
       }
     }
-    if (getElevatorPosition() < kSoftLimitLow) {
-      if (getMotorSpeed() < 0.0) {
-        setMotorSpeed(0.0);
-      }
+  
+    private double getMotorSpeed() {
+      return leftElevatorMotor.get();
     }
-  }
-
-  private double getMotorSpeed() {
-    return leftElevatorMotor.get();
-  }
-
-  public void setPosition(double setpoint) {
-    setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
-    elevatorPID.setSetpoint(setpoint);
-  }
-
-  public boolean atSetpoint() {
-    return isNear(elevatorPID.getSetpoint());
-  }
-
-  public boolean isNear(double position) {
-    return MathUtil.isNear(position, getElevatorSpeed(), kTolerance);
-  }
-
-  public boolean isNearPickupLevel() {
-    return isNear(kPickupLevel);
-  }
-
-  public boolean isNearLevel1() {
-    return isNear(kLevel1Trough);
-  }
-
-  public boolean isNearLevel2() {
-    return isNear(kLevel2);
-  }
-
-  public boolean isNearLevel3() {
-    return isNear(kLevel3);
-  }
-
-  public boolean isNearLevel4() {
-    return isNear(kLevel4);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    // checks for limit switches
-
-    double speedCalculation = elevatorPID.calculate(getElevatorPosition());
-    setMotorSpeed(speedCalculation);
-
-    // important to check the limits after setting the speed
-    checkLimits();
-  }
-
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addDoubleProperty("Position", this::getElevatorPosition, null);
-    builder.addDoubleProperty("MaxSpeed", () -> kElevatorMaxSpeed, (x) -> {
-      kElevatorMaxSpeed = x;
+  
+    public void setPosition(double setpoint) {
+      setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
+      elevatorPID.setGoal(setpoint);
+    }
+  
+    public boolean isNear(double position) {
+      return MathUtil.isNear(position, getElevatorSpeed(), kTolerance);
+    }
+  
+    public boolean isNearPickupLevel() {
+      return isNear(kPickupLevel);
+    }
+  
+    public boolean isNearLevel1() {
+      return isNear(kLevel1Trough);
+    }
+  
+    public boolean isNearLevel2() {
+      return isNear(kLevel2);
+    }
+  
+    public boolean isNearLevel3() {
+      return isNear(kLevel3);
+    }
+  
+    public boolean isNearLevel4() {
+      return isNear(kLevel4);
+    }
+  
+    @Override
+    public void periodic() {
+      // This method will be called once per scheduler run
+      // checks for limit switches
+  
+      // todo I bet we need some feedforward here
+      double speedCalculation = elevatorPID.calculate(getElevatorPosition());
+      setMotorSpeed(speedCalculation);
+  
+      // important to check the limits after setting the speed
+      checkLimits();
+    }
+  
+    @Override
+    public void initSendable(SendableBuilder builder) {
+      super.initSendable(builder);
+      builder.addDoubleProperty("Position", this::getElevatorPosition, null);
+      builder.addDoubleProperty("kElevatorMaxSpeed", () -> kElevatorMaxSpeed, (x) -> {
+        kElevatorMaxSpeed = x; updateCfg();
+      });
+      builder.addDoubleProperty("kElevatorMaxAccel", () -> kElevatorMaxAccel, (x) -> {
+      kElevatorMaxAccel = x; updateCfg();
     });
     builder.addDoubleProperty("Tolerance", () -> kTolerance, (x) -> {
       kTolerance = x;
@@ -194,13 +205,13 @@ public class Elevator extends SubsystemBase {
     builder.addBooleanProperty("AtLevel3", this::isNearLevel3, null);
     builder.addBooleanProperty("AtLevel4", this::isNearLevel4, null);
     builder.addDoubleProperty("elevator kP", () -> kP, (x) -> {
-      kP = x;
+      kP = x; updateCfg();
     });
     builder.addDoubleProperty("elevator kI", () -> kI, (x) -> {
-      kI = x;
+      kI = x; updateCfg();
     });
     builder.addDoubleProperty("elevator kD", () -> kD, (x) -> {
-      kD = x;
+      kD = x; updateCfg();
     });
   }
 
