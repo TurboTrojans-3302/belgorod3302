@@ -163,9 +163,13 @@ public final class Constants {
     public static final int leftClimberID = 13;
     public static final int rightClimberID = 14;
     public static final int climberLimitSwitchID = 3;
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
     public static double climberMaxSpeed = 0.5;
     public static double climberAutoSpeed = 0.3;
-
+    public static double kLowerLimit = 0;
+    public static double kUpperLimit = 100;
   }
 
   public static final class GripperConstants {

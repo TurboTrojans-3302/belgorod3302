@@ -5,83 +5,100 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.ClimberConstants;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Climbers extends SubsystemBase {
   /** Creates a new Climbers. */
   SparkMax m_rightClimber;
   SparkMax m_leftClimber;
-  SparkMaxConfig leftConfig;
+  SparkClosedLoopController m_leftController;
+  SparkClosedLoopController m_rightController;
+  RelativeEncoder m_leftEncoder;
+  RelativeEncoder m_rightEncoder;
   //used for detecting when climber is at highest position
   DigitalInput limitSwitchClimber;
-  double climberSpeed;
-  boolean maxHeight;
-  ResetMode leftResetMode;
-  PersistMode leftPersistMode;
+  double kP = ClimberConstants.kP;
+  double kI = ClimberConstants.kI;
+  double kD = ClimberConstants.kD;
+  double kLowerLimit = ClimberConstants.kLowerLimit;
+  double kUpperLimit = ClimberConstants.kUpperLimit;
+
 
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
     m_rightClimber = new SparkMax(rightMotorId, MotorType.kBrushless);
-    leftConfig = new SparkMaxConfig(); 
-    leftConfig.inverted(true);
-    //applies the inverted configuration without resetting all parameters and making sure they arent permanent with the no persist part.
     m_leftClimber.configure(leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    m_rightClimber.configure(rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    m_leftController = m_leftClimber.getClosedLoopController();
+    m_rightController = m_rightClimber.getClosedLoopController();
+    m_leftEncoder = m_leftClimber.getEncoder();
+    m_rightEncoder = m_rightClimber.getEncoder();
     limitSwitchClimber = new DigitalInput(0);
-    climberSpeed = 0;
-    maxHeight = false;
   }
 
-  public double getSpeed(){
-    return climberSpeed;
-  }
-  
-  public boolean limitCheck(){
-    if (!limitSwitchClimber.get()){
-      maxHeight = true;
-      return maxHeight;
-    } else {
-      maxHeight = false;
-      return maxHeight;
-    }
-  }
-  public double setSpeed(double speed) {
-    if (maxHeight && climberSpeed > 0){
-      climberSpeed = 0;
-      m_leftClimber.set(climberSpeed);
-      m_rightClimber.set(climberSpeed);
-      return climberSpeed;
-    } else {
-      climberSpeed = MathUtil.clamp(speed, -Constants.ClimberConstants.climberMaxSpeed, Constants.ClimberConstants.climberMaxSpeed);
-      m_leftClimber.set(climberSpeed);
-      m_rightClimber.set(climberSpeed);
-      return climberSpeed;
-    }
+  public static SparkMaxConfig leftConfig = new SparkMaxConfig();
+  public static SparkMaxConfig rightConfig = new SparkMaxConfig();
+  static {
+      leftConfig.smartCurrentLimit(40)
+        .idleMode(IdleMode.kBrake)
+        .inverted(true)
+        .apply(new EncoderConfig().inverted(true))
+        .apply(new ClosedLoopConfig().pid(ClimberConstants.kP, ClimberConstants.kI,
+                                           ClimberConstants.kD));
+      rightConfig.smartCurrentLimit(40)
+        .idleMode(IdleMode.kBrake)
+        .inverted(false)
+        .apply(new EncoderConfig().inverted(false))
+        .apply(new ClosedLoopConfig().pid(ClimberConstants.kP, ClimberConstants.kI,
+                                          ClimberConstants.kD));
   }
 
-  public double ClimbersUp(){
-    if (maxHeight){
-      climberSpeed = 0;
-      m_leftClimber.set(climberSpeed);
-      m_rightClimber.set(climberSpeed);
-      return climberSpeed;
-    } else {
-      climberSpeed = Constants.ClimberConstants.climberAutoSpeed;
-      m_leftClimber.set(climberSpeed);
-      m_rightClimber.set(climberSpeed);
-      return climberSpeed;
-    }
+
+  public double getPosition(){
+    return m_leftEncoder.getPosition();
+  }
+
+  //todo should handle the limit switch in here somewhere
+  public void setPosition(double position){
+    position = MathUtil.clamp(position, kLowerLimit, kUpperLimit);
+    m_leftController.setReference(position, ControlType.kPosition);
+    m_rightController.setReference(position, ControlType.kPosition);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  private void setPIDConstants(){
+    SparkMaxConfig newConfig = new SparkMaxConfig();
+    newConfig.apply(new ClosedLoopConfig().pid(kP, kI, kD));
+    m_leftClimber.configure(newConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    super.initSendable(builder);
+    builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; setPIDConstants(); });
+    builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; setPIDConstants(); });
+    builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; setPIDConstants(); });
+    builder.addDoubleProperty("kLowerLimit", ()->kLowerLimit, (x)->{kLowerLimit = x;});
+    builder.addDoubleProperty("kUpperLimit", ()->kUpperLimit, (x)->{kUpperLimit = x;});
   }
 }
