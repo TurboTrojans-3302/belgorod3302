@@ -11,7 +11,9 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,12 +26,14 @@ public class IntakeArm extends SubsystemBase {
   private VictorSPX m_armSpx;
   private DutyCycleEncoder m_ArmEncoder;
   private double m_armAngleOffset = IntakeConstants.armAngleOffset;
-  private PIDController m_PidController;
+  public ProfiledPIDController m_PidController;
   private ArmFeedforward m_Feedforward;
   private double kS = IntakeConstants.kS;
   private double kG = IntakeConstants.kG;
   private double kV = IntakeConstants.kV;
   private double kA = IntakeConstants.kA;
+  private double kMaxArmAngle = IntakeConstants.MaxArmAngle;
+  private double kMinArmAngle = IntakeConstants.MinArmAngle;
 
   private LinearFilter m_velocityFilter;
   private double m_lastArmAngle;
@@ -42,7 +46,8 @@ public class IntakeArm extends SubsystemBase {
     m_armSpx.setInverted(true);
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
     m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
-    m_PidController = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
+    m_PidController = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
+                                                new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
     resetFeedForward();
     m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
     m_lastArmAngle = getArmAngleDegrees();
@@ -67,8 +72,8 @@ public class IntakeArm extends SubsystemBase {
   }
 
   public void setPositionAngleSetpoint(double angle) {
-    double setpoint = MathUtil.clamp(angle, IntakeConstants.MinArmAngle, IntakeConstants.MaxArmAngle);
-    m_PidController.setSetpoint(setpoint);
+    double setpoint = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
+    m_PidController.setGoal(setpoint);
   }
 
   public boolean atSetpoint(){
@@ -76,7 +81,7 @@ public class IntakeArm extends SubsystemBase {
   }
 
   public double getPositionAngleSetpoint() {
-    return m_PidController.getSetpoint();
+    return m_PidController.getGoal().position;
   }
 
   public double getArmAngleDegrees() {
@@ -109,6 +114,12 @@ public class IntakeArm extends SubsystemBase {
     builder.addDoubleProperty("kA", () -> kA, (x) -> {
       kA = x;
       resetFeedForward();
+    });
+    builder.addDoubleProperty("kMinArmAngle", () -> kMinArmAngle, (x) -> {
+      kMinArmAngle = x;
+    });
+    builder.addDoubleProperty("kMaxArmAngle", () -> kMaxArmAngle, (x) -> {
+      kMaxArmAngle = x;
     });
   }
 }

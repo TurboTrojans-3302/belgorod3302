@@ -48,8 +48,8 @@ public class RobotContainer {
   //                                                 CanIds.kRightMotorElevatorCanId,
   //                                                 DigitalIO.kElevatorHighLimitSwitchId,
   //                                                 DigitalIO.kElevatorLowLimitSwitchId);
-  // public final Intake m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
-  // public final IntakeArm m_intakeArm = new IntakeArm();
+  public final Intake m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
+  public final IntakeArm m_intakeArm = new IntakeArm();
   // public final Gripper m_gripper = new Gripper(CanIds.kGripperMotorCanId,
   //                                              CanIds.kGripperExtensionMotorCanId,
   //                                              DigitalIO.kGripperClosedSwitchId,
@@ -115,6 +115,9 @@ public class RobotContainer {
     SmartDashboard.putData("DriveSubsystem", m_robotDrive);
     SmartDashboard.putData("Navigation", m_nav);
     SmartDashboard.putData("GoToCommand", new GoToCommand(m_robotDrive, m_nav, Pose2d.kZero));
+    SmartDashboard.putData("IntakeArm", m_intakeArm);
+    SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
+    SmartDashboard.putData("Intake", m_intake);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
 

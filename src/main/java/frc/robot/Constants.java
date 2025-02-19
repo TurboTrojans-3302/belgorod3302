@@ -158,6 +158,8 @@ public final class Constants {
     public static final double kG = 0.0;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
+    public static final double kMaxVelocity = 180;
+    public static final double kMaxAcceleration = 45;
   }
 
   public static final class ClimberConstants {
