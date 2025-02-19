@@ -78,7 +78,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     instance = this;
-    m_autonMenus = new AutonMenus();
     
     // Configure the button bindings
     configureButtonBindings();
@@ -100,8 +99,6 @@ public class RobotContainer {
     SmartDashboard.putData("GoToCommand", new GoToCommand(m_robotDrive, m_nav, Pose2d.kZero));
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
-
-  
 
   }
 
@@ -182,7 +179,7 @@ public class RobotContainer {
    * called once when is set to Red by the DriverStation
    */
   public void initRed() {
-    m_autonomousChooser = m_autonMenus.redCommands;
+    m_autonomousChooser = AutonMenus.getRed();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
   }
 
@@ -190,7 +187,7 @@ public class RobotContainer {
    * called once when is set to Blue by the DriverStation
    */
   public void initBlue() {
-    m_autonomousChooser = m_autonMenus.blueCommands;
+    m_autonomousChooser = AutonMenus.getBlue();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
   }
 

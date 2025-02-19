@@ -14,15 +14,10 @@ import frc.robot.commands.TurnToAprilTag;
 /** Add your docs here. */
 public class AutonMenus {
 
-    public SendableChooser<Command> blueCommands;
-    public SendableChooser<Command> redCommands;
-
-    public AutonMenus(){
+    public static SendableChooser<Command> getBlue(){
         RobotContainer bot = RobotContainer.getInstance();
     
-        blueCommands = new SendableChooser<Command>();
-        redCommands = new SendableChooser<Command>();
-
+        SendableChooser<Command> blueCommands = new SendableChooser<Command>();
         blueCommands.setDefaultOption("Do Nothing", new DoNothing());
         blueCommands.addOption("turn to april tag B 10", new TurnToAprilTag(bot.m_robotDrive, 10));
         blueCommands.addOption("turn to april tag 1", new TurnToAprilTag(bot.m_robotDrive, 1));
@@ -37,6 +32,13 @@ public class AutonMenus {
         blueCommands.addOption("Nav to tag 18", GoToCommand.absolute(bot.m_robotDrive, bot.m_nav, bot.m_nav.getPose2dInFrontOfTag(18, 0.5)));
         blueCommands.addOption("Nav to tag 19", GoToCommand.absolute(bot.m_robotDrive, bot.m_nav, bot.m_nav.getPose2dInFrontOfTag(19, 0.5)));
         
+        return blueCommands;
+    }
+
+    public static SendableChooser<Command> getRed(){
+        RobotContainer bot = RobotContainer.getInstance();
+
+        SendableChooser<Command> redCommands = new SendableChooser<Command>();
         redCommands.setDefaultOption("Do Nothing", new DoNothing());
         redCommands.addOption("turn to april tag B 10", new TurnToAprilTag(bot.m_robotDrive, 10));
         redCommands.addOption("turn to april tag 1", new TurnToAprilTag(bot.m_robotDrive, 1));
@@ -51,6 +53,6 @@ public class AutonMenus {
         redCommands.addOption("Nav to tag 18", GoToCommand.absolute(bot.m_robotDrive, bot.m_nav, bot.m_nav.getPose2dInFrontOfTag(18, 0.5)));
         redCommands.addOption("Nav to tag 19", GoToCommand.absolute(bot.m_robotDrive, bot.m_nav, bot.m_nav.getPose2dInFrontOfTag(19, 0.5)));
         
-
+        return redCommands;
     }
 }
