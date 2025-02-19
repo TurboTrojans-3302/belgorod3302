@@ -120,7 +120,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     setLED(LEDmode.Auton);
-    m_robotContainer.m_nav.resetOdometry(m_robotContainer.getStartPosition());
     System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_nav.getPose());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println("Starting command: " + m_autonomousCommand.getName());

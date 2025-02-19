@@ -8,6 +8,7 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -118,37 +119,6 @@ public class RobotContainer {
     // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive,
     // m_driverController));
 
-    m_autonomousChooser = new SendableChooser<Command>();
-    m_autonomousChooser.setDefaultOption("turn to april tag B 10", new TurnToAprilTag(m_robotDrive, 10));
-    m_autonomousChooser.addOption("turn to april tag 1", new TurnToAprilTag(m_robotDrive, 1));
-    m_autonomousChooser.addOption("turn to april tag 11", new TurnToAprilTag(m_robotDrive, 11));
-    m_autonomousChooser.addOption("Drive to april tag 1", new DriveToAprilTag(m_robotDrive, m_nav, 1));
-    m_autonomousChooser.addOption("GoTo 1, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, 0, 0));
-    m_autonomousChooser.addOption("GoTo 2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, 2.0, 0, 0));
-    m_autonomousChooser.addOption("GoTo -2, 0, 0", GoToCommand.relative(m_robotDrive, m_nav, -2.0, 0, 0));
-    m_autonomousChooser.addOption("GoTo 1, -1, 0", GoToCommand.relative(m_robotDrive, m_nav, 1.0, -1.0, 0));
-    m_autonomousChooser.addOption("Nav to tag 1",
-        GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(1, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 17",
-        GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(17, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 18",
-        GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(18, 0.5)));
-    m_autonomousChooser.addOption("Nav to tag 19",
-        GoToCommand.absolute(m_robotDrive, m_nav, m_nav.getPose2dInFrontOfTag(19, 0.5)));
-    // m_autonomousChooser.addOption("one meter square", oneMeterSquare);
-
-    SmartDashboard.putData("Auton Command", m_autonomousChooser);
-
-    m_startPosChooser = new SendableChooser<Pose2d>();
-    m_startPosChooser.setDefaultOption("ZeroZero", Constants.FieldConstants.ZeroZero);
-    m_startPosChooser.addOption("Left IceCream",
-        org.littletonrobotics.frc2025.FieldConstants.StagingPositions.leftIceCream);
-    m_startPosChooser.addOption("Middle IceCream",
-        org.littletonrobotics.frc2025.FieldConstants.StagingPositions.middleIceCream);
-    m_startPosChooser.addOption("Right IceCream",
-        org.littletonrobotics.frc2025.FieldConstants.StagingPositions.rightIceCream);
-    SmartDashboard.putData("Start Position", m_startPosChooser);
-
     SmartDashboard.putData("GoToCommand", new GoToCommand(m_robotDrive, m_nav, Pose2d.kZero));
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
@@ -236,6 +206,10 @@ public class RobotContainer {
   public void initRed() {
     m_autonomousChooser = AutonMenus.getRed();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
+
+    m_startPosChooser = StartPositions.getRed();
+    SmartDashboard.putData("Start Position", m_startPosChooser);
+    m_startPosChooser.onChange(this::setStartPosition);
   }
 
   /*
@@ -244,6 +218,16 @@ public class RobotContainer {
   public void initBlue() {
     m_autonomousChooser = AutonMenus.getBlue();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
+
+    m_startPosChooser = StartPositions.getBlue();
+    SmartDashboard.putData("Start Position", m_startPosChooser);
+    m_startPosChooser.onChange(this::setStartPosition);
+  }
+
+  private void setStartPosition(Pose2d pose) {
+    if(DriverStation.isDisabled()){
+      m_nav.resetOdometry(pose);
+    }
   }
 
 
