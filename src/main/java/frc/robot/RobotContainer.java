@@ -22,6 +22,7 @@ import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TestDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.DriveSubsystem;
@@ -82,10 +83,10 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
-    Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
-    m_robotDrive.setDefaultCommand(teleopCommand);
-    SmartDashboard.putData("TeleopCommand", teleopCommand);
-    //m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
+    //Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
+    //m_robotDrive.setDefaultCommand(teleopCommand);
+    //SmartDashboard.putData("TeleopCommand", teleopCommand);
+    m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
 
     m_autonomousChooser = new SendableChooser<Command>();
