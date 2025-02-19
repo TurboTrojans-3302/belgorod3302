@@ -139,18 +139,17 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
 
   @Override
   public double getSteerAngle() {
-    return getPosition().angle.getRadians();
+    return getPosition().angle.getRadians() - m_chassisAngularOffset;
   }
 
   @Override
-  public void set(double voltage, double steerAngle) {
+  public void set(double voltage, double steerAngleRadians) {
     m_drivingSpark.setVoltage(voltage);
-    m_turningClosedLoopController.setReference(steerAngle, ControlType.kPosition);
+    m_turningClosedLoopController.setReference(steerAngleRadians + m_chassisAngularOffset, ControlType.kPosition);
   }
 
   public void testSet(double voltage, double angleRadians) {
-    m_drivingSpark.setVoltage(voltage);
-    m_turningClosedLoopController.setReference(angleRadians, ControlType.kPosition);
+    this.set(voltage, angleRadians);
   }
 
   private void setPIDConstants(SparkMax spark, double p, double i, double d) {
