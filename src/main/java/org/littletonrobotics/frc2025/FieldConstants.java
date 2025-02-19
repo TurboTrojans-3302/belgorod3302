@@ -21,6 +21,7 @@ import java.util.Map;
 public class FieldConstants {
   public static final double fieldLength = Units.inchesToMeters(690.876);
   public static final double fieldWidth = Units.inchesToMeters(317);
+  public static final Pose2d RedOrigin = new Pose2d(fieldLength, fieldWidth, Rotation2d.fromDegrees(180));
   public static final double startingLineX =
       Units.inchesToMeters(299.438); // Measured from the inside of starting line
 
@@ -168,5 +169,13 @@ public class FieldConstants {
 
     public final double height;
     public final double pitch;
+  }
+
+  public static Pose2d redVersion(Pose2d pose) {
+    return new Pose2d(fieldLength - pose.getX(), fieldWidth - pose.getY(), pose.getRotation().plus(Rotation2d.kPi));
+  }
+
+  public static Translation2d redVersion(Translation2d translation) {
+    return RedOrigin.getTranslation().plus(translation.rotateBy(Rotation2d.kPi));
   }
 }

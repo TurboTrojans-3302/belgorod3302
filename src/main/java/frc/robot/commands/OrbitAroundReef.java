@@ -7,8 +7,11 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import org.littletonrobotics.frc2025.FieldConstants;
+
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
 
@@ -34,7 +37,7 @@ public class OrbitAroundReef extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Translation2d reef = FieldConstants.Reef.center;
+    Translation2d reef = (Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center);
     Pose2d robot = nav.getPose();
     Translation2d robotTranslationType = robot.getTranslation();
     Translation2d C = reef.minus(robotTranslationType);
