@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Autonomous.Blue;
+package frc.robot.commands.Autonomous.Red;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,7 +28,7 @@ import frc.robot.subsystems.Navigation;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class CenterAndStationPickupBlue extends SequentialCommandGroup {
+public class CenterAndStationPickupRed extends SequentialCommandGroup {
   /** Creates a new WallSideGroundScoreBlue. */
   DriveSubsystem m_drive;
   Navigation m_nav;
@@ -40,13 +40,13 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
   double position2;
   double poleOffset1;
   double poleOffset2;
-  int aprilTagReef = 20;
-  int aprilTagStation = 13;
+  int aprilTagReef = 11;
+  int aprilTagStation = 1;
   
   Pose2d aprilTagPoseReef;
   Pose2d aprilTagPoseStation;
 
-  public CenterAndStationPickupBlue(DriveSubsystem drive, Navigation nav, Gripper gripper, Elevator elevator, IntakeArm arm, Intake intake, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst) {
+  public CenterAndStationPickupRed(DriveSubsystem drive, Navigation nav, Gripper gripper, Elevator elevator, IntakeArm arm, Intake intake, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     m_drive = drive;
@@ -75,7 +75,7 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
                 new WaitCommand(0.2),
                 new OpenGripper(m_gripper),
                 new WaitCommand(0.2),
-                new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() + Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
+                new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() - Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() - Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
                 //the change to the pose is supposed to move the robot so it is facing the right side of the station, to minimize the chances of getting in someones way
                 new AutoCoralPickupGround(m_drive, m_nav, m_intake, 1.0), //just drives forward with intake on, I want something that isn't just guesswork, maybe color detection
                 new IntakeCycle(m_intake, m_intakeArm, m_gripper), //intake cycle does everything from spinning the intake, moving the arm, and transferring from the arm to the gripper, it skips the steps that have already been done
