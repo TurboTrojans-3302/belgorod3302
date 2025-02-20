@@ -49,8 +49,10 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
   boolean limitPickupRight = false;
   boolean limitPickupLeft = false;
   double angleTolerance;
+  boolean stationLeft;
+  boolean stationRight;
 
-  public CenterAndStationPickup(RobotContainer bot, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst, double angleToleranceOfStationPickup, String alliance) {
+  public CenterAndStationPickup(RobotContainer bot, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst, double angleToleranceOfStationPickup, String alliance, boolean StationLeft, boolean StationRight) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     m_drive = bot.m_robotDrive;
@@ -64,6 +66,8 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
     position2 = elevatorScoringPosition2;
 
     angleTolerance = angleToleranceOfStationPickup;
+    stationLeft = StationLeft;
+    stationRight = StationRight;
 
     if (alliance == "Blue" || alliance == "blue"){
       aprilTagReef = 20;
@@ -84,10 +88,16 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
     if (leftFirst){
       poleOffset1 = Constants.FieldConstants.yOffsetReefPoleLeft;
       poleOffset2 = Constants.FieldConstants.yOffsetReefPoleRight;
-      limitPickupRight = true;
+     
     } else {
       poleOffset1 = Constants.FieldConstants.yOffsetReefPoleRight;
       poleOffset2 = Constants.FieldConstants.yOffsetReefPoleLeft;
+      
+    }
+
+    if (stationLeft){
+      limitPickupRight = true;
+    } else if (stationRight) {
       limitPickupLeft = true;
     }
     
