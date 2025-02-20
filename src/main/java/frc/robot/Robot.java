@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.security.AllPermission;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -63,7 +65,6 @@ public class Robot extends TimedRobot {
                                               Constants.LimelightConstants.Offset.pitch,
                                               Constants.LimelightConstants.Offset.yaw
                                             );
-    m_robotContainer.m_nav.resetOdometry(m_robotContainer.getStartPosition());
   }
 
   /**
@@ -74,7 +75,7 @@ public class Robot extends TimedRobot {
    * <p>
    * This runs after the mode specific periodic functions, but before LiveWindow
    * and
-   * SmartDashboard integrated updating.
+   * Dashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
@@ -97,13 +98,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-
-    Optional<Alliance> a = DriverStation.getAlliance();
-    if (a.isPresent()) {
-      alliance = a.get();
+    if(alliance == null) {
+      Optional<Alliance> a = DriverStation.getAlliance();
+      if (a.isPresent()) {
+        alliance = a.get();
+        if(alliance == Alliance.Red) {
+          m_robotContainer.initRed();
+        } else {
+          m_robotContainer.initBlue();
+        }
+      }
     }
-
   }
+
 
   /**
    * This autonomous runs the autonomous command selected by your
@@ -112,7 +119,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     setLED(LEDmode.Auton);
-    m_robotContainer.m_nav.resetOdometry(m_robotContainer.getStartPosition());
     System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_nav.getPose());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println("Starting command: " + m_autonomousCommand.getName());
