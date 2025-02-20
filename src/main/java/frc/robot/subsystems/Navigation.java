@@ -31,6 +31,8 @@ public class Navigation extends SubsystemBase {
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
+  public double targetTXNeuralNetwork;
+  public double targetDistanceNeuralNetwork;
 
   /** Creates a new Navigation. */
   public Navigation(DriveSubsystem drive) {
@@ -104,7 +106,28 @@ public class Navigation extends SubsystemBase {
     return tagPose.plus(delta);
   }
 
+  public void changePipeline(int pipelineID){
+    LimelightHelpers.setPipelineIndex(cameraName, pipelineID);
+    limelightPipeline = LimelightHelpers.getCurrentPipelineType(cameraName);
+  }
 
+  public void setTargetTX(double tx){
+    targetTXNeuralNetwork = tx;
+    
+  }
+
+  public void setTargetDistanceFiducial(double distance){
+    targetDistanceNeuralNetwork = distance;
+    
+  }
+
+  public double getTargetTX(){
+    return targetTXNeuralNetwork;
+  }
+
+  public double getTargetDistanceFiducial(){
+    return targetDistanceNeuralNetwork;
+  }
   /**
    * @return heading angle of the bot, according to the odometry, in degrees
    */

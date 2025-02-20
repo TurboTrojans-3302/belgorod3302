@@ -3,16 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands.Autonomous;
-
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.commands.AutoCoralPickupGround;
+import frc.robot.commands.ChangeLimelightPipeline;
+import frc.robot.commands.CoralChaser;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.ExtendGripper;
 import frc.robot.commands.GoToCommand;
@@ -49,8 +46,11 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
   Pose2d aprilTagPoseReef;
   Pose2d aprilTagPoseStation;
   Alliance kAlliance;
+  boolean limitPickupRight = false;
+  boolean limitPickupLeft = false;
+  double angleTolerance;
 
-  public CenterAndStationPickup(RobotContainer bot, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst, String alliance) {
+  public CenterAndStationPickup(RobotContainer bot, double elevatorScoringPosition1, double elevatorScoringPosition2, boolean leftFirst, double angleToleranceOfStationPickup, String alliance) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     m_drive = bot.m_robotDrive;
@@ -62,6 +62,8 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
     //customisable scoring positions so we dont have to make so many commands
     position1 = elevatorScoringPosition1;
     position2 = elevatorScoringPosition2;
+
+    angleTolerance = angleToleranceOfStationPickup;
 
     if (alliance == "Blue" || alliance == "blue"){
       aprilTagReef = 20;
@@ -82,9 +84,11 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
     if (leftFirst){
       poleOffset1 = Constants.FieldConstants.yOffsetReefPoleLeft;
       poleOffset2 = Constants.FieldConstants.yOffsetReefPoleRight;
+      limitPickupRight = true;
     } else {
       poleOffset1 = Constants.FieldConstants.yOffsetReefPoleRight;
       poleOffset2 = Constants.FieldConstants.yOffsetReefPoleLeft;
+      limitPickupLeft = true;
     }
     
     aprilTagPoseReef = m_nav.getPose2dInFrontOfTag(aprilTagReef, 1.0);
@@ -99,7 +103,9 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
                 new WaitCommand(0.2),
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + stationRightXOffset, aprilTagPoseStation.getY() + stationRightYOffset, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
                 //the change to the pose is supposed to move the robot so it is facing the right side of the station, to minimize the chances of getting in someones way
-                new AutoCoralPickupGround(m_drive, m_nav, m_intake, 1.0), //just drives forward with intake on, I want something that isn't just guesswork, maybe color detection
+            
+                new CoralChaser(m_drive, m_nav, m_intake, 0.5, limitPickupRight, limitPickupLeft, angleToleranceOfStationPickup, true),
+                new ChangeLimelightPipeline(m_nav, Constants.LimelightConstants.PipelineIdx.AprilTag),
                 new IntakeCycle(m_intake, m_intakeArm, m_gripper), //intake cycle does everything from spinning the intake, moving the arm, and transferring from the arm to the gripper, it skips the steps that have already been done
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition2),
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
