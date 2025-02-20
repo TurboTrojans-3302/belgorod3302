@@ -29,7 +29,7 @@ public class Navigation extends SubsystemBase {
 
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
-  private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;

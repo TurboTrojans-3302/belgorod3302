@@ -56,8 +56,6 @@ public class RobotContainer {
   public Gripper m_gripper;
   public Climbers m_climbers;
 
-  public AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-
   private final SendableChooser<Command> m_autonomousChooser;
   private final SendableChooser<Pose2d> m_startPosChooser;
 
