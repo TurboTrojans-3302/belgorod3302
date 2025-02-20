@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
                                               Constants.LimelightConstants.Offset.pitch,
                                               Constants.LimelightConstants.Offset.yaw
                                             );
-    m_robotContainer.m_nav.resetOdometry(m_robotContainer.getStartPosition());
   }
 
   /**

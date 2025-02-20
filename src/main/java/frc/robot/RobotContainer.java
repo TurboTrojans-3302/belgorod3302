@@ -146,7 +146,7 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
-
+if(ELEVATOR_ENABLE){
     new JoystickButton(m_copilotController, XboxController.Button.kA.value)
         .onTrue(new MoveElevator(m_elevator,
             Constants.ElevatorConstants.kLevel1Trough,
@@ -180,7 +180,7 @@ public class RobotContainer {
         Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
     elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
         Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
-
+    }
   };
 
   /**

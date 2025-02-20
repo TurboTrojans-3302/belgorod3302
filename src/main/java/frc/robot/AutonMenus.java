@@ -18,7 +18,7 @@ public class AutonMenus {
         RobotContainer bot = RobotContainer.getInstance();
     
         SendableChooser<Command> blueCommands = new SendableChooser<Command>();
-        blueCommands.setDefaultOption("Do Nothing", new DoNothing());
+        blueCommands.setDefaultOption("Do Nothing (blue)", new DoNothing());
         blueCommands.addOption("turn to april tag B 10", new TurnToAprilTag(bot.m_robotDrive, 10));
         blueCommands.addOption("turn to april tag 1", new TurnToAprilTag(bot.m_robotDrive, 1));
         blueCommands.addOption("turn to april tag 11", new TurnToAprilTag(bot.m_robotDrive, 11));
@@ -39,7 +39,7 @@ public class AutonMenus {
         RobotContainer bot = RobotContainer.getInstance();
 
         SendableChooser<Command> redCommands = new SendableChooser<Command>();
-        redCommands.setDefaultOption("Do Nothing", new DoNothing());
+        redCommands.setDefaultOption("Do Nothing (red)", new DoNothing());
         redCommands.addOption("turn to april tag B 10", new TurnToAprilTag(bot.m_robotDrive, 10));
         redCommands.addOption("turn to april tag 1", new TurnToAprilTag(bot.m_robotDrive, 1));
         redCommands.addOption("turn to april tag 11", new TurnToAprilTag(bot.m_robotDrive, 11));
