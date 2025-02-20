@@ -125,11 +125,9 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
         return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
-    public void orbit(double orbitSpeed) {
-        final Translation2d center = new Translation2d(1.0, 0.0);
+    public void orbitRobotFrame(double orbitSpeed, Translation2d center) {
         drive(new ChassisSpeeds(0, 0, orbitSpeed), center);
     }
-
 
     @Override
     public void initSendable(SendableBuilder builder){

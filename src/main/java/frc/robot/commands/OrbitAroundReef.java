@@ -38,12 +38,12 @@ public class OrbitAroundReef extends Command {
   @Override
   public void execute() {
     Translation2d reef = (Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center);
+    Pose2d reefPose = new Pose2d(reef, Rotation2d.kZero);
     Pose2d robot = nav.getPose();
-    Translation2d robotTranslationType = robot.getTranslation();
-    Translation2d C = reef.minus(robotTranslationType);
-    Rotation2d angleOfVector = C.getAngle();
-    Translation2d finalVector = new Translation2d(speed, angleOfVector.plus(Rotation2d.fromDegrees(90)));
-    drive.driveFieldOriented(finalVector, 0);
+
+    Translation2d orbitCenterRobotFrame = reefPose.relativeTo(robot).getTranslation();
+
+    drive.orbitRobotFrame(speed, orbitCenterRobotFrame);
   }
 
   // Called once the command ends or is interrupted.
