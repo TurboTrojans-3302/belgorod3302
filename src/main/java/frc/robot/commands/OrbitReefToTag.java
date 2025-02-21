@@ -35,15 +35,14 @@ public class OrbitReefToTag extends Command {
     addRequirements(drive);
     this.drive = drive;
     this.nav = nav;
-
     Pose2d tagPose = nav.getTagPose2d(tagId);
     this.destAngle = tagPose.getRotation();
-    reefCenterPose = new Pose2d((Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center), Rotation2d.kZero);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    reefCenterPose = new Pose2d((Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center), Rotation2d.kZero);
     profile = new TrapezoidProfile(new Constraints(orbitVelocity, orbitAccel));
   }
 

@@ -22,7 +22,7 @@ import frc.robot.subsystems.Eddie.DriveConstants;
  * Left stick press: toggle slow drive, press (planned)
  * Right stick press: toggle field oriented, press (planned)
  * 
- * A button: 
+ * A button: navigate to the far apriltag, while held
  * B button: hold to orbit CCW around reef (planned)
  * X button: hold to orbit CW around reef (planned)
  * Y button: 
