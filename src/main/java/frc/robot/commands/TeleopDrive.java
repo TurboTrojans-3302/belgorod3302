@@ -4,19 +4,17 @@
 
 package frc.robot.commands;
 
-import java.lang.reflect.Method;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
 import frc.robot.subsystems.Eddie.DriveConstants;
-import frc.robot.commands.OrbitAroundReef;
 
 /*
  * Driver Xbox Controller
@@ -104,20 +102,21 @@ public class TeleopDrive extends Command {
     if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
 
       if(m_driverController.getXButton()){
-        new OrbitAroundReef(drive, nav, -0.5 * speedScale);
+        new OrbitAroundReef(drive, nav, -orbitSpeed * speedScale);
       }
       else if(m_driverController.getBButton()){
-        new OrbitAroundReef(drive, nav, 0.5 * speedScale);
+        new OrbitAroundReef(drive, nav, orbitSpeed * speedScale);
       }
       else{
         m_robotDrive.stop();
       }
 
+      final Translation2d orbitCenter = new Translation2d(1.0, 0.0);
       if(m_driverController.getPOV() == 90 && m_driverController.getXButton() == false && m_driverController.getBButton() == false){
-        m_robotDrive.orbit(orbitSpeed * -speedScale);
+        m_robotDrive.orbitRobotFrame(orbitSpeed * -speedScale, orbitCenter);
       }
       else if(m_driverController.getPOV() == 270){
-        m_robotDrive.orbit(orbitSpeed * speedScale);
+        m_robotDrive.orbitRobotFrame(orbitSpeed * speedScale, orbitCenter);
       }else{
         m_robotDrive.stop();
       }
