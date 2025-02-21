@@ -21,7 +21,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class OrbitReefToAngle extends Command {
+public class OrbitReefToTag extends Command {
   private DriveSubsystem drive;
   private Navigation nav;
   private Rotation2d destAngle;
@@ -31,13 +31,14 @@ public class OrbitReefToAngle extends Command {
   private double orbitAccel = Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared;
 
   /** Creates a new OrbitToAngle. */
-  public OrbitReefToAngle(DriveSubsystem drive, Navigation nav, Rotation2d angle) {
+  public OrbitReefToTag(DriveSubsystem drive, Navigation nav, int tagId) {
     addRequirements(drive);
     this.drive = drive;
     this.nav = nav;
-    this.destAngle = angle;
-    reefCenterPose = new Pose2d((Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center), Rotation2d.kZero);
 
+    Pose2d tagPose = nav.getTagPose2d(tagId);
+    this.destAngle = tagPose.getRotation();
+    reefCenterPose = new Pose2d((Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center), Rotation2d.kZero);
   }
 
   // Called when the command is initially scheduled.
