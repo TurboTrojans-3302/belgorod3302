@@ -17,8 +17,8 @@ import frc.robot.subsystems.Eddie.DriveConstants;
 /*
  * Driver Xbox Controller
  * 
- * Left stick press: toggle slow drive, press (planned)
- * Right stick press: toggle field oriented, press (planned)
+ * Left stick press: toggle slow drive, press
+ * Right stick press: toggle field oriented, press
  * 
  * A button: 
  * B button: hold to orbit CCW around reef (planned)
@@ -33,8 +33,8 @@ import frc.robot.subsystems.Eddie.DriveConstants;
  * Left Trigger - 
  * Right Trigger - 
  * 
- * Right Bumper - intake in (planned)
- * Left Bumper -  intake out (planned)
+ * Right Bumper - intake in 
+ * Left Bumper -  intake out
  * 
  */
 
@@ -65,6 +65,7 @@ public class TeleopDrive extends Command {
   private DriveSubsystem m_robotDrive;
   private XboxController m_driverController;
   private boolean m_fieldOrientedEnable = true;
+  private boolean m_slowDriveFlag = false;
   private double orbitSpeed = DriveConstants.ORBIT_SPEED;
 
   /** Creates a new TeleopDrive. */
@@ -83,12 +84,15 @@ public class TeleopDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double speedScale;
-    if (m_driverController.getLeftBumperButton()) {
-      speedScale = 0.5;
-    } else {
-      speedScale = 1.0;
+    
+    if(m_driverController.getRightStickButtonPressed()){
+      m_fieldOrientedEnable = !m_fieldOrientedEnable;
     }
+    
+    if (m_driverController.getLeftStickButtonPressed()) {
+      m_slowDriveFlag = !m_slowDriveFlag;
+    }
+    double speedScale = m_slowDriveFlag ? 0.5 : 1.0;
 
     double forward = stick2speed(speedScale * m_driverController.getLeftY());
     double leftward = stick2speed(speedScale * m_driverController.getLeftX());
@@ -107,12 +111,14 @@ public class TeleopDrive extends Command {
       }
 
     } else {
-      if(m_driverController.getRightBumperButton() || !m_fieldOrientedEnable) {
-        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
-      } else {
+
+      if(m_fieldOrientedEnable) {
         double reverse = (Robot.alliance == Alliance.Red) ? -1.0 : 1.0;
         m_robotDrive.driveFieldOriented(reverse * forward, reverse * leftward, rotate);
+      }else{
+        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
       }
+
     }
   }
 
@@ -135,6 +141,7 @@ public class TeleopDrive extends Command {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addBooleanProperty("FieldOrientedEnable", () -> m_fieldOrientedEnable, (x)->{m_fieldOrientedEnable = x;});
+    builder.addBooleanProperty("SlowDriveFlag", () -> m_slowDriveFlag, (x)->{m_slowDriveFlag = x;});
     builder.addDoubleProperty("Orbit Speed", ()-> orbitSpeed, (x)-> orbitSpeed = x);
   }
 }

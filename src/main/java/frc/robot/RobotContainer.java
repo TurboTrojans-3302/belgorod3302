@@ -126,58 +126,56 @@ public class RobotContainer {
     return instance;
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its
-   * subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-   * passing it to a
-   * {@link JoystickButton}.
-   */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, XboxController.Button.kLeftStick.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
-    new JoystickButton(m_driverController, XboxController.Button.kRightStick.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
-if(ELEVATOR_ENABLE){
-    new JoystickButton(m_copilotController, XboxController.Button.kA.value)
-        .onTrue(new MoveElevator(m_elevator,
-            Constants.ElevatorConstants.kLevel1Trough,
-            Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2,
-            Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+    /**
+     * Driver's Controller
+     */
+    if(INTAKE_ENABLE){
+        new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+            .whileTrue(new RunCommand( () -> m_intake.in(), m_intake));
+        new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+            .whileTrue(new RunCommand( () -> m_intake.out(), m_intake));
+    }
 
-    new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3,
-            Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+    /**
+     * Copilot's Controller
+     *
+     */        
+    if (ELEVATOR_ENABLE) {
+      new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+          .onTrue(new MoveElevator(m_elevator,
+              Constants.ElevatorConstants.kLevel1Trough,
+              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-        .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4,
-            Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2,
+              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    // get dpad position as a boolean (they are automatically returned by getPOV()
-    // as an exact value)
-    BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
-    BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3,
+              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    // convert booleansupplier into triggers so the whileTrue() method can be called
-    // upon them
-    Trigger elevatorUp = new Trigger(dpadUp);
-    Trigger elevatorDown = new Trigger(dpadDown);
+      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4,
+              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
 
-    // dpad causes the elevator to go up/down slowly during teleop
-    elevatorUp.whileTrue(new MoveElevator(m_elevator,
-        Constants.ElevatorConstants.kLevel4,
-        Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
-    elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
-        Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      // get dpad position as a boolean (they are automatically returned by getPOV()
+      // as an exact value)
+      BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
+      BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+
+      // convert booleansupplier into triggers so the whileTrue() method can be called
+      // upon them
+      Trigger elevatorUp = new Trigger(dpadUp);
+      Trigger elevatorDown = new Trigger(dpadDown);
+
+      // dpad causes the elevator to go up/down slowly during teleop
+      elevatorUp.whileTrue(new MoveElevator(m_elevator,
+          Constants.ElevatorConstants.kLevel4,
+          Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
+          Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
     }
   };
 
@@ -223,10 +221,9 @@ if(ELEVATOR_ENABLE){
   }
 
   private void setStartPosition(Pose2d pose) {
-    if(DriverStation.isDisabled()){
+    if (DriverStation.isDisabled()) {
       m_nav.resetOdometry(pose);
     }
   }
-
 
 }
