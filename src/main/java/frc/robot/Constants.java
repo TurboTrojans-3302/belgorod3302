@@ -159,6 +159,8 @@ public final class Constants {
     public static final double armAngleOffset = 0;
     public static final double MaxArmAngle = 90.0;
     public static final double MinArmAngle = 0.0;
+    public static final double inSpeed = 0;
+    public static final double outSpeed = 0;
   }
 
   public static final class ClimberConstants {
