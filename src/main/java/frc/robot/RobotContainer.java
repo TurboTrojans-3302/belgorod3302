@@ -10,6 +10,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +23,8 @@ import frc.robot.Constants.DigitalIO;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.MoveElevator;
+import frc.robot.commands.NavigateToTag;
+import frc.robot.commands.OrbitAroundReef;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.Climbers;
@@ -65,6 +68,8 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+
+  private int targetTagId = 0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -131,6 +136,16 @@ public class RobotContainer {
     /**
      * Driver's Controller
      */
+    new Trigger(()->{ return m_driverController.getPOV() == 0; })
+      .onTrue(new RunCommand(()->{ targetTagId = (int) LimelightHelpers.getFiducialID("limelight"); }));
+    new Trigger(()->{ return m_driverController.getPOV() == 0; })
+      .whileTrue(new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ));
+
+    new JoystickButton(m_driverController, XboxController.Button.kB.value)
+      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
+      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+
     if(INTAKE_ENABLE){
         new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
             .whileTrue(new RunCommand( () -> m_intake.in(), m_intake));
