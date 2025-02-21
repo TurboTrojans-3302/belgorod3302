@@ -24,19 +24,19 @@ public class GoToCommand extends Command {
 
   private final double dT = Robot.kDefaultPeriod;
 
-  private Pose2d m_dest;
-  private Transform2d m_delta;
-  private DriveSubsystem m_drive;
+  protected Pose2d m_dest;
+  protected Transform2d m_delta;
+  protected DriveSubsystem m_drive;
   private TrapezoidProfile m_trapezoid;
-  private boolean m_relativeFlag;
-  private Navigation m_nav;
+  protected boolean m_relativeFlag;
+  protected Navigation m_nav;
 
   static double speedLimit = AutoConstants.kMaxSpeedMetersPerSecond;
   static double accelLimit = AutoConstants.kMaxAccelerationMetersPerSecondSquared;
   static double kDistanceTolerance = Constants.AutoConstants.kDistanceTolerance;
   static double kHeadingTolerance = Constants.AutoConstants.kHeadingTolerance;
 
-  private GoToCommand(DriveSubsystem drive, Navigation nav) {
+  protected GoToCommand(DriveSubsystem drive, Navigation nav) {
     m_drive = drive;
     this.m_nav = nav;
     addRequirements(m_drive);
@@ -85,7 +85,7 @@ public class GoToCommand extends Command {
     return m_dest.minus(m_nav.getPose()).getTranslation();
   }
 
-  private double distance() {
+  protected double distance() {
     return translation2dest().getNorm();
   }
 
