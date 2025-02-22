@@ -172,12 +172,12 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_gyroOffsetDeg = angle - m_gyro.getAngle();
   }
 
-  public double getGyroAngleRadians() {
-    return MathUtil.angleModulus(Units.degreesToRadians(getGyroAngleDegrees()));
+  public double getGyroAngleDegrees() {
+    return MathUtil.angleModulus(Math.toDegrees(getGyroAngleRadians()));
   }
 
-  public double getGyroAngleDegrees() {
-    return m_gyro.getAngle() + m_gyroOffsetDeg;
+  public double getGyroAngleRadians() {
+    return -m_gyro.getAngle() + m_gyroOffsetDeg; // fix ofsett name
   }
 
   /**
