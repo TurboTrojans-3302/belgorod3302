@@ -150,10 +150,14 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   }
 
   public void testSetAll(double voltage, double angle) {
-    m_frontLeft.testSet(voltage, angle);
-    m_frontRight.testSet(voltage, angle);
-    m_rearLeft.testSet(voltage, angle);
-    m_rearRight.testSet(voltage, angle);
+    // m_frontLeft.testSet(voltage, angle);
+    //  m_frontRight.testSet(voltage, angle);
+    //  m_rearLeft.testSet(voltage, angle);
+    //  m_rearRight.testSet(voltage, angle);
+    m_frontLeft.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
+    m_frontRight.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
+    m_rearRight.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
