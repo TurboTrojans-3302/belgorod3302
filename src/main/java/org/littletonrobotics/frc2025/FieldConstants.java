@@ -140,8 +140,8 @@ public class FieldConstants {
                       Units.degreesToRadians(level.pitch),
                       poseDirection.getRotation().getRadians())));
         }
-        branchPositions.add((face * 2) + 1, fillRight);
-        branchPositions.add((face * 2) + 2, fillLeft);
+        //branchPositions.add((face * 2) + 1, fillRight);
+        //branchPositions.add((face * 2) + 2, fillLeft);
       }
     }
   }
