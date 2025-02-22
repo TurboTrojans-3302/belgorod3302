@@ -71,16 +71,16 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
       public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("SwerveDrive");
 
-        builder.addDoubleProperty("Front Left Angle", () -> m_frontLeft.getSteerAngle(), null);
+        builder.addDoubleProperty("Front Left Angle", () -> Math.toDegrees(m_frontLeft.getSteerAngle()), null);
         builder.addDoubleProperty("Front Left Velocity", () -> m_frontLeft.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Front Right Angle", () -> m_frontRight.getSteerAngle(), null);
+        builder.addDoubleProperty("Front Right Angle", () -> Math.toDegrees(m_frontRight.getSteerAngle()), null);
         builder.addDoubleProperty("Front Right Velocity", () -> m_frontRight.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Back Left Angle", () -> m_rearLeft.getSteerAngle(), null);
+        builder.addDoubleProperty("Back Left Angle", () -> Math.toDegrees(m_rearLeft.getSteerAngle()), null);
         builder.addDoubleProperty("Back Left Velocity", () -> m_rearLeft.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Back Right Angle", () -> m_rearRight.getSteerAngle(), null);
+        builder.addDoubleProperty("Back Right Angle", () -> Math.toDegrees(m_rearRight.getSteerAngle()), null);
         builder.addDoubleProperty("Back Right Velocity", () -> m_rearRight.getDriveVelocity(), null);
 
         builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
