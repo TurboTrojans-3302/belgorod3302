@@ -33,9 +33,9 @@ public class DriveConstants {
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double kFrontLeftChassisAngularOffset = Math.toRadians(9.305);
-    public static final double kFrontRightChassisAngularOffset = 1.624600;
-    public static final double kBackLeftChassisAngularOffset = Math.toRadians(3.335000);
-    public static final double kBackRightChassisAngularOffset = 2.618; 
+    public static final double kFrontRightChassisAngularOffset = Math.toRadians(92.55);
+    public static final double kBackLeftChassisAngularOffset = Math.toRadians(3.51);
+    public static final double kBackRightChassisAngularOffset = Math.toRadians(149.8); 
 
     public static final double headingP = 0.02;
     public static final double headingI = 0.0001;
