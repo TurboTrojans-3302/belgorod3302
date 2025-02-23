@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -138,8 +140,9 @@ public class RobotContainer {
      */
     new Trigger(()->{ return m_driverController.getPOV() == 0; })
       .onTrue(new RunCommand(()->{ targetTagId = (int) LimelightHelpers.getFiducialID("limelight"); }));
-    //new Trigger(()->{ return m_driverController.getPOV() == 0; })
-      //.whileTrue(new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ));
+    new Trigger(()->{ return m_driverController.getPOV() == 0; })
+      .whileTrue(Commands.defer(()->new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ),
+                                Set.of(m_robotDrive, m_nav)));
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
       .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));

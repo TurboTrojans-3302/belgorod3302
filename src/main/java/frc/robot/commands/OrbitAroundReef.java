@@ -27,7 +27,7 @@ public class OrbitAroundReef extends Command {
       this.nav = nav;
       this.speed = speed;
 
-    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
@@ -37,8 +37,9 @@ public class OrbitAroundReef extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //Translation2d reef = (Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center);
-    Translation2d reef = FieldConstants.Reef.center;
+    //todo why does this crash? Is the alliance value not set yet?
+    Translation2d reef = (Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center);
+    //Translation2d reef = FieldConstants.Reef.center;
     Pose2d reefPose = new Pose2d(reef, Rotation2d.kZero);
     Pose2d robot = nav.getPose();
 
