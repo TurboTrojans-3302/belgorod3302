@@ -198,4 +198,8 @@ public class FieldConstants {
 
   public record AlgaeObjective(int id) {}
 
+  public static AprilTagFieldLayout getAprilTagFieldLayout() {
+    return APRIL_TAG_FIELD_LAYOUT;
+  }
+
 }
