@@ -18,10 +18,15 @@ public class NavigateToTag extends SequentialCommandGroup {
   /** Creates a new NavigateToTag. */
   public NavigateToTag(DriveSubsystem drive, Navigation nav, IntSupplier getTagId) {
     int tagid = getTagId.getAsInt();
+
+    if(tagid < 1) {
+      // do nothing?
+    }else{
     Pose2d target = nav.getTagPose2d(tagid);
-    addCommands(new GoAlmostTo(drive, nav, target, 1.5),
-                new OrbitReefToTag(drive, nav, tagid),
-                new GoToCommand(drive, nav, nav.getPose2dInFrontOfTag(tagid, 0.05))
-                );
+        addCommands(new GoAlmostTo(drive, nav, target, 1.5),
+                    new OrbitReefToTag(drive, nav, tagid),
+                    new GoToCommand(drive, nav, nav.getPose2dInFrontOfTag(tagid, 0.05))
+                    );
+    }
   }
 }

@@ -140,7 +140,7 @@ public class RobotContainer {
      */
     new Trigger(()->{ return m_driverController.getPOV() == 0; })
       .onTrue(new RunCommand(()->{ targetTagId = (int) LimelightHelpers.getFiducialID("limelight"); }));
-    new Trigger(()->{ return m_driverController.getPOV() == 0; })
+    new Trigger(()->{ return m_driverController.getPOV() == 180; })
       .whileTrue(Commands.defer(()->new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ),
                                 Set.of(m_robotDrive, m_nav)));
 

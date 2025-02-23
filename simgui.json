@@ -55,6 +55,9 @@
           }
         },
         "open": true
+      },
+      "limelight": {
+        "open": true
       }
     }
   },
