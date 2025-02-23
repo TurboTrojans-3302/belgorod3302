@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.CanIds;
 
 public class LudwigDriveTrain extends DriveSubsystemBase {
@@ -242,5 +243,13 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     }, (x) -> {
       maxRotationLimit = x;
     });
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    m_frontLeft.iterateSim(Robot.kDefaultPeriod);
+    m_frontRight.iterateSim(Robot.kDefaultPeriod);
+    m_rearLeft.iterateSim(Robot.kDefaultPeriod);
+    m_rearRight.iterateSim(Robot.kDefaultPeriod);
   }
 }
