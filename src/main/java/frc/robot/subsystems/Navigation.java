@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import org.littletonrobotics.frc2025.FieldConstants;
 import org.littletonrobotics.frc2025.FieldConstants.Reef;
 
 import au.grapplerobotics.ConfigurationFailedException;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.Robot;
 import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class Navigation extends SubsystemBase {
@@ -29,9 +31,9 @@ public class Navigation extends SubsystemBase {
 
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
-  private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+  private AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
   protected SwerveDrivePoseEstimator m_odometry;
-  //private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
+  private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
 
   /** Creates a new Navigation. */
@@ -43,13 +45,13 @@ public class Navigation extends SubsystemBase {
         m_drive.getSwerveModulePositions(),
         Constants.FieldConstants.ZeroZero);
 
-    // try {
-    //   m_dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
-    //   m_dxSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
-    //   m_dxSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
-    // } catch (ConfigurationFailedException e) {
-    //   System.out.println("LaserCan Configuration failed! " + e);
-    // }
+    try {
+      m_dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
+      m_dxSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 16, 16));
+      m_dxSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+    } catch (ConfigurationFailedException e) {
+      System.out.println("LaserCan Configuration failed! " + e);
+    }
 
     LimelightHelpers.setPipelineIndex(cameraName, Constants.LimelightConstants.PipelineIdx.AprilTag);
     limelightPipeline = LimelightHelpers.getCurrentPipelineType(cameraName);
@@ -87,15 +89,15 @@ public class Navigation extends SubsystemBase {
   }
 
   public Double getDxToObjectMeters() {
-      // Measurement m = m_dxSensor.getMeasurement();
-      // return m.distance_mm * 0.001;
-      return 0.0;
-    }
+    if(!Robot.isReal()){return 0.0;}
+    Measurement m = m_dxSensor.getMeasurement();
+    return m.distance_mm * 0.001;
+  }
 
   public boolean dxMeasurmentGood() {
-    // Measurement m = m_dxSensor.getMeasurement();
-    // return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
-    return false;
+    if(!Robot.isReal()){return true;}
+    Measurement m = m_dxSensor.getMeasurement();
+    return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 
   public Pose2d getTagPose2d(int tagId) {
