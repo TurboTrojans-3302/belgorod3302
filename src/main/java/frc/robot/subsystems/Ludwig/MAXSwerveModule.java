@@ -106,10 +106,11 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
+    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset)); 
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
+    //correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
+    // todo put the optimization back
 
     // Command driving and turning SPARKS towards their respective setpoints.
     m_drivingClosedLoopController.setReference(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
@@ -161,8 +162,8 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Swerve Module " + m_drivingSpark.getDeviceId() + "/" + m_turningSpark.getDeviceId());
-    builder.addDoubleProperty("AngleOffset", () -> m_chassisAngularOffset, (x) -> {
-      m_chassisAngularOffset = x;
+    builder.addDoubleProperty("AngleOffset", () -> Math.toDegrees(m_chassisAngularOffset), (x) -> {
+      m_chassisAngularOffset = Math.toRadians(x);
     });
     builder.addDoubleProperty("Steer P",
         () -> steerP,

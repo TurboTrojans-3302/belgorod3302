@@ -150,10 +150,14 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   }
 
   public void testSetAll(double voltage, double angle) {
-    m_frontLeft.testSet(voltage, angle);
-    m_frontRight.testSet(voltage, angle);
-    m_rearLeft.testSet(voltage, angle);
-    m_rearRight.testSet(voltage, angle);
+    // m_frontLeft.testSet(voltage, angle);
+    //  m_frontRight.testSet(voltage, angle);
+    //  m_rearLeft.testSet(voltage, angle);
+    //  m_rearRight.testSet(voltage, angle);
+    m_frontLeft.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
+    m_frontRight.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
+    m_rearRight.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(voltage, Rotation2d.fromRadians(angle)));
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -169,11 +173,11 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   }
 
   public double getGyroAngleRadians() {
-    return MathUtil.angleModulus(Units.degreesToRadians(getGyroAngleDegrees()));
+    return MathUtil.angleModulus(Math.toRadians(getGyroAngleDegrees()));
   }
 
-  public double getGyroAngleDegrees() {
-    return m_gyro.getAngle() + m_gyroOffsetDeg;
+  public double getGyroAngleDegrees () {
+    return -m_gyro.getAngle() + m_gyroOffsetDeg; // fix offset name
   }
 
   /**
