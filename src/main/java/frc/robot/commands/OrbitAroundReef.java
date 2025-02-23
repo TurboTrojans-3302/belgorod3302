@@ -20,6 +20,7 @@ public class OrbitAroundReef extends Command {
   private DriveSubsystem drive;
   private Navigation nav;
   private double speed;
+  Translation2d reef;
   
     /** Creates a new OrbitAroundReef. */
     public OrbitAroundReef(DriveSubsystem drive, Navigation nav, double speed) {
@@ -32,13 +33,15 @@ public class OrbitAroundReef extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    //todo why does this crash? Is the alliance value not set yet?
+    reef = (Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center);
+    //System.out.println("Start Orbiting around Reef at: " + reef.toString());
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //todo why does this crash? Is the alliance value not set yet?
-    Translation2d reef = (Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center);
     //Translation2d reef = FieldConstants.Reef.center;
     Pose2d reefPose = new Pose2d(reef, Rotation2d.kZero);
     Pose2d robot = nav.getPose();

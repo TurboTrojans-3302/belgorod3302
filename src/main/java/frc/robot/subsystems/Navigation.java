@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.Robot;
 import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class Navigation extends SubsystemBase {
@@ -88,11 +89,13 @@ public class Navigation extends SubsystemBase {
   }
 
   public Double getDxToObjectMeters() {
+    if(!Robot.isReal()){return 0.0;}
     Measurement m = m_dxSensor.getMeasurement();
     return m.distance_mm * 0.001;
   }
 
   public boolean dxMeasurmentGood() {
+    if(!Robot.isReal()){return true;}
     Measurement m = m_dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
