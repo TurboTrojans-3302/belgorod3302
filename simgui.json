@@ -1,11 +1,6 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "SPARK MAX [1]": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK MAX [1] RELATIVE ENCODER": {
         "header": {
           "open": true
@@ -20,9 +15,11 @@
       "/SmartDashboard/DriveSubsystem": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/GoToCommand": "Command",
+      "/SmartDashboard/IMU": "Gyro",
       "/SmartDashboard/Navigation": "Subsystem",
       "/SmartDashboard/Start Position": "String Chooser",
-      "/SmartDashboard/TeleopCommand": "Command"
+      "/SmartDashboard/TeleopCommand": "Command",
+      "/SmartDashboard/headingPIDcontroller": "PIDController"
     },
     "windows": {
       "/SmartDashboard/DriveSubsystem": {
@@ -31,12 +28,13 @@
         }
       },
       "/SmartDashboard/Field": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
+        "bottom": 1638,
+        "builtin": "2025 Reefscape",
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
         "window": {
           "visible": true
         }
@@ -46,23 +44,38 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "DriveSubsystem": {
-          "open": true
+        "Auton Command": {
+          "open": true,
+          "string[]##v_/SmartDashboard/Auton Command/options": {
+            "open": true
+          }
         },
         "Field": {
           "double[]##v_/SmartDashboard/Field/Robot": {
             "open": true
           }
         },
-        "open": true
-      },
-      "limelight": {
+        "Navigation": {
+          "open": true
+        },
         "open": true
       }
     }
   },
   "NetworkTables Info": {
     "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
       "open": true
     },
     "visible": true
