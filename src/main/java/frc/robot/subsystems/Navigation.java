@@ -131,6 +131,7 @@ public class Navigation extends SubsystemBase {
       builder.addStringProperty("ClassiferFound", () -> {return LimelightHelpers.getClassifierClass(cameraName);}, null);
       builder.addBooleanProperty("DxGood", this::dxMeasurmentGood, null);
       builder.addDoubleProperty("DxSensor", this::getDxToObjectMeters, null);
+      builder.addStringProperty("EstimatedPosition", ()->getPose().toString(), null);
     }
 
     static public enum ReefPole { 
