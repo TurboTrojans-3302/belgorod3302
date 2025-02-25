@@ -44,6 +44,7 @@ public class OrbitReefToTag extends Command {
   public void initialize() {
     reefCenterPose = new Pose2d((Robot.alliance == Alliance.Red ? FieldConstants.redVersion(FieldConstants.Reef.center) : FieldConstants.Reef.center), Rotation2d.kZero);
     profile = new TrapezoidProfile(new Constraints(orbitVelocity, orbitAccel));
+    System.out.println("Start OrbitReefToTag: " + destAngle.toString());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -60,7 +61,7 @@ public class OrbitReefToTag extends Command {
   }
 
   private double getArcDistance(){
-    Translation2d center = reefCenterPose.relativeTo(nav.getPose()).getTranslation();
+    Translation2d center = nav.getPose().relativeTo(reefCenterPose).getTranslation();
     Rotation2d currentAngle = center.getAngle();
     Double deltaRadians = MathUtil.angleModulus(destAngle.minus(currentAngle).getRadians());
     return deltaRadians * center.getNorm();
@@ -69,7 +70,9 @@ public class OrbitReefToTag extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    System.out.println("Finish OrbitReefToTag");
+  }
 
   // Returns true when the command should end.
   @Override

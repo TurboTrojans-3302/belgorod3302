@@ -38,14 +38,30 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/GoToCommand": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
     "transitory": {
+      "FMSInfo": {
+        "open": true
+      },
+      "LiveWindow": {
+        "open": true
+      },
+      "Shuffleboard": {
+        ".recording": {
+          "open": true
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "Auton Command": {
-          "open": true,
           "string[]##v_/SmartDashboard/Auton Command/options": {
             "open": true
           }
@@ -55,9 +71,12 @@
             "open": true
           }
         },
-        "Navigation": {
+        "GoToCommand": {
           "open": true
         },
+        "open": true
+      },
+      "limelight": {
         "open": true
       }
     }

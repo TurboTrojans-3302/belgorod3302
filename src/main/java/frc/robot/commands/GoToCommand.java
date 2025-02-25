@@ -143,5 +143,7 @@ public class GoToCommand extends Command {
     builder.addDoubleProperty("accelLimit", () -> accelLimit, (x) -> accelLimit = x );
     builder.addDoubleProperty("kDistanceTolerance", () -> kDistanceTolerance, (x) -> kDistanceTolerance = x );
     builder.addDoubleProperty("kHeadingTolerance", () -> kHeadingTolerance, (x) -> kHeadingTolerance = x );
+    builder.addDoubleProperty("dest X", ()->m_dest.getX(), (x)->{m_dest = new Pose2d(x, m_dest.getY(), m_dest.getRotation()); });
+    builder.addDoubleProperty("dest Y", ()->m_dest.getY(), (y)->{m_dest = new Pose2d(m_dest.getX(), y, m_dest.getRotation()); });
   }
 }
