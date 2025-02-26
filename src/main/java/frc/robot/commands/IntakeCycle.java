@@ -25,6 +25,6 @@ public class IntakeCycle extends SequentialCommandGroup {
     m_arm = arm;
     m_gripper = gripper;
     
-    addCommands(new AutoIntake(intake), new AutoArmCycle(m_arm), new IntakeAndGripper(m_intake, m_gripper));
+    addCommands(new AutoIntake(intake), new AutoArmCycle(m_arm)); //todo add gripper commands
   }
 }

@@ -92,6 +92,8 @@ public final class Constants {
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final double kDistanceTolerance = 0.050;
+    public static final double kHeadingTolerance = 2.0; // degrees
   }
 
   public static final class FieldConstants {
@@ -157,6 +159,8 @@ public final class Constants {
     public static final double armAngleOffset = 0;
     public static final double MaxArmAngle = 90.0;
     public static final double MinArmAngle = 0.0;
+    public static final double inSpeed = 0;
+    public static final double outSpeed = 0;
   }
 
   public static final class ClimberConstants {
