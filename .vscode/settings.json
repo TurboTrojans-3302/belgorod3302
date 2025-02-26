@@ -1,3 +1,4 @@
 {
-    "wpilib.autoStartRioLog": false
+    "wpilib.autoStartRioLog": true,
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

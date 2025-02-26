@@ -1,0 +1,139 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK MAX [1] RELATIVE ENCODER": {
+        "header": {
+          "open": true
+        }
+      },
+      "window": {
+        "visible": false
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auton Command": "String Chooser",
+      "/SmartDashboard/DriveSubsystem": "Subsystem",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/GoToCommand": "Command",
+      "/SmartDashboard/GoToCommand 0, 0": "Command",
+      "/SmartDashboard/GoToCommand 0, 6": "Command",
+      "/SmartDashboard/GoToCommand 6, 0": "Command",
+      "/SmartDashboard/GoToCommand 6, 6": "Command",
+      "/SmartDashboard/IMU": "Gyro",
+      "/SmartDashboard/Nav to tag  8": "Command",
+      "/SmartDashboard/Nav to tag 21": "Command",
+      "/SmartDashboard/Navigation": "Subsystem",
+      "/SmartDashboard/Start Position": "String Chooser",
+      "/SmartDashboard/StopCommand": "Command",
+      "/SmartDashboard/TeleopCommand": "Command",
+      "/SmartDashboard/TeleopDrive": "Command",
+      "/SmartDashboard/headingPIDcontroller": "PIDController"
+    },
+    "windows": {
+      "/SmartDashboard/DriveSubsystem": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "bottom": 1638,
+        "builtin": "2025 Reefscape",
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/GoToCommand 0, 0": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/GoToCommand 0, 6": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/GoToCommand 6, 0": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/GoToCommand 6, 6": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Nav to tag  8": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Nav to tag 21": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/StopCommand": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/TeleopCommand": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      },
+      "Shuffleboard": {
+        ".recording": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "Auton Command": {
+          "string[]##v_/SmartDashboard/Auton Command/options": {
+            "open": true
+          }
+        },
+        "Field": {
+          "double[]##v_/SmartDashboard/Field/Robot": {
+            "open": true
+          }
+        }
+      },
+      "limelight": {
+        "open": true
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    }
+  }
+}

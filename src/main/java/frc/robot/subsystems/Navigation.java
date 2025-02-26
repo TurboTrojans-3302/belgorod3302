@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import org.littletonrobotics.frc2025.FieldConstants;
 import org.littletonrobotics.frc2025.FieldConstants.Reef;
 
 import au.grapplerobotics.ConfigurationFailedException;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
+import frc.robot.Robot;
 import frc.robot.LimelightHelpers.PoseEstimate;
 
 public class Navigation extends SubsystemBase {
@@ -29,7 +31,7 @@ public class Navigation extends SubsystemBase {
 
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
-  private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  private AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
@@ -87,11 +89,13 @@ public class Navigation extends SubsystemBase {
   }
 
   public Double getDxToObjectMeters() {
+    if(!Robot.isReal()){return 0.0;}
     Measurement m = m_dxSensor.getMeasurement();
     return m.distance_mm * 0.001;
   }
 
   public boolean dxMeasurmentGood() {
+    if(!Robot.isReal()){return true;}
     Measurement m = m_dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
@@ -111,10 +115,17 @@ public class Navigation extends SubsystemBase {
   }
 
   /**
+   * @return heading angle of the bot, according to the odometry
+   */
+  public Rotation2d getAngle() {
+    return m_odometry.getEstimatedPosition().getRotation();
+  }
+
+  /**
    * @return heading angle of the bot, according to the odometry, in degrees
    */
   public double getAngleDegrees() {
-    return m_odometry.getEstimatedPosition().getRotation().getDegrees();
+    return getAngle().getDegrees();
   }
 
 /**
@@ -134,6 +145,7 @@ public class Navigation extends SubsystemBase {
       builder.addStringProperty("ClassiferFound", () -> {return LimelightHelpers.getClassifierClass(cameraName);}, null);
       builder.addBooleanProperty("DxGood", this::dxMeasurmentGood, null);
       builder.addDoubleProperty("DxSensor", this::getDxToObjectMeters, null);
+      builder.addStringProperty("EstimatedPosition", ()->getPose().toString(), null);
     }
 
     static public enum ReefPole { 

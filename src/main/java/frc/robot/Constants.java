@@ -82,7 +82,18 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI / 2.0;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+
+    public static final double kPXController = 1;
+    public static final double kPYController = 1;
+    public static final double kPThetaController = 1;
+
+    // Constraint for the motion profiled robot angle controller
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final double kDistanceTolerance = 0.050;
+    public static final double kHeadingTolerance = 2.0; // degrees
   }
 
   public static final class FieldConstants {
@@ -148,6 +159,8 @@ public final class Constants {
     public static final double armAngleOffset = 0;
     public static final double MaxArmAngle = 90.0;
     public static final double MinArmAngle = 0.0;
+    public static final double inSpeed = 0;
+    public static final double outSpeed = 0;
   }
 
   public static final class ClimberConstants {
