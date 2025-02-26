@@ -6,27 +6,35 @@ package frc.robot.subsystems.Ludwig;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import frc.robot.Robot;
 
 public class MAXSwerveModule implements SwerveModule, Sendable {
   private final SparkMax m_drivingSpark;
   private final SparkMax m_turningSpark;
+  public final SparkSim m_drivingSparkSim;
+  public final SparkSim m_turningSparkSim;
 
   private final RelativeEncoder m_drivingEncoder;
   private final AbsoluteEncoder m_turningEncoder;
+  private final SparkAbsoluteEncoderSim m_turningEncoderSim;
 
   private final SparkClosedLoopController m_drivingClosedLoopController;
   private final SparkClosedLoopController m_turningClosedLoopController;
@@ -45,9 +53,13 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
   public MAXSwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
     m_drivingSpark = new SparkMax(drivingCANId, MotorType.kBrushless);
     m_turningSpark = new SparkMax(turningCANId, MotorType.kBrushless);
+    m_drivingSparkSim = new SparkSim(m_drivingSpark, DCMotor.getNEO(1));
+    m_turningSparkSim = new SparkSim(m_turningSpark, DCMotor.getNeo550(1));
+  
 
     m_drivingEncoder = m_drivingSpark.getEncoder();
     m_turningEncoder = m_turningSpark.getAbsoluteEncoder();
+    m_turningEncoderSim = new SparkAbsoluteEncoderSim(m_turningSpark);
 
     m_drivingClosedLoopController = m_drivingSpark.getClosedLoopController();
     m_turningClosedLoopController = m_turningSpark.getClosedLoopController();
@@ -106,10 +118,11 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
+    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset)); 
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
+    //correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
+    // todo put the optimization back
 
     // Command driving and turning SPARKS towards their respective setpoints.
     m_drivingClosedLoopController.setReference(correctedDesiredState.speedMetersPerSecond, ControlType.kVelocity);
@@ -158,11 +171,17 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
     spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
+  public void iterateSim(double dt) {
+    m_drivingSparkSim.iterate(m_desiredState.speedMetersPerSecond, RoboRioSim.getVInVoltage(), dt);
+    m_turningSparkSim.setPosition(m_desiredState.angle.getRadians());
+    m_turningEncoderSim.setPosition(m_desiredState.angle.getRadians());
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Swerve Module " + m_drivingSpark.getDeviceId() + "/" + m_turningSpark.getDeviceId());
-    builder.addDoubleProperty("AngleOffset", () -> m_chassisAngularOffset, (x) -> {
-      m_chassisAngularOffset = x;
+    builder.addDoubleProperty("AngleOffset", () -> Math.toDegrees(m_chassisAngularOffset), (x) -> {
+      m_chassisAngularOffset = Math.toRadians(x);
     });
     builder.addDoubleProperty("Steer P",
         () -> steerP,
