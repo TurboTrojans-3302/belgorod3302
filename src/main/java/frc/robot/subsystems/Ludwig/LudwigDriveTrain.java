@@ -12,18 +12,17 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.CalibrationTime;
 import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
-import edu.wpi.first.wpilibj.simulation.ADIS16448_IMUSim;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.simulation.ADIS16448_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.DriveSubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.CanIds;
+import frc.robot.Robot;
+import frc.robot.subsystems.DriveSubsystemBase;
 
 public class LudwigDriveTrain extends DriveSubsystemBase {
   private double maxSpeedLimit = DriveConstants.kMaxSpeedMetersPerSecond; // m/s
@@ -254,9 +253,16 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     }, (x) -> {
       maxRotationLimit = x;
     });
-    builder.addDoubleProperty("CommandedVx", ()->CommandedSpeeds.vxMetersPerSecond, null);
-    builder.addDoubleProperty("CommandedVy", ()->CommandedSpeeds.vyMetersPerSecond, null);
-    builder.addDoubleProperty("CommandedOmega", ()->CommandedSpeeds.omegaRadiansPerSecond, null);
+    builder.addStringProperty("CommandedSpeeds",
+                              ()->String.format("x:%5.2f y:%5.2f (%5.2f %5.2f deg) %4.2f",
+                                                CommandedSpeeds.vxMetersPerSecond,
+                                                CommandedSpeeds.vyMetersPerSecond,
+                                                Math.hypot(CommandedSpeeds.vxMetersPerSecond, CommandedSpeeds.vyMetersPerSecond),
+                                                Math.toDegrees(Math.atan2(CommandedSpeeds.vxMetersPerSecond, CommandedSpeeds.vyMetersPerSecond)),
+                                                CommandedSpeeds.omegaRadiansPerSecond
+                                                ),
+                              null
+                              );
   }
 
   @Override

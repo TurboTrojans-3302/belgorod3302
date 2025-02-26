@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.frc2025.FieldConstants;
 
 /** Add your docs here. */
 public abstract class DriveSubsystemBase extends SubsystemBase {
@@ -103,10 +104,18 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
         driveRobotOriented(translationMetersPerSecond, yawCommand);
     }
 
+    public void driveFieldOriented(ChassisSpeeds speeds){
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds.vxMetersPerSecond,
+                                                                         speeds.vyMetersPerSecond,
+                                                                         speeds.omegaRadiansPerSecond,
+                                                                         Rotation2d.fromDegrees(getGyroAngleDegrees()));
+
+        drive(robotSpeeds);
+    }
+
     public void driveFieldOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(),
-                rotation, Rotation2d.fromDegrees(getGyroAngleDegrees()));
-        drive(speeds);
+        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+        driveFieldOriented(speeds);
     }
 
     public void driveRobotOriented(Translation2d translation, double rotation) {
@@ -119,13 +128,15 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
         return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
       }
     
-      public Translation2d getVelocityVector() {
+    /*
+     * Returns the velocity vector of the robot, in the Robot Frame, in meters per second.
+     */
+    public Translation2d getVelocityVector() {
         ChassisSpeeds chassisSpeeds = getChassisSpeeds();
         return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     }
 
-    public void orbit(double orbitSpeed) {
-        final Translation2d center = new Translation2d(1.0, 0.0);
+    public void orbitRobotFrame(double orbitSpeed, Translation2d center) {
         drive(new ChassisSpeeds(0, 0, orbitSpeed), center);
     }
 
