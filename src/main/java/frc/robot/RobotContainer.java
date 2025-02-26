@@ -4,15 +4,18 @@
 
 package frc.robot;
 
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -22,6 +25,8 @@ import frc.robot.Constants.DigitalIO;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.MoveElevator;
+import frc.robot.commands.NavigateToTag;
+import frc.robot.commands.OrbitAroundReef;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TestDrive;
 import frc.robot.commands.TurnToAprilTag;
@@ -66,6 +71,8 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+
+  private int targetTagId = 0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -117,9 +124,6 @@ public class RobotContainer {
     SmartDashboard.putData("TeleopCommand", teleopCommand);
    // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
-
-    SmartDashboard.putData("GoToCommand", new GoToCommand(m_robotDrive, m_nav, Pose2d.kZero));
-
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
 
@@ -132,6 +136,17 @@ public class RobotContainer {
     /**
      * Driver's Controller
      */
+    new Trigger(()->{ return m_driverController.getPOV() == 0; })
+      .onTrue(new RunCommand(()->{ targetTagId = (int) LimelightHelpers.getFiducialID("limelight"); }));
+    new Trigger(()->{ return m_driverController.getPOV() == 180; })
+      .whileTrue(Commands.defer(()->new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ),
+                                Set.of(m_robotDrive, m_nav)));
+
+    new JoystickButton(m_driverController, XboxController.Button.kB.value)
+      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
+      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+
     if(INTAKE_ENABLE){
         new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
             .whileTrue(new RunCommand( () -> m_intake.in(), m_intake));
