@@ -135,7 +135,8 @@
             "properties": {
               "topic": "/SmartDashboard/Start Position",
               "period": 0.06,
-              "sort_options": false
+              "sort_options": false,
+              "show_submit_button":true
             }
           }
         ]
@@ -192,14 +193,21 @@
             "title": "gyroAngleDegrees",
             "x": 384.0,
             "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/DriveSubsystem/gyroAngleDegrees",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "start_angle": 180.0,
+              "end_angle": 180.0,
+              "min_value": -180.0,
+              "max_value": 180.0,
+              "number_of_labels": 8,
+              "wrap_value": true,
+              "show_pointer": true,
+              "show_ticks": true
             }
           }
         ]
