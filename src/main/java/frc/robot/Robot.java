@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -18,6 +21,7 @@ import frc.robot.commands.GoToCommand;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.StopCommand;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.NavRoute;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -183,6 +187,15 @@ public class Robot extends TimedRobot {
                                                                   ()->{return 8;}
                                                                   ));
     SmartDashboard.putData("StopCommand", new StopCommand(m_robotContainer.m_robotDrive));
+
+    SmartDashboard.putData("TestRoute", new NavRoute(m_robotContainer.m_robotDrive,
+                                                      m_robotContainer.m_nav,
+                                                      List.of(new Pose2d(0, 0, new Rotation2d(0)),
+                                                              new Pose2d(6, 0, new Rotation2d(0)),
+                                                              new Pose2d(6, 6, new Rotation2d(0)),
+                                                              new Pose2d(0, 6, new Rotation2d(0))
+                                                              )
+                                                      ));
   }
 
   /** This function is called periodically during test mode. */

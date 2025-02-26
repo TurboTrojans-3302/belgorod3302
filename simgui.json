@@ -30,6 +30,7 @@
       "/SmartDashboard/StopCommand": "Command",
       "/SmartDashboard/TeleopCommand": "Command",
       "/SmartDashboard/TeleopDrive": "Command",
+      "/SmartDashboard/TestRoute": "Command",
       "/SmartDashboard/headingPIDcontroller": "PIDController"
     },
     "windows": {
@@ -89,14 +90,16 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/TestRoute": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
     "transitory": {
-      "FMSInfo": {
-        "open": true
-      },
       "Shuffleboard": {
         ".recording": {
           "open": true
@@ -112,7 +115,11 @@
           "double[]##v_/SmartDashboard/Field/Robot": {
             "open": true
           }
-        }
+        },
+        "Navigation": {
+          "open": true
+        },
+        "open": true
       },
       "limelight": {
         "open": true
@@ -134,6 +141,7 @@
         "open": true
       },
       "open": true
-    }
+    },
+    "visible": true
   }
 }
