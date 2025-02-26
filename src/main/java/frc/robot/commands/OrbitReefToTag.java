@@ -54,7 +54,7 @@ public class OrbitReefToTag extends Command {
     double currentSpeed = drive.getSpeed();
     double arcDistance = getArcDistance();
     double speed = profile.calculate(Robot.kDefaultPeriod,
-                                     new State(0, currentSpeed),
+                                     new State(0, currentSpeed * Math.signum(arcDistance)),
                                      new State(arcDistance, 0)).velocity;
 
     drive.orbitRobotFrame(speed, center);

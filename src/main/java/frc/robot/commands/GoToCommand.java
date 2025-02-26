@@ -82,7 +82,7 @@ public class GoToCommand extends Command {
   }
 
   private Translation2d translation2dest() {
-    return m_dest.minus(m_nav.getPose()).getTranslation();
+    return m_dest.getTranslation().minus(m_nav.getPose().getTranslation());
   }
 
   protected double distance() {
@@ -94,7 +94,7 @@ public class GoToCommand extends Command {
   }
 
   private double speedTowardTarget() {
-    Translation2d botDirection = m_drive.getVelocityVector();
+    Translation2d botDirection = m_drive.getVelocityVector().rotateBy(m_nav.getAngle());
     Translation2d targetDirection = translation2dest();
 
     if (botDirection.getNorm() <= 1e-6) {
@@ -145,5 +145,6 @@ public class GoToCommand extends Command {
     builder.addDoubleProperty("kHeadingTolerance", () -> kHeadingTolerance, (x) -> kHeadingTolerance = x );
     builder.addDoubleProperty("dest X", ()->m_dest.getX(), (x)->{m_dest = new Pose2d(x, m_dest.getY(), m_dest.getRotation()); });
     builder.addDoubleProperty("dest Y", ()->m_dest.getY(), (y)->{m_dest = new Pose2d(m_dest.getX(), y, m_dest.getRotation()); });
+    builder.addDoubleProperty("dest ϴ", ()->m_dest.getRotation().getDegrees(), (t)->{m_dest = new Pose2d(m_dest.getX(), m_dest.getY(), Rotation2d.fromDegrees(t)); });
   }
 }

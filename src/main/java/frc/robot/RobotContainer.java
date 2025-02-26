@@ -124,9 +124,6 @@ public class RobotContainer {
     SmartDashboard.putData("TeleopCommand", teleopCommand);
    // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
-
-    SmartDashboard.putData("GoToCommand", GoToCommand.absolute(m_robotDrive, m_nav, 1, 1, 45));
-
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
 
