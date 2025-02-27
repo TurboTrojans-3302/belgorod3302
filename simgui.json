@@ -135,7 +135,8 @@
         "open": true
       },
       "open": true
-    }
+    },
+    "visible": true
   },
   "Plot": {
     "Plot <0>": {
@@ -147,7 +148,8 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 607,
+          "height": 585,
+          "name": "arm",
           "series": [
             {
               "color": [
@@ -175,6 +177,15 @@
                 1.0
               ],
               "id": "NT:/SmartDashboard/IntakeArm/motorVoltage"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/IntakeArmPID/goal"
             }
           ]
         }

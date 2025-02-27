@@ -5,8 +5,12 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -17,6 +21,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,6 +46,9 @@ public class IntakeArm extends SubsystemBase {
   private double kMaxArmAngle = IntakeConstants.MaxArmAngle;
   private double kMinArmAngle = IntakeConstants.MinArmAngle;
   private final double kGearRatio = 100.0;
+  private final double kVelocityConversionFactor = (360.0 / 60.0) / kGearRatio; // converts RPM to deg/sec
+  private final double kPositionConversionFactor = 360.0 / kGearRatio; // converts Revolutions to degrees
+  private SparkMaxConfig sparkConfig;
   
   // simulation constants
   private final double kMoment = 32.3; //kg-m^2
@@ -54,8 +62,14 @@ public class IntakeArm extends SubsystemBase {
 
   /** Creates a new IntakeArm. */
   public IntakeArm() {
-    m_armSparkMax = new SparkMax(Constants.CanIds.intakeArmMotorID, MotorType.kBrushed);
 
+    sparkConfig = new SparkMaxConfig();
+    sparkConfig.idleMode(IdleMode.kBrake)
+               .smartCurrentLimit(50);
+    sparkConfig.encoder.positionConversionFactor(kPositionConversionFactor) 
+                       .velocityConversionFactor(kVelocityConversionFactor);
+    m_armSparkMax = new SparkMax(Constants.CanIds.intakeArmMotorID, MotorType.kBrushed);
+    m_armSparkMax.configure(sparkConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
     m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
     m_PidController = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
@@ -65,8 +79,9 @@ public class IntakeArm extends SubsystemBase {
     m_lastArmAngle = getArmAngleDegrees();
 
     m_ArmEncoderSim = new DutyCycleEncoderSim(m_ArmEncoder);
-    m_armSparkMaxSim = new SparkMaxSim(m_armSparkMax, DCMotor.getAndymarkRs775_125(0));
-    m_sim = new SingleJointedArmSim(DCMotor.getAndymarkRs775_125(1),
+    DCMotor plant = DCMotor.getAndymark9015(1);
+    m_armSparkMaxSim = new SparkMaxSim(m_armSparkMax, plant);
+    m_sim = new SingleJointedArmSim(plant,
                                     kGearRatio,
                                     kMoment,
                                     kArmLength,
@@ -92,7 +107,7 @@ public class IntakeArm extends SubsystemBase {
     double pid = m_PidController.calculate(newAngle);
     double ff = m_Feedforward.calculate(newAngle, m_armVelocity);
 
-    m_armSparkMax.setVoltage( pid + ff);
+    m_armSparkMax.set( (pid + ff));
   }
 
   public void setPositionAngleSetpoint(double angle) {
@@ -145,16 +160,16 @@ public class IntakeArm extends SubsystemBase {
     builder.addDoubleProperty("kMaxArmAngle", () -> kMaxArmAngle, (x) -> {
       kMaxArmAngle = x;
     });
-    builder.addDoubleProperty("motorVoltage", ()->m_armSparkMax.getAppliedOutput(), null);
-    builder.addDoubleProperty("Position Setpoint", ()->getPositionAngleSetpoint(), (x)->setPositionAngleSetpoint(x));
-    builder.addDoubleProperty("PID Error", ()->m_PidController.getPositionError(), null);
+    builder.addDoubleProperty("motorVoltage", ()->m_armSparkMax.getAppliedOutput()*12, null);
+    // builder.addDoubleProperty("Position Setpoint", ()->getPositionAngleSetpoint(), (x)->setPositionAngleSetpoint(x));
+    // builder.addDoubleProperty("PID Error", ()->m_PidController.getPositionError(), null);
   }
 
   @Override
   public void simulationPeriodic(){
-    m_armSparkMaxSim.setBusVoltage(12);
-    m_sim.setInputVoltage(m_armSparkMaxSim.getAppliedOutput());
+    m_sim.setInputVoltage(m_armSparkMaxSim.getAppliedOutput() * 12.0);
     m_sim.update(Robot.kDefaultPeriod);
+    m_armSparkMaxSim.iterate(Math.toDegrees(m_sim.getVelocityRadPerSec()), 12.0, Robot.kDefaultPeriod);
     m_ArmEncoderSim.set(m_sim.getAngleRads()/6.28318);
   }
 }

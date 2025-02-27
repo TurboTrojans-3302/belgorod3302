@@ -198,12 +198,12 @@ public class RobotContainer {
     if(INTAKE_ARM_ENABLE){
       new JoystickButton(m_copilotController, XboxController.Button.kLeftBumper.value)
         .onTrue(new InstantCommand(()->{
-                                         double p = m_intakeArm.getArmAngleDegrees();
+                                         double p = m_intakeArm.getPositionAngleSetpoint();
                                          m_intakeArm.setPositionAngleSetpoint(p+10.0);
                                        }, m_intakeArm));
       new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
         .onTrue(new InstantCommand(()->{
-                                         double p = m_intakeArm.getArmAngleDegrees();
+                                         double p = m_intakeArm.getPositionAngleSetpoint();
                                          m_intakeArm.setPositionAngleSetpoint(p-10.0);
                                        }, m_intakeArm));
                                   }

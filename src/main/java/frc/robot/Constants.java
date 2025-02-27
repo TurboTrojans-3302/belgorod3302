@@ -157,8 +157,8 @@ public final class Constants {
     public static final double intakeSpeedMin = -0.75;
     public static final int armEncoderDInput = 0;
     public static final double armAngleOffset = 0;
-    public static final double MaxArmAngle = 90.0;
-    public static final double MinArmAngle = 0.0;
+    public static final double MaxArmAngle = 110.0;
+    public static final double MinArmAngle = -30.0;
     public static final double inSpeed = 0;
     public static final double outSpeed = 0;
     public static final double kS = 0.0;
