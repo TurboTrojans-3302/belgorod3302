@@ -4,10 +4,9 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
-import com.ctre.phoenix.motorcontrol.VictorSPXSimCollection;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -20,6 +19,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -27,8 +27,8 @@ import frc.robot.Robot;
 
 public class IntakeArm extends SubsystemBase {
 
-  private VictorSPX m_armSpx;
-  private VictorSPXSimCollection m_armSpxSim;
+  private SparkMax m_armSparkMax;
+  private SparkMaxSim m_armSparkMaxSim;
   private DutyCycleEncoder m_ArmEncoder;
   private DutyCycleEncoderSim m_ArmEncoderSim;
   private double m_armAngleOffset = IntakeConstants.armAngleOffset;
@@ -54,10 +54,8 @@ public class IntakeArm extends SubsystemBase {
 
   /** Creates a new IntakeArm. */
   public IntakeArm() {
-    m_armSpx = new VictorSPX(Constants.CanIds.intakeArmMotorID);
-    m_armSpx.setNeutralMode(NeutralMode.Brake);
-    m_armSpx.setInverted(true);
-    m_armSpxSim = m_armSpx.getSimCollection();
+    m_armSparkMax = new SparkMax(Constants.CanIds.intakeArmMotorID, MotorType.kBrushed);
+
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
     m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
     m_PidController = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
@@ -65,6 +63,9 @@ public class IntakeArm extends SubsystemBase {
     resetFeedForward();
     m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
     m_lastArmAngle = getArmAngleDegrees();
+
+    m_ArmEncoderSim = new DutyCycleEncoderSim(m_ArmEncoder);
+    m_armSparkMaxSim = new SparkMaxSim(m_armSparkMax, DCMotor.getAndymarkRs775_125(0));
     m_sim = new SingleJointedArmSim(DCMotor.getAndymarkRs775_125(1),
                                     kGearRatio,
                                     kMoment,
@@ -72,7 +73,7 @@ public class IntakeArm extends SubsystemBase {
                                     Math.toRadians(kMinArmAngle),
                                     Math.toRadians(kMaxArmAngle),
                                     true,
-                                    Math.toRadians(kMaxArmAngle)
+                                    0
                                     );
   }
 
@@ -84,14 +85,14 @@ public class IntakeArm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     double newAngle = getArmAngleDegrees();
-    double vel = (newAngle = m_lastArmAngle) / Robot.kDefaultPeriod;
+    double vel = (newAngle - m_lastArmAngle) / Robot.kDefaultPeriod;
     m_armVelocity = m_velocityFilter.calculate(vel);
     m_lastArmAngle = newAngle;
 
     double pid = m_PidController.calculate(newAngle);
     double ff = m_Feedforward.calculate(newAngle, m_armVelocity);
 
-    m_armSpx.set(VictorSPXControlMode.PercentOutput, pid + ff);
+    m_armSparkMax.setVoltage( pid + ff);
   }
 
   public void setPositionAngleSetpoint(double angle) {
@@ -144,11 +145,15 @@ public class IntakeArm extends SubsystemBase {
     builder.addDoubleProperty("kMaxArmAngle", () -> kMaxArmAngle, (x) -> {
       kMaxArmAngle = x;
     });
+    builder.addDoubleProperty("motorVoltage", ()->m_armSparkMax.getAppliedOutput(), null);
+    builder.addDoubleProperty("Position Setpoint", ()->getPositionAngleSetpoint(), (x)->setPositionAngleSetpoint(x));
+    builder.addDoubleProperty("PID Error", ()->m_PidController.getPositionError(), null);
   }
 
   @Override
   public void simulationPeriodic(){
-    m_sim.setInputVoltage(m_armSpxSim.getMotorOutputLeadVoltage());
+    m_armSparkMaxSim.setBusVoltage(12);
+    m_sim.setInputVoltage(m_armSparkMaxSim.getAppliedOutput());
     m_sim.update(Robot.kDefaultPeriod);
     m_ArmEncoderSim.set(m_sim.getAngleRads()/6.28318);
   }

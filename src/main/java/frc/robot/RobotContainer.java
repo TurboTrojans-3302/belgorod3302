@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -48,7 +49,7 @@ public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = false;
   private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = false;
 
@@ -99,6 +100,7 @@ public class RobotContainer {
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
+      SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -122,10 +124,6 @@ public class RobotContainer {
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
     m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
-   // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
-    SmartDashboard.putData("IntakeArm", m_intakeArm);
-    SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
-    SmartDashboard.putData("Intake", m_intake);
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
@@ -196,6 +194,19 @@ public class RobotContainer {
       elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
     }
+
+    if(INTAKE_ARM_ENABLE){
+      new JoystickButton(m_copilotController, XboxController.Button.kLeftBumper.value)
+        .onTrue(new InstantCommand(()->{
+                                         double p = m_intakeArm.getArmAngleDegrees();
+                                         m_intakeArm.setPositionAngleSetpoint(p+10.0);
+                                       }, m_intakeArm));
+      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
+        .onTrue(new InstantCommand(()->{
+                                         double p = m_intakeArm.getArmAngleDegrees();
+                                         m_intakeArm.setPositionAngleSetpoint(p-10.0);
+                                       }, m_intakeArm));
+                                  }
   };
 
   /**
