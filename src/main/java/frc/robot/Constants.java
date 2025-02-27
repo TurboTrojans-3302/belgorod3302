@@ -151,9 +151,9 @@ public final class Constants {
     public static final int intakeLimitSwitchID = 2;
     public static final double intakeSpeedMax = 0.75;
     public static final double intakeSpeedAuto = 0.4;
-    public static final double kI = 0.0;
-    public static final double kP = 0.0;
-    public static final double kD = 0.0;
+    public static final double kI = 0.002;
+    public static final double kP = 0.04;
+    public static final double kD = 0.002;
     public static final double intakeSpeedMin = -0.75;
     public static final int armEncoderDInput = 0;
     public static final double armAngleOffset = 0;
@@ -162,11 +162,11 @@ public final class Constants {
     public static final double inSpeed = 0;
     public static final double outSpeed = 0;
     public static final double kS = 0.0;
-    public static final double kG = 0.0;
+    public static final double kG = 0.4;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
-    public static final double kMaxVelocity = 180;
-    public static final double kMaxAcceleration = 45;
+    public static final double kMaxVelocity = 360;
+    public static final double kMaxAcceleration = 60;
   }
 
   public static final class ClimberConstants {

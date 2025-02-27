@@ -19,6 +19,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -45,18 +46,22 @@ public class IntakeArm extends SubsystemBase {
   private double kA = IntakeConstants.kA;
   private double kMaxArmAngle = IntakeConstants.MaxArmAngle;
   private double kMinArmAngle = IntakeConstants.MinArmAngle;
+  private double kMaxAcceleration = IntakeConstants.kMaxAcceleration;
+  private double kMaxVelocity = IntakeConstants.kMaxVelocity;
   private final double kGearRatio = 100.0;
   private final double kVelocityConversionFactor = (360.0 / 60.0) / kGearRatio; // converts RPM to deg/sec
   private final double kPositionConversionFactor = 360.0 / kGearRatio; // converts Revolutions to degrees
   private SparkMaxConfig sparkConfig;
   
   // simulation constants
-  private final double kMoment = 32.3; //kg-m^2
+  private final double kMoment = SingleJointedArmSim.estimateMOI(0.355, 9.1);
   private final double kArmLength = .355;
 
   private LinearFilter m_velocityFilter;
   private double m_lastArmAngle;
   private double m_armVelocity = 0.0;
+  private double pid = 0;
+  private double ff = 0;
 
   private SingleJointedArmSim m_sim;
 
@@ -73,7 +78,7 @@ public class IntakeArm extends SubsystemBase {
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
     m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
     m_PidController = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
-                                                new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
+                                                new Constraints(kMaxVelocity, kMaxAcceleration));
     resetFeedForward();
     m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
     m_lastArmAngle = getArmAngleDegrees();
@@ -90,10 +95,17 @@ public class IntakeArm extends SubsystemBase {
                                     true,
                                     0
                                     );
+    m_sim.setState( 0, 0);
+
+
   }
 
   private void resetFeedForward() {
     m_Feedforward = new ArmFeedforward(kS, kG, kV, kA);
+  }
+
+  private void resetConstraints(){
+    m_PidController.setConstraints(new Constraints(kMaxVelocity, kMaxAcceleration));
   }
 
   @Override
@@ -104,8 +116,10 @@ public class IntakeArm extends SubsystemBase {
     m_armVelocity = m_velocityFilter.calculate(vel);
     m_lastArmAngle = newAngle;
 
-    double pid = m_PidController.calculate(newAngle);
-    double ff = m_Feedforward.calculate(newAngle, m_armVelocity);
+    pid = m_PidController.calculate(newAngle);
+    State intermediate = m_PidController.getSetpoint();
+    ff = m_Feedforward.calculate(Math.toRadians(intermediate.position),
+                                        Math.toRadians(intermediate.velocity));
 
     m_armSparkMax.set( (pid + ff));
   }
@@ -154,15 +168,23 @@ public class IntakeArm extends SubsystemBase {
       kA = x;
       resetFeedForward();
     });
+    builder.addDoubleProperty("kMaxVelocity", () -> kMaxVelocity, (x) -> {
+      kMaxVelocity = x;
+      resetConstraints();
+    });
+    builder.addDoubleProperty("kMaxAcceleration", () -> kMaxAcceleration, (x) -> {
+      kMaxAcceleration = x;
+      resetConstraints();
+    });
     builder.addDoubleProperty("kMinArmAngle", () -> kMinArmAngle, (x) -> {
       kMinArmAngle = x;
     });
     builder.addDoubleProperty("kMaxArmAngle", () -> kMaxArmAngle, (x) -> {
       kMaxArmAngle = x;
     });
+    builder.addStringProperty("pid", ()->String.format("%.2f", pid), null);
+    builder.addStringProperty("ff", ()->String.format("%.2f", ff), null);
     builder.addDoubleProperty("motorVoltage", ()->m_armSparkMax.getAppliedOutput()*12, null);
-    // builder.addDoubleProperty("Position Setpoint", ()->getPositionAngleSetpoint(), (x)->setPositionAngleSetpoint(x));
-    // builder.addDoubleProperty("PID Error", ()->m_PidController.getPositionError(), null);
   }
 
   @Override
