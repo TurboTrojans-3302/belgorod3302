@@ -7,66 +7,65 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
+
+  private double inSpeed = Constants.IntakeConstants.inSpeed;
+  private double outSpeed = Constants.IntakeConstants.outSpeed;
+
   /** Creates a new Intake. */
   public SparkMax m_intake;
-  public double intakeSpeed;
   public DigitalInput intakeLimitSwitch;
-  public boolean objectDetected;
-
-
 
   public Intake(int motorId, int limitSwitchId) {
     m_intake = new SparkMax(motorId, MotorType.kBrushless);
     intakeLimitSwitch = new DigitalInput(limitSwitchId);
-    intakeSpeed = 0;
-    m_intake.set(intakeSpeed);
-    objectDetected = false;
+    m_intake.set(0.0);
   }
   
   public double getSpeed(){
-    return intakeSpeed;
-
-  }
-  public double setSpeed(double speed){
-    if (objectDetected){
-      if (getSpeed() > 0){
-        intakeSpeed = 0;
-        return intakeSpeed;
-      } else {
-        intakeSpeed = MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax);
-        m_intake.set(intakeSpeed);
-        return intakeSpeed;
-      }
-      
-    } 
-    return intakeSpeed;
-    
-
+    return m_intake.get();
   }
 
-  public boolean limitSwitch(){
-    if (!intakeLimitSwitch.get()){
-      objectDetected = true;
-      m_intake.set(0);
-      return objectDetected;
-    } else {
-      objectDetected = false;
-      return objectDetected;
-    }
-
+  /*
+   * negative speed pulls in, positive speed pushes out
+   */
+  public void setSpeed(double speed){
+    m_intake.set(MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax));
   }
 
+  public boolean objectDetected(){
+    return !intakeLimitSwitch.get();
+  }
 
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    limitSwitch();
-    getSpeed();
+    if (objectDetected()){
+      setSpeed(Math.max(getSpeed(), 0.0));
+    }
+
+  }
+
+  public void in(){
+    setSpeed(inSpeed);
+  }
+
+  public void out(){
+    setSpeed(outSpeed);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addDoubleProperty("Speed", this::getSpeed, this::setSpeed);
+    builder.addBooleanProperty("Object Detected", this::objectDetected, null);
+    builder.addDoubleProperty("inSpeed", ()->inSpeed, (x)->inSpeed = x);
+    builder.addDoubleProperty("outSpeed", ()->outSpeed, (x)->outSpeed = x);
   }
 }
