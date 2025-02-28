@@ -43,6 +43,7 @@ public class Climbers extends SubsystemBase {
   double lockedPosition = ClimberConstants.kLockedPosition;
   double kMaxVelocity = ClimberConstants.kMaxVelocity;
   double kMaxAcceleration = ClimberConstants.kMaxAcceleration;
+  double kPositionTolerance = ClimberConstants.kPositionTolerance;
 
   double increment = ClimberConstants.increment;
 
@@ -84,7 +85,7 @@ public class Climbers extends SubsystemBase {
   }
 
   public boolean isNearPosition(double p){
-    return MathUtil.isNear(p, getPosition(), ClimberConstants.kPositionTolerance);
+    return MathUtil.isNear(p, getPosition(), kPositionTolerance);
   }
 
   public boolean limitSwitch(){
@@ -143,6 +144,8 @@ public class Climbers extends SubsystemBase {
     builder.addDoubleProperty("kMaxAcceleration", ()->kMaxAcceleration, (x)->{kMaxAcceleration = x; updateConfig(); });
     builder.addDoubleProperty("kLowerLimit", ()->kLowerLimit, (x)->{kLowerLimit = x;});
     builder.addDoubleProperty("kUpperLimit", ()->kUpperLimit, (x)->{kUpperLimit = x;});
+    builder.addDoubleProperty("kPositionTolerance", ()->kPositionTolerance, (x)->{kPositionTolerance = x;});
+    builder.addDoubleProperty("lockedPosition", ()->lockedPosition, (x)->{lockedPosition = x;});
     builder.addBooleanProperty("limitSwitch", this::limitSwitch, null);
   }
 }
