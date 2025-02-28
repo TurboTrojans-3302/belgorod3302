@@ -52,28 +52,30 @@ public final class Constants {
     // 10
     // 11
     // 12
-    public static final int kIntakeMotorCanId = 13;    
-    public static final int kLeftMotorElevatorCanId = 14;
-    public static final int kRightMotorElevatorCanId = 15;
-    public static final int kGripperMotorCanId = 16;
-    public static final int kGripperExtensionMotorCanId = 17;
-    public static final int kClimberLeftMotorCanId = 18;
-    public static final int kClimberRightMotorCanId = 19;
-    public static final int intakeArmLeftMotorID = 20;
-    public static final int intakeArmRightMotorID = 21;
+    public static final int kLowerIntakeMotorCanId = 13;    
+    public static final int kUpperIntakeMotorCanId = 14;    
+    public static final int kLeftMotorElevatorCanId = 15;
+    public static final int kRightMotorElevatorCanId = 16;
+    public static final int kGripperMotorCanId = 17;
+    public static final int kGripperExtensionMotorCanId = 18;
+    public static final int kClimberLeftMotorCanId = 19;
+    public static final int kClimberRightMotorCanId = 20;
+    public static final int intakeArmLeftMotorID = 21;
+    public static final int intakeArmRightMotorID = 22;
 
   }
 
   public static final class DigitalIO {
         public static final int kElevatorHighLimitSwitchId = 0;
         public static final int kElevatorLowLimitSwitchId = 1;
-        public static final int kIntakeLimitSwitchId = 2;
-        public static final int kIntakeArmLimitSwitchId = 3;
-        public static final int kIntakeArmEncoderDIO = 4;
-        public static final int kGripperClosedSwitchId = 5;
-        public static final int kGripperFullyRetractedSwitchId = 6;
-        public static final int kGripperObjectDetectedSwitchId = 7;
-        public static final int kClimberLimitSwitchId = 8;
+        public static final int kLowerIntakeLimitSwitchId = 2;
+        public static final int kUpperIntakeLimitSwitchId = 3;        
+        public static final int kIntakeArmLimitSwitchId = 4;
+        public static final int kIntakeArmEncoderDIO = 5;
+        public static final int kGripperClosedSwitchId = 6;
+        public static final int kGripperFullyRetractedSwitchId = 7;
+        public static final int kGripperObjectDetectedSwitchId = 8;
+        public static final int kClimberLimitSwitchId = 9;
       }
 
   public static final class OIConstants {
@@ -184,6 +186,7 @@ public final class Constants {
     public static final double kP = 0.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
+    public static final double kLoadPosition = 0;
   }
 
   public static final class IntakeConstants {
@@ -207,6 +210,7 @@ public final class Constants {
     public static final double kFloorPosition = -30.;
     public static final double kElevatorPosition = 110;
     public static final double kTroughPosition = 60;
+    public static final double upperLoadSpeed = 0;
   }
 
   public static final class ClimberConstants {

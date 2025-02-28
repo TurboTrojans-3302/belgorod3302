@@ -96,7 +96,8 @@ public class RobotContainer {
       SmartDashboard.putData("Elevator", m_elevator);
     }
     if (INTAKE_ENABLE) {
-      m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
+      m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,
+                            DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kLowerIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
