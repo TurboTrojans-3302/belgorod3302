@@ -26,9 +26,7 @@
  * 
  */
 
- //todo manual gripper and extension control
- //todo manual climber control
- //todo manual intake arm control
+ 
 /* 
  * Copilot Controller
  *
@@ -51,3 +49,10 @@
  *
  *
  */
+
+
+ Button Board
+
+ Safety switch - enable climber lock
+ Engine Start - climber lock
+ 

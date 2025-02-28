@@ -79,6 +79,42 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
     public static final int kCopilotControllerPort = 1;
+    public static final int kButtonBoardPort = 2;
+    public static final class ButtonBox {
+      public static final int Left1 = 0;
+      public static final int Right1 = 1;
+      public static final int Left2 = 2;
+      public static final int Right2 = 3;
+      public static final int Left3 = 4;
+      public static final int Right3 = 5;
+      public static final int Left4 = 6;
+      public static final int Right4 = 7;
+      public static final int Esc = 8;
+      public static final int Enter = 9;
+      public static final int EngineStart = 10;
+      public static final int SafetySwitch = 11;
+      public static final int Switch1Up = 12;
+      public static final int Switch1Down = 13;
+      public static final int Switch2Up = 14;
+      public static final int Switch2Down = 15;
+      public static final int Switch3Up = 16;
+      public static final int Switch3Down = 17;
+      public static final int Switch4Up = 18;
+      public static final int Switch4Down = 19;
+      public static final int LeftKnobCW = 20;
+      public static final int LeftKnobCCW = 21;
+      public static final int RightKnobCCW = 22;
+      public static final int RightKnobCW = 23;
+
+      public static final double StickUp = -1.0;
+      public static final double StickUpRight = -0.71429;
+      public static final double StickRight = -0.42857;
+      public static final double StickDownRight = -0.14286;
+      public static final double StickDown = 0.14286;
+      public static final double StickDownLeft = 0.42857;
+      public static final double StickLeft = 0.71429;
+      public static final double StickUpLeft = 1.0;
+    }
   }
 
   public static final class AutoConstants {
@@ -172,8 +208,10 @@ public final class Constants {
     public static final double kMaxVelocity = 3000; //RPM
     public static final double kMaxAcceleration = 1500; //RPM/s
     public static double kLowerLimit = 0;
+    public static double kLockedPosition = -25;
     public static double kUpperLimit = 100;
     public static double kPositionTolerance = 5;
+    public static double increment = 15.0;
   }
 
   public static final class GripperConstants {

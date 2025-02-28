@@ -40,8 +40,11 @@ public class Climbers extends SubsystemBase {
   double kD = ClimberConstants.kD;
   double kLowerLimit = ClimberConstants.kLowerLimit;
   double kUpperLimit = ClimberConstants.kUpperLimit;
+  double lockedPosition = ClimberConstants.kLockedPosition;
   double kMaxVelocity = ClimberConstants.kMaxVelocity;
   double kMaxAcceleration = ClimberConstants.kMaxAcceleration;
+
+  double increment = ClimberConstants.increment;
 
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
@@ -88,14 +91,32 @@ public class Climbers extends SubsystemBase {
     return !limitSwitchClimber.get();
   }
 
-  //todo should handle the limit switch in here somewhere
   public void setPosition(double position){
-    position = MathUtil.clamp(position, kLowerLimit, kUpperLimit);
-    if(limitSwitch()){
-      position = Math.min(position, getPosition());
+    setPosition(position, false);
+  }
+  
+  public void setPosition(double position, boolean override){
+    if (override == false){
+      position = MathUtil.clamp(position, kLowerLimit, kUpperLimit);
+      if(limitSwitch()){
+       position = Math.min(position, getPosition());
+      }
     }
+    
     m_leftController.setReference(position, ControlType.kPosition);
     m_rightController.setReference(position, ControlType.kPosition);
+  }
+
+  public void climbersUp(){
+    setPosition(getPosition() + increment);
+  }
+
+  public void climbersDown(){
+    setPosition(getPosition() - increment);
+  }
+
+  public void climbersFullDown(){
+    setPosition(lockedPosition, true);
   }
 
   @Override
