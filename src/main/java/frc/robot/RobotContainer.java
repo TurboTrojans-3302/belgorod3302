@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -192,6 +193,19 @@ public class RobotContainer {
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
       elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+
+
+    }
+
+    if (GRIPPER_ENABLE){
+      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
+      .onTrue(new InstantCommand(() ->  m_gripper.toggleGripper()));
+      Trigger extensionOut = new Trigger( () -> (m_copilotController.getLeftTriggerAxis() > 0.8));
+      Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
+
+      extensionOut.onTrue(new InstantCommand(() -> m_gripper.extendGripper()));
+      extensionIn.onTrue(new InstantCommand(() -> m_gripper.retractGripper()));
+  
     }
   };
 
