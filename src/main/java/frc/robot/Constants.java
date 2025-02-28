@@ -106,6 +106,8 @@ public final class Constants {
       public static final int LeftKnobCCW = 21;
       public static final int RightKnobCCW = 22;
       public static final int RightKnobCW = 23;
+      public static final int LeftKnobPush = 24;
+      public static final int RightKnobPush = 25;
 
       public static final double StickUp = -1.0;
       public static final double StickUpRight = -0.71429;
