@@ -29,6 +29,7 @@
       "/SmartDashboard/StopCommand": "Command",
       "/SmartDashboard/TeleopCommand": "Command",
       "/SmartDashboard/TeleopDrive": "Command",
+      "/SmartDashboard/TestRoute": "Command",
       "/SmartDashboard/headingPIDcontroller": "PIDController"
     },
     "windows": {
@@ -83,6 +84,16 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/TeleopCommand": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/TestRoute": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -104,10 +115,7 @@
             "open": true
           }
         },
-        "IntakeArm": {
-          "open": true
-        },
-        "IntakeArmPID": {
+        "Navigation": {
           "open": true
         },
         "open": true
@@ -197,5 +205,7 @@
         }
       ]
     }
+    },
+    "visible": true
   }
 }
