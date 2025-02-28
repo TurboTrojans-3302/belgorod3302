@@ -1,147 +1,36 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "SPARK MAX [1] RELATIVE ENCODER": {
-        "header": {
-          "open": true
-        }
+      "window": {
+        "visible": false
       }
     }
   },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Auton Command": "String Chooser",
       "/SmartDashboard/DriveSubsystem": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/GoToCommand": "Command",
-      "/SmartDashboard/GoToCommand 0, 0": "Command",
-      "/SmartDashboard/GoToCommand 0, 6": "Command",
-      "/SmartDashboard/GoToCommand 6, 0": "Command",
-      "/SmartDashboard/GoToCommand 6, 6": "Command",
       "/SmartDashboard/IMU": "Gyro",
       "/SmartDashboard/IntakeArm": "Subsystem",
       "/SmartDashboard/IntakeArmPID": "ProfiledPIDController",
-      "/SmartDashboard/Nav to tag  8": "Command",
-      "/SmartDashboard/Nav to tag 21": "Command",
       "/SmartDashboard/Navigation": "Subsystem",
-      "/SmartDashboard/Start Position": "String Chooser",
-      "/SmartDashboard/StopCommand": "Command",
       "/SmartDashboard/TeleopCommand": "Command",
-      "/SmartDashboard/TeleopDrive": "Command",
-      "/SmartDashboard/TestRoute": "Command",
       "/SmartDashboard/headingPIDcontroller": "PIDController"
-    },
-    "windows": {
-      "/SmartDashboard/DriveSubsystem": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Field": {
-        "bottom": 1638,
-        "builtin": "2025 Reefscape",
-        "height": 8.051901817321777,
-        "left": 534,
-        "right": 3466,
-        "top": 291,
-        "width": 17.54825210571289,
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/GoToCommand 0, 0": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/GoToCommand 0, 6": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/GoToCommand 6, 0": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/GoToCommand 6, 6": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Nav to tag  8": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Nav to tag 21": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/TeleopCommand": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/TeleopCommand": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/TestRoute": {
-        "window": {
-          "visible": true
-        }
-      }
     }
   },
   "NetworkTables": {
     "transitory": {
-      "Shuffleboard": {
-        ".recording": {
-          "open": true
-        }
-      },
       "SmartDashboard": {
-        "Auton Command": {
-          "string[]##v_/SmartDashboard/Auton Command/options": {
-            "open": true
-          }
-        },
-        "Field": {
-          "double[]##v_/SmartDashboard/Field/Robot": {
-            "open": true
-          }
-        },
-        "Navigation": {
+        "IntakeArm": {
           "open": true
         },
-        "open": true
-      },
-      "limelight": {
+        "IntakeArmPID": {
+          "open": true
+        },
         "open": true
       }
     }
-  },
-  "NetworkTables Info": {
-    "Clients": {
-      "open": true
-    },
-    "Connections": {
-      "open": true
-    },
-    "Server": {
-      "Publishers": {
-        "open": true
-      },
-      "Subscribers": {
-        "open": true
-      },
-      "open": true
-    },
-    "visible": true
   },
   "Plot": {
     "Plot <0>": {
@@ -153,8 +42,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 585,
-          "name": "arm",
+          "height": 317,
           "series": [
             {
               "color": [
@@ -163,7 +51,7 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/IntakeArm/ArmAngle"
+              "id": "NT:/SmartDashboard/IntakeArmPID/goal"
             },
             {
               "color": [
@@ -172,40 +60,31 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/IntakeArm/Position Setpoint"
-            },
+              "id": "NT:/SmartDashboard/IntakeArm/ArmAngle"
+            }
+          ]
+        },
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 317,
+          "series": [
             {
               "color": [
-                0.3333333432674408,
-                0.658823549747467,
-                0.4078431725502014,
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
                 1.0
               ],
               "id": "NT:/SmartDashboard/IntakeArm/motorVoltage"
-            },
-            {
-              "color": [
-                0.7686275243759155,
-                0.30588236451148987,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/IntakeArmPID/goal"
-            },
-            {
-              "color": [
-                0.5058823823928833,
-                0.44705885648727417,
-                0.7019608020782471,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/IntakeArm/sim angle"
             }
           ]
         }
       ]
     }
-    },
-    "visible": true
   }
 }
