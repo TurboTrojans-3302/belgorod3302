@@ -208,6 +208,37 @@ public class RobotContainer {
     }
   };
 
+  public void configureTestControls(){
+    if(INTAKE_ARM_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Up)
+          .whileTrue(new InstantCommand(()->m_intakeArm.changeSetPoint(0.5)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down)
+          .whileTrue(new InstantCommand(()->m_intakeArm.changeSetPoint(-0.5)));
+    }
+    
+    if(INTAKE_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
+          .onTrue(new InstantCommand(()->m_intake.out()))
+          .onFalse(new InstantCommand(()->m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down)
+          .onTrue(new InstantCommand(()->m_intake.in()))
+          .onFalse(new InstantCommand(()->m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up)
+          .onTrue(new InstantCommand(()->m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(()->m_intake.setUpperSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down)
+          .onTrue(new InstantCommand(()->m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(()->m_intake.setUpperSpeed(0.0)));
+    }
+
+    if(ELEVATOR_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
+          .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(1.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
+          .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(-1.0)));
+    }
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

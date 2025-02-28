@@ -141,6 +141,11 @@ public class IntakeArm extends SubsystemBase {
     return m_PidController.atSetpoint();
   }
 
+  public void changeSetPoint(double delta){
+    double p = getPositionAngleSetpoint();
+    setPositionAngleSetpoint(p + delta);
+  }
+
   public double getPositionAngleSetpoint() {
     return m_PidController.getGoal().position;
   }
