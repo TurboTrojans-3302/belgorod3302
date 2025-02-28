@@ -4,17 +4,16 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -22,10 +21,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -46,8 +43,9 @@ public class IntakeArm extends SubsystemBase {
   private double kA = IntakeConstants.kA;
   private double kMaxArmAngle = IntakeConstants.MaxArmAngle;
   private double kMinArmAngle = IntakeConstants.MinArmAngle;
-  private double kMaxAcceleration = IntakeConstants.kMaxAcceleration;
-  private double kMaxVelocity = IntakeConstants.kMaxVelocity;
+  private double kFloorPosition = IntakeConstants.kFloorPosition;
+  private double kElevatorPosition = IntakeConstants.kElevatorPosition;
+  private double kTroughPosition = IntakeConstants.kTroughPosition;
   private final double kGearRatio = 100.0;
   private final double kVelocityConversionFactor = (360.0 / 60.0) / kGearRatio; // converts RPM to deg/sec
   private final double kPositionConversionFactor = 360.0 / kGearRatio; // converts Revolutions to degrees
@@ -78,7 +76,7 @@ public class IntakeArm extends SubsystemBase {
     m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
     m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
     m_PidController = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
-                                                new Constraints(kMaxVelocity, kMaxAcceleration));
+                                                new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
     resetFeedForward();
     m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
     m_lastArmAngle = getArmAngleDegrees();
@@ -102,10 +100,6 @@ public class IntakeArm extends SubsystemBase {
 
   private void resetFeedForward() {
     m_Feedforward = new ArmFeedforward(kS, kG, kV, kA);
-  }
-
-  private void resetConstraints(){
-    m_PidController.setConstraints(new Constraints(kMaxVelocity, kMaxAcceleration));
   }
 
   @Override
@@ -145,6 +139,10 @@ public class IntakeArm extends SubsystemBase {
     return m_armVelocity;
   }
 
+  public void floorPosition(){ setPositionAngleSetpoint(kFloorPosition); }
+  public void troughPosition(){ setPositionAngleSetpoint(kTroughPosition); }
+  public void elevatorPosition(){ setPositionAngleSetpoint(kElevatorPosition); }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
@@ -167,14 +165,6 @@ public class IntakeArm extends SubsystemBase {
     builder.addDoubleProperty("kA", () -> kA, (x) -> {
       kA = x;
       resetFeedForward();
-    });
-    builder.addDoubleProperty("kMaxVelocity", () -> kMaxVelocity, (x) -> {
-      kMaxVelocity = x;
-      resetConstraints();
-    });
-    builder.addDoubleProperty("kMaxAcceleration", () -> kMaxAcceleration, (x) -> {
-      kMaxAcceleration = x;
-      resetConstraints();
     });
     builder.addDoubleProperty("kMinArmAngle", () -> kMinArmAngle, (x) -> {
       kMinArmAngle = x;

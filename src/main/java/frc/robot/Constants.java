@@ -153,7 +153,7 @@ public final class Constants {
     public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.002;
     public static final double kP = 0.04;
-    public static final double kD = 0.002;
+    public static final double kD = 0.005;
     public static final double intakeSpeedMin = -0.75;
     public static final int armEncoderDInput = 0;
     public static final double armAngleOffset = 0;
@@ -166,7 +166,10 @@ public final class Constants {
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double kMaxVelocity = 360;
-    public static final double kMaxAcceleration = 60;
+    public static final double kMaxAcceleration = 180;
+    public static final double kFloorPosition = -30.;
+    public static final double kElevatorPosition = 110;
+    public static final double kTroughPosition = 60;
   }
 
   public static final class ClimberConstants {

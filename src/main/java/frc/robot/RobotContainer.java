@@ -196,17 +196,13 @@ public class RobotContainer {
     }
 
     if(INTAKE_ARM_ENABLE){
-      new JoystickButton(m_copilotController, XboxController.Button.kLeftBumper.value)
-        .onTrue(new InstantCommand(()->{
-                                         double p = m_intakeArm.getPositionAngleSetpoint();
-                                         m_intakeArm.setPositionAngleSetpoint(p+10.0);
-                                       }, m_intakeArm));
-      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
-        .onTrue(new InstantCommand(()->{
-                                         double p = m_intakeArm.getPositionAngleSetpoint();
-                                         m_intakeArm.setPositionAngleSetpoint(p-10.0);
-                                       }, m_intakeArm));
-                                  }
+      new Trigger(()->{ return m_copilotController.getRightY() < -0.9; })
+        .onTrue(new InstantCommand( () -> m_intakeArm.floorPosition() ));
+      new Trigger(()->{ return m_copilotController.getRightY() >  0.9; })
+        .onTrue(new InstantCommand( () -> m_intakeArm.elevatorPosition()));
+      new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
+        .onTrue(new InstantCommand(()-> m_intakeArm.troughPosition()));
+    }
   };
 
   /**
