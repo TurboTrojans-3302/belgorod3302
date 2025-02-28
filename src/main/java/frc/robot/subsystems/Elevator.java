@@ -27,7 +27,7 @@ public class Elevator extends SubsystemBase {
 
   public SparkMax leftElevatorMotor;
   public SparkMax rightElevatorMotor;
-  public PIDController elevatorPID;
+  public PIDController elevatorPID; //todo make this a ProfiledPIDController
   double kP = Constants.ElevatorConstants.kP;
   double kI = Constants.ElevatorConstants.kI;
   double kD = Constants.ElevatorConstants.kD;
@@ -77,6 +77,11 @@ public class Elevator extends SubsystemBase {
 
     return elevatorEncoder.getPosition();
 
+  }
+
+  public void changeSetPoint(double delta){
+    double p = getElevatorPosition();
+    setPositionPID(p + delta);
   }
 
   // stopping elevator with limit switches
