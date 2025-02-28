@@ -59,7 +59,9 @@ public final class Constants {
     public static final int kGripperExtensionMotorCanId = 17;
     public static final int kClimberLeftMotorCanId = 18;
     public static final int kClimberRightMotorCanId = 19;
-    public static final int intakeArmMotorID = 20;
+    public static final int intakeArmLeftMotorID = 20;
+    public static final int intakeArmRightMotorID = 21;
+
   }
 
   public static final class DigitalIO {
@@ -67,10 +69,11 @@ public final class Constants {
         public static final int kElevatorLowLimitSwitchId = 1;
         public static final int kIntakeLimitSwitchId = 2;
         public static final int kIntakeArmLimitSwitchId = 3;
-        public static final int kGripperClosedSwitchId = 4;
-        public static final int kGripperFullyRetractedSwitchId = 5;
-        public static final int kGripperObjectDetectedSwitchId = 6;
-        public static final int kClimberLimitSwitchId = 7;
+        public static final int kIntakeArmEncoderDIO = 4;
+        public static final int kGripperClosedSwitchId = 5;
+        public static final int kGripperFullyRetractedSwitchId = 6;
+        public static final int kGripperObjectDetectedSwitchId = 7;
+        public static final int kClimberLimitSwitchId = 8;
       }
 
   public static final class OIConstants {
@@ -184,34 +187,35 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final int intakeLimitSwitchID = 2;
     public static final double intakeSpeedMax = 0.75;
     public static final double intakeSpeedAuto = 0.4;
-    public static final double kI = 0.0;
-    public static final double kP = 0.0;
-    public static final double kD = 0.0;
+    public static final double kI = 0.005;
+    public static final double kP = 0.050;
+    public static final double kD = 0.002;
     public static final double intakeSpeedMin = -0.75;
-    public static final int armEncoderDInput = 0;
     public static final double armAngleOffset = 0;
-    public static final double MaxArmAngle = 90.0;
-    public static final double MinArmAngle = 0.0;
+    public static final double MaxArmAngle = 110.0;
+    public static final double MinArmAngle = -30.0;
     public static final double inSpeed = 0;
     public static final double outSpeed = 0;
+    public static final double kS = 0.0;
+    public static final double kG = 0.4;
+    public static final double kV = 0.0;
+    public static final double kA = 0.0;
+    public static final double kMaxVelocity = 720;
+    public static final double kMaxAcceleration = 200;
+    public static final double kFloorPosition = -30.;
+    public static final double kElevatorPosition = 110;
+    public static final double kTroughPosition = 60;
   }
 
   public static final class ClimberConstants {
-    public static final int leftClimberID = 13;
-    public static final int rightClimberID = 14;
-    public static final int climberLimitSwitchID = 3;
     public static double climberMaxSpeed = 0.5;
     public static double climberAutoSpeed = 0.3;
 
   }
 
   public static final class GripperConstants {
-    public static final int gripperMotorID = 16;
-    public static final int gripperExtensionMotorID = 17;
-    public static final int limitSwitchID = 5;
     public static final double gripperExtendedPosition = 100.0;
     // only one speed necessary
     public static final double gripperMotorSpeed = 0.6;
