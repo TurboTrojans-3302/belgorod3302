@@ -50,7 +50,7 @@ public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = false;
   private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = false;
 
@@ -102,6 +102,7 @@ public class RobotContainer {
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
+      SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -125,7 +126,6 @@ public class RobotContainer {
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
     m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
-   // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
@@ -195,6 +195,15 @@ public class RobotContainer {
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
       elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+    }
+
+    if(INTAKE_ARM_ENABLE){
+      new Trigger(()->{ return m_copilotController.getRightY() < -0.9; })
+        .onTrue(new InstantCommand( () -> m_intakeArm.floorPosition() ));
+      new Trigger(()->{ return m_copilotController.getRightY() >  0.9; })
+        .onTrue(new InstantCommand( () -> m_intakeArm.elevatorPosition()));
+      new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
+        .onTrue(new InstantCommand(()-> m_intakeArm.troughPosition()));
     }
   };
 
