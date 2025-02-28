@@ -52,7 +52,7 @@ public class RobotContainer {
   private static boolean INTAKE_ENABLE = false;
   private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
-  private static boolean CLIMBERS_ENABLE = false;
+  private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
 
@@ -196,6 +196,17 @@ public class RobotContainer {
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
       elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+    }
+    if (CLIMBERS_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Enter)
+      .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Esc)
+      .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
+      
+      Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
+      Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
+      
+      safetySwitch.and(lockClimbers).onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
     }
 
     if(INTAKE_ARM_ENABLE){
