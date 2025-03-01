@@ -15,7 +15,7 @@ B button: hold to orbit CCW around reef (planned)
 
 X button: hold to orbit CW around reef (planned)
 
-Y button: 
+Y button: Switch camera view
 
 Up Arrow: Target April tag that is currently being looked at and sent to dashboard, press (planned)
 

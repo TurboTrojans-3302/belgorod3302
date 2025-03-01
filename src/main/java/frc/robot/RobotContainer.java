@@ -89,12 +89,12 @@ public class RobotContainer {
           DigitalIO.kElevatorHighLimitSwitchId,
           DigitalIO.kElevatorLowLimitSwitchId);
       SmartDashboard.putData("Elevator", m_elevator);
-      //SmartDashboard.putData("Elevator L PID", m_elevator.leftPID);
-      //SmartDashboard.putData("Elevator R PID", m_elevator.rightPID);
+      // SmartDashboard.putData("Elevator L PID", m_elevator.leftPID);
+      // SmartDashboard.putData("Elevator R PID", m_elevator.rightPID);
     }
     if (INTAKE_ENABLE) {
       m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,
-                            DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kLowerIntakeLimitSwitchId);
+          DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kLowerIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
@@ -137,15 +137,11 @@ public class RobotContainer {
     /**
      * Driver's Controller
      */
-    new Trigger(() -> {
-      return m_driverController.getPOV() == 0;
-    })
+    new Trigger(() -> m_driverController.getPOV() == 0)
         .onTrue(new RunCommand(() -> {
           targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
         }));
-    new Trigger(() -> {
-      return m_driverController.getPOV() == 180;
-    })
+    new Trigger(() -> m_driverController.getPOV() == 180)
         .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
             Set.of(m_robotDrive, m_nav)));
 
@@ -153,6 +149,12 @@ public class RobotContainer {
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+        .onTrue(new InstantCommand(() -> {
+          double stream = LimelightHelpers.getLimelightNTDouble("limelight", "stream");
+          LimelightHelpers.setLimelightNTDouble("limelight", "stream",
+              (stream == 0.0 ? 2.0 : 0.0));
+        }));
 
     if (INTAKE_ENABLE) {
       new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
@@ -199,69 +201,74 @@ public class RobotContainer {
       elevatorUp.whileTrue(new ElevatorManualMove(m_elevator, Constants.ElevatorConstants.kManualRate));
       elevatorDown.whileTrue(new ElevatorManualMove(m_elevator, -Constants.ElevatorConstants.kManualRate));
 
-
     }
 
-    if (GRIPPER_ENABLE){
+    if (GRIPPER_ENABLE) {
       new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
-      .onTrue(new InstantCommand(() ->  m_gripper.toggleGripper()));
-      Trigger extensionOut = new Trigger( () -> (m_copilotController.getLeftTriggerAxis() > 0.8));
+          .onTrue(new InstantCommand(() -> m_gripper.toggleGripper()));
+      Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
       Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
 
       extensionOut.onTrue(new InstantCommand(() -> m_gripper.extendGripper()));
       extensionIn.onTrue(new InstantCommand(() -> m_gripper.retractGripper()));
-  
+
     }
-    if (CLIMBERS_ENABLE){
-      new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
-          .whileTrue(new InstantCommand(()->m_climbers.climbersUp()));
-      new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickDown)
-          .whileTrue(new InstantCommand(()->m_climbers.climbersDown()));
-      
+    if (CLIMBERS_ENABLE) {
+      new Trigger(() -> m_buttonBoard
+          .getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
+          .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
+      new Trigger(() -> m_buttonBoard
+          .getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickDown)
+          .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
+
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
-      
+
       safetySwitch.and(lockClimbers).onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
     }
 
-    if(INTAKE_ARM_ENABLE){
-      new Trigger(()->{ return m_copilotController.getRightY() < -0.9; })
-        .onTrue(new InstantCommand( () -> m_intakeArm.floorPosition() ));
-      new Trigger(()->{ return m_copilotController.getRightY() >  0.9; })
-        .onTrue(new InstantCommand( () -> m_intakeArm.elevatorPosition()));
+    if (INTAKE_ARM_ENABLE) {
+      new Trigger(() -> {
+        return m_copilotController.getRightY() < -0.9;
+      })
+          .onTrue(new InstantCommand(() -> m_intakeArm.floorPosition()));
+      new Trigger(() -> {
+        return m_copilotController.getRightY() > 0.9;
+      })
+          .onTrue(new InstantCommand(() -> m_intakeArm.elevatorPosition()));
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
-        .onTrue(new InstantCommand(()-> m_intakeArm.troughPosition()));
+          .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
     }
   };
 
-  public void configureTestControls(){
-    if(INTAKE_ARM_ENABLE){
+  public void configureTestControls() {
+    if (INTAKE_ARM_ENABLE) {
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Up)
-          .whileTrue(new InstantCommand(()->m_intakeArm.changeSetPoint(0.5)));
+          .whileTrue(new InstantCommand(() -> m_intakeArm.changeSetPoint(0.5)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down)
-          .whileTrue(new InstantCommand(()->m_intakeArm.changeSetPoint(-0.5)));
-    }
-    
-    if(INTAKE_ENABLE){
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
-          .onTrue(new InstantCommand(()->m_intake.out()))
-          .onFalse(new InstantCommand(()->m_intake.setLowerSpeed(0.0)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down)
-          .onTrue(new InstantCommand(()->m_intake.in()))
-          .onFalse(new InstantCommand(()->m_intake.setLowerSpeed(0.0)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up)
-          .onTrue(new InstantCommand(()->m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
-          .onFalse(new InstantCommand(()->m_intake.setUpperSpeed(0.0)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down)
-          .onTrue(new InstantCommand(()->m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
-          .onFalse(new InstantCommand(()->m_intake.setUpperSpeed(0.0)));
+          .whileTrue(new InstantCommand(() -> m_intakeArm.changeSetPoint(-0.5)));
     }
 
-    if(ELEVATOR_ENABLE){
+    if (INTAKE_ENABLE) {
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
+          .onTrue(new InstantCommand(() -> m_intake.out()))
+          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down)
+          .onTrue(new InstantCommand(() -> m_intake.in()))
+          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up)
+          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down)
+          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+    }
+
+    if (ELEVATOR_ENABLE) {
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
-          .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(1.0)));
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
-          .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(-1.0)));
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
     }
   }
 
