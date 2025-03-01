@@ -13,11 +13,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.AutoCoralPickupGround;
 import frc.robot.commands.DriveToAprilTag;
-import frc.robot.commands.ExtendGripper;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.IntakeCycle;
 import frc.robot.commands.MoveRobotAndElevator;
-import frc.robot.commands.OpenGripper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Gripper;
@@ -71,9 +69,9 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
     addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition1), 
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset1, 0.0), //I think this is the only time it makes sense to use relative so we dont have to have coordinates which are different for each side of the reef.
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 new WaitCommand(0.2),
-                new OpenGripper(m_gripper),
+                m_gripper.openCommand(),
                 new WaitCommand(0.2),
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() + Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
                 //the change to the pose is supposed to move the robot so it is facing the right side of the station, to minimize the chances of getting in someones way
@@ -83,8 +81,9 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition2),
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset2, 0.0),
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 new WaitCommand(0.2),
-                new OpenGripper(gripper));
+                gripper.openCommand()
+                );
 }
 }

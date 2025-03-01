@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -35,6 +37,7 @@ public class Elevator extends SubsystemBase {
   public DigitalInput elevatorLowLimitSwitch;
   public RelativeEncoder elevatorEncoder;
 
+  public double kLoadPosition = ElevatorConstants.kLoadPosition;
   public double kLevel1Trough = ElevatorConstants.kLevel1Trough;
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
@@ -147,6 +150,20 @@ public class Elevator extends SubsystemBase {
      elevatorPID.setSetpoint(setpoint);
   }
 
+  public Command setPostionCommand(double setpoint){
+    return new FunctionalCommand(()->setPositionPID(setpoint),
+                                 null,
+                                 null,
+                                 ()->atSetpoint()
+                                );
+  }
+
+  public Command loadPosCommand() { return setPostionCommand(kLoadPosition); }
+  public Command level1Command() { return setPostionCommand(kLevel1Trough); }
+  public Command level2Command() { return setPostionCommand(kLevel2); }
+  public Command level3Command() { return setPostionCommand(kLevel3); }
+  public Command level4Command() { return setPostionCommand(kLevel4); }
+
   public boolean atSetpoint(){
     return elevatorPID.atSetpoint();
   }
@@ -154,11 +171,6 @@ public class Elevator extends SubsystemBase {
    public boolean isNear(double position) {
     return MathUtil.isNear(position, getElevatorSpeed(), kSmallTolerance);
    }
-
-   public boolean isNearLevel1(){ return isNear(kLevel1Trough); }
-   public boolean isNearLevel2(){ return isNear(kLevel2); }
-   public boolean isNearLevel3(){ return isNear(kLevel3); }
-   public boolean isNearLevel4(){ return isNear(kLevel4); }
 
   @Override
   public void periodic() {
@@ -183,10 +195,10 @@ public class Elevator extends SubsystemBase {
     builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> { kLevel2 = x; });
     builder.addDoubleProperty("Level3", () -> kLevel3, (x) -> { kLevel3 = x; });
     builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> { kLevel4 = x; });
-    builder.addBooleanProperty("AtLevel1", this::isNearLevel1, null );
-    builder.addBooleanProperty("AtLevel2", this::isNearLevel2, null );
-    builder.addBooleanProperty("AtLevel3", this::isNearLevel3, null );
-    builder.addBooleanProperty("AtLevel4", this::isNearLevel4, null );
+    builder.addBooleanProperty("AtLevel1", ()->isNear(kLevel1Trough), null );
+    builder.addBooleanProperty("AtLevel2", ()->isNear(kLevel2), null );
+    builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
+    builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );
     builder.addDoubleProperty("elevator kP", ()-> kP, (x) -> {kP = x;});
     builder.addDoubleProperty("elevator kI", ()-> kI, (x) -> {kI = x;});
     builder.addDoubleProperty("elevator kD", ()-> kD, (x) -> {kD = x;});
