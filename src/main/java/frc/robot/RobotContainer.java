@@ -197,6 +197,19 @@ public class RobotContainer {
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
       elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+
+
+    }
+
+    if (GRIPPER_ENABLE){
+      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
+      .onTrue(new InstantCommand(() ->  m_gripper.toggleGripper()));
+      Trigger extensionOut = new Trigger( () -> (m_copilotController.getLeftTriggerAxis() > 0.8));
+      Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
+
+      extensionOut.onTrue(new InstantCommand(() -> m_gripper.extendGripper()));
+      extensionIn.onTrue(new InstantCommand(() -> m_gripper.retractGripper()));
+  
     }
     if (CLIMBERS_ENABLE){
       new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
