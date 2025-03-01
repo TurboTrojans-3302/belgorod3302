@@ -119,6 +119,7 @@ public final class Constants {
       public static final double StickDownLeft = 0.42857;
       public static final double StickLeft = 0.71429;
       public static final double StickUpLeft = 1.0;
+      public static final int kStickAxis = 5;
     }
   }
 
@@ -216,9 +217,16 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static double climberMaxSpeed = 0.5;
-    public static double climberAutoSpeed = 0.3;
-
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kMaxVelocity = 3000; //RPM
+    public static final double kMaxAcceleration = 1500; //RPM/s
+    public static double kLowerLimit = 0;
+    public static double kLockedPosition = -25;
+    public static double kUpperLimit = 100;
+    public static double kPositionTolerance = 5;
+    public static double increment = 15.0;
   }
 
   public static final class GripperConstants {

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,7 +53,7 @@ public class RobotContainer {
   private static boolean INTAKE_ENABLE = false;
   private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
-  private static boolean CLIMBERS_ENABLE = false;
+  private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
 
@@ -196,6 +197,17 @@ public class RobotContainer {
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
       elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+    }
+    if (CLIMBERS_ENABLE){
+      new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
+          .whileTrue(new InstantCommand(()->m_climbers.climbersUp()));
+      new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickDown)
+          .whileTrue(new InstantCommand(()->m_climbers.climbersDown()));
+      
+      Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
+      Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
+      
+      safetySwitch.and(lockClimbers).onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
     }
 
     if(INTAKE_ARM_ENABLE){
