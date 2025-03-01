@@ -3,8 +3,11 @@
  * 
  * Confirm positive left speed sends elevator up
  * Confirm negative right speed sends elevator up
- * 
- * 
+ * Confirm encoder increases as elevator goes up
+ * Find upper and lower position limits
+ * Tune PID constants
+ * Tune profile velocity and accel values
+ * Find maximum up speed with no cable slack (fully loaded)
  */
 
 package frc.robot.subsystems;
@@ -32,13 +35,14 @@ public class Elevator extends SubsystemBase {
 
   public SparkMax leftElevatorMotor;
   public SparkMax rightElevatorMotor;
-  public ProfiledPIDController elevatorPID;
+  public ProfiledPIDController leftPID, rightPID;
   double kP = Constants.ElevatorConstants.kP;
   double kI = Constants.ElevatorConstants.kI;
   double kD = Constants.ElevatorConstants.kD;
   public DigitalInput elevatorHighLimitSwitch;
   public DigitalInput elevatorLowLimitSwitch;
-  public RelativeEncoder elevatorEncoder;
+  public RelativeEncoder leftEncoder;
+  public RelativeEncoder rightEncoder;
 
   public double kLimitLow = ElevatorConstants.kLimitLow;
   public double kLimitHigh = ElevatorConstants.kLimitHigh;
@@ -66,31 +70,26 @@ public class Elevator extends SubsystemBase {
       // getEncoder() is a function already in the SparkBase class that creates a
       // relative encoder if there isnt one
       // I would assume we only need one of the motors to use an encoder
-      elevatorEncoder = leftElevatorMotor.getEncoder();
+      leftEncoder = leftElevatorMotor.getEncoder();
+      rightEncoder = rightElevatorMotor.getEncoder();
     }
   
     private void updateCfg(){
-      elevatorPID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
-      elevatorPID.setTolerance(kTolerance);
-      elevatorPID.reset(getElevatorPosition());
+      leftPID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
+      leftPID.setTolerance(kTolerance);
+      leftPID.reset(getElevatorPosition());
+      rightPID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
+      rightPID.setTolerance(kTolerance);
+      rightPID.reset(getElevatorPosition());
     }
 
     public double getElevatorSpeed() {
-      return elevatorEncoder.getVelocity();
-    }
-  
-    private double setMotorSpeed(double speed) {
-      leftElevatorMotor.set(speed);
-      rightElevatorMotor.set(-speed);
-      return speed;
+      return leftEncoder.getVelocity();
     }
   
     public double getElevatorPosition() {
       // returns relative encoder position from one of the motors in full rotations
-      // TODO test how many rotations get the elevator to its fullest extent from a
-      // starting position
-  
-      return elevatorEncoder.getPosition();
+      return leftEncoder.getPosition();
     }
   
     public void changeSetPoint(double delta){
@@ -99,7 +98,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public void resetElevatorPositionEncoder(double position) {
-      elevatorEncoder.setPosition(position);
+      leftEncoder.setPosition(position);
       updateCfg();
     }
   
@@ -118,29 +117,12 @@ public class Elevator extends SubsystemBase {
           resetElevatorPositionEncoder(kLimitLow);
         }
       }
-  
-      /*
-       * Checking the soft limits
-       */
-      if (getElevatorPosition() > kSoftLimitHigh) {
-        if (getMotorSpeed() > 0.0) {
-          setMotorSpeed(0.0);
-        }
-      }
-      if (getElevatorPosition() < kSoftLimitLow) {
-        if (getMotorSpeed() < 0.0) {
-          setMotorSpeed(0.0);
-        }
-      }
     }
-  
-    private double getMotorSpeed() {
-      return leftElevatorMotor.get();
-    }
-  
+    
     public void setPosition(double setpoint) {
       setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
-      elevatorPID.setGoal(setpoint);
+      leftPID.setGoal(setpoint);
+      rightPID.setGoal(setpoint);
     }
   
     public boolean isNear(double position) {
@@ -162,18 +144,17 @@ public class Elevator extends SubsystemBase {
   public Command level4Command() { return setPostionCommand(kLevel4); }
 
   public boolean atSetpoint(){
-    return elevatorPID.atGoal();
+    return leftPID.atGoal();
   }
   
   
     @Override
     public void periodic() {
-      // This method will be called once per scheduler run
-      // checks for limit switches
-  
       // todo I bet we need some feedforward here
-      double speedCalculation = elevatorPID.calculate(getElevatorPosition());
-      setMotorSpeed(speedCalculation);
+      double leftSpeed = leftPID.calculate(leftEncoder.getPosition());
+      leftElevatorMotor.set(leftSpeed);
+      double rightSpeed = rightPID.calculate(rightEncoder.getPosition());
+      rightElevatorMotor.set(rightSpeed);
   
       // important to check the limits after setting the speed
       checkLimits();

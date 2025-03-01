@@ -4,10 +4,7 @@
 
 package frc.robot.commands.Autonomous.Blue;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -64,8 +61,8 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
       poleOffset1 = Constants.FieldConstants.yOffsetReefPoleRight;
       poleOffset2 = Constants.FieldConstants.yOffsetReefPoleLeft;
     }
-    aprilTagPoseReef = m_nav.getPose2dInFrontOfTag(aprilTagReef, 1.0);
-    aprilTagPoseStation = m_nav.getPose2dInFrontOfTag(aprilTagStation, 2.5);
+    aprilTagPoseReef = Navigation.getPose2dInFrontOfTag(aprilTagReef, 1.0);
+    aprilTagPoseStation = Navigation.getPose2dInFrontOfTag(aprilTagStation, 2.5);
     addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition1), 
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset1, 0.0), //I think this is the only time it makes sense to use relative so we dont have to have coordinates which are different for each side of the reef.
