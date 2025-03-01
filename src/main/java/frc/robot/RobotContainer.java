@@ -199,10 +199,10 @@ public class RobotContainer {
           Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
     }
     if (CLIMBERS_ENABLE){
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Enter)
-      .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Esc)
-      .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
+      new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
+          .whileTrue(new InstantCommand(()->m_climbers.climbersUp()));
+      new Trigger(()-> m_buttonBoard.getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickDown)
+          .whileTrue(new InstantCommand(()->m_climbers.climbersDown()));
       
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));

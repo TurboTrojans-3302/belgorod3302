@@ -121,6 +121,7 @@ public final class Constants {
       public static final double StickDownLeft = 0.42857;
       public static final double StickLeft = 0.71429;
       public static final double StickUpLeft = 1.0;
+      public static final int kStickAxis = 5;
     }
   }
 
