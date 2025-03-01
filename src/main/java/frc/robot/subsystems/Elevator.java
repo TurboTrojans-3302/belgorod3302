@@ -138,7 +138,7 @@ public class Elevator extends SubsystemBase {
     }
   
     public boolean isNear(double position) {
-      return MathUtil.isNear(position, getElevatorSpeed(), kTolerance);
+      return MathUtil.isNear(position, getElevatorPosition(), kTolerance);
     }
   
     public boolean isNearPickupLevel() {
