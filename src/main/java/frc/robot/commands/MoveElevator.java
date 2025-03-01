@@ -12,20 +12,18 @@ public class MoveElevator extends Command {
 
   Elevator m_Elevator;
   double elevatorPosition;
-  double elevatorSpeed;
     
-  public MoveElevator(Elevator elevator, double position, double speed) {
+  public MoveElevator(Elevator elevator, double position) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_Elevator = elevator;
     elevatorPosition = position;
-    elevatorSpeed = speed;
     addRequirements(m_Elevator);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_Elevator.setPosition(elevatorPosition, elevatorSpeed);
+    m_Elevator.setPosition(elevatorPosition);
 
   }
 
@@ -37,7 +35,7 @@ public class MoveElevator extends Command {
   @Override
   public void end(boolean interrupted) {
     //whoops forgot this earlier
-    m_Elevator.setMotorSpeed(0);
+    m_Elevator.stop();
   }
 
   // Returns true when the command should end.

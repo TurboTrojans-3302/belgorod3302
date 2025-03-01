@@ -4,34 +4,46 @@
 
 package frc.robot.commands;
 
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class GoAlmostTo extends GoToCommand {
-  private double m_distanceAway;
+public class NavRoute extends GoToCommand {
+  private List<Pose2d> waypoints;
+  private int index;
 
-  /** Creates a new GoAlmostTo. */
-  public GoAlmostTo(DriveSubsystem drive, Navigation nav, Pose2d target, double distanceAway) {
-    super(drive, nav, target);
-    this.m_distanceAway = distanceAway;
+  /** Creates a new NavRoute. */
+  public NavRoute(DriveSubsystem drive, Navigation nav, List<Pose2d> waypoints) {
+    super(drive, nav);
+    this.waypoints = waypoints;
+    m_dest = waypoints.get(0);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     Pose2d bot = m_nav.getPose();
-    Translation2d translation = m_dest.getTranslation().minus(bot.getTranslation());
-    Rotation2d angle = translation.getAngle();
-    m_dest = new Pose2d(m_dest.getTranslation(), angle);
+    Pose2d nearest = bot.nearest(waypoints);
+    index = waypoints.indexOf(nearest);
+    m_dest = waypoints.get(index);
     super.initialize();
   }
 
+  // Returns true when the command should end.
   @Override
-  protected double distance(){
-    return Math.max(super.distance() - m_distanceAway, 0.0);
+  public boolean isFinished() {
+    if(super.isFinished()) {
+      index++;
+      if(index == waypoints.size()){
+        return true;
+      }
+      m_dest = waypoints.get(index);
+      super.initialize();
+    }
+
+    return false;
   }
 }

@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Navigation;
@@ -31,7 +30,7 @@ public class MoveRobotAndElevator extends ParallelCommandGroup {
     commandedPose = pose;
     // or do I need to create a new parallel command instance instead?
     addCommands(new GoToCommand(drive, nav, commandedPose),
-                new MoveElevator(elevator, elevatorPosition, Constants.ElevatorConstants.kElevatorAutoSpeedToLevel)
+                new MoveElevator(elevator, elevatorPosition)
                );
   }
 }

@@ -25,7 +25,7 @@ public class NavigateToTag extends SequentialCommandGroup {
 
         addCommands(new DriveCloseToReef(drive, nav),
                     new OrbitReefToTag(drive, nav, tagid),
-                    new GoToCommand(drive, nav, nav.getPose2dInFrontOfTag(tagid, 0.05))
+                    new GoToCommand(drive, nav, Navigation.getPose2dInFrontOfTag(tagid, 0.05))
                     );
     }
   }
