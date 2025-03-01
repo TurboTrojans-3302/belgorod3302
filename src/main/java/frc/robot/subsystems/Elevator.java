@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -41,6 +43,7 @@ public class Elevator extends SubsystemBase {
   public double kLimitHigh = ElevatorConstants.kLimitHigh;
   public double kSoftLimitLow = ElevatorConstants.kSoftLimitLow;
   public double kSoftLimitHigh = ElevatorConstants.kSoftLimitHigh;
+  public double kLoadPosition = ElevatorConstants.kLoadPosition;
   public double kLevel1Trough = ElevatorConstants.kLevel1Trough;
   public double kPickupLevel = ElevatorConstants.kPickupLevel;
   public double kLevel2 = ElevatorConstants.kLevel2;
