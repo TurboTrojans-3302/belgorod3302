@@ -35,7 +35,7 @@ public class OrbitReefToTag extends Command {
     addRequirements(drive);
     this.drive = drive;
     this.nav = nav;
-    Pose2d tagPose = nav.getTagPose2d(tagId);
+    Pose2d tagPose = Navigation.getTagPose2d(tagId);
     this.destAngle = tagPose.getRotation();
   }
 

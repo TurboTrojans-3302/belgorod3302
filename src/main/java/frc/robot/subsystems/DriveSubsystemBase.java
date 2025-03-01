@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.frc2025.FieldConstants;
 
 /** Add your docs here. */
 public abstract class DriveSubsystemBase extends SubsystemBase {
