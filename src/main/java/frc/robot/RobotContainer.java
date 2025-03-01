@@ -144,9 +144,8 @@ public class RobotContainer {
           targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
         }));
     new Trigger(() -> m_driverController.getPOV() == 180)
-        //.whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
-        .whileTrue(new DriveCloseToReef(m_robotDrive, m_nav));
-            //Set.of(m_robotDrive, m_nav));
+        .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
+            Set.of(m_robotDrive, m_nav)));
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
