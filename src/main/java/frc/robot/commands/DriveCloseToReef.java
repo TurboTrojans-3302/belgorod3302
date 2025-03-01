@@ -18,7 +18,7 @@ import frc.robot.subsystems.Navigation;
 public class DriveCloseToReef extends GoAlmostTo {
   /** Creates a new DriveCloseToReef. */
   public DriveCloseToReef(DriveSubsystem drive, Navigation nav) {
-    super(drive, nav, null, 1.5);
+    super(drive, nav, null, 0.5);
   }
 
   // Called when the command is initially scheduled.
