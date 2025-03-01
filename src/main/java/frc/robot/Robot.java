@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -18,11 +19,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.GoToCommand;
+import frc.robot.commands.NavRoute;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.StopCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TestDrive;
-import frc.robot.commands.NavRoute;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -59,6 +61,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    // Starts recording to data log
+    DataLogManager.start();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
