@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,7 +50,7 @@ public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = false;
   private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = false;
 
@@ -72,6 +73,7 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+  GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
 
   private int targetTagId = 0;
 
@@ -94,12 +96,14 @@ public class RobotContainer {
       SmartDashboard.putData("Elevator", m_elevator);
     }
     if (INTAKE_ENABLE) {
-      m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
+      m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,
+                            DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kLowerIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
+      SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -123,7 +127,6 @@ public class RobotContainer {
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
     m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
-   // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
@@ -207,7 +210,47 @@ public class RobotContainer {
       extensionIn.onTrue(new InstantCommand(() -> m_gripper.retractGripper()));
   
     }
+
+    if(INTAKE_ARM_ENABLE){
+      new Trigger(()->{ return m_copilotController.getRightY() < -0.9; })
+        .onTrue(new InstantCommand( () -> m_intakeArm.floorPosition() ));
+      new Trigger(()->{ return m_copilotController.getRightY() >  0.9; })
+        .onTrue(new InstantCommand( () -> m_intakeArm.elevatorPosition()));
+      new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
+        .onTrue(new InstantCommand(()-> m_intakeArm.troughPosition()));
+    }
   };
+
+  public void configureTestControls(){
+    if(INTAKE_ARM_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Up)
+          .whileTrue(new InstantCommand(()->m_intakeArm.changeSetPoint(0.5)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down)
+          .whileTrue(new InstantCommand(()->m_intakeArm.changeSetPoint(-0.5)));
+    }
+    
+    if(INTAKE_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
+          .onTrue(new InstantCommand(()->m_intake.out()))
+          .onFalse(new InstantCommand(()->m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down)
+          .onTrue(new InstantCommand(()->m_intake.in()))
+          .onFalse(new InstantCommand(()->m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up)
+          .onTrue(new InstantCommand(()->m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(()->m_intake.setUpperSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down)
+          .onTrue(new InstantCommand(()->m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(()->m_intake.setUpperSpeed(0.0)));
+    }
+
+    if(ELEVATOR_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
+          .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(1.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
+          .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(-1.0)));
+    }
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

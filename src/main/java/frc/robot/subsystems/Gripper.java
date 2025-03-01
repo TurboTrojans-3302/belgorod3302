@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -118,6 +120,38 @@ public class Gripper extends SubsystemBase {
     double position = gripperEncoder.getPosition();
     double speed = gripperPID.calculate(position);
     gripperMotor.set(speed);
+  }
+
+  public Command extendCommand(){
+    return new FunctionalCommand( ()-> extendGripper(),
+                                  null,
+                                  null,
+                                  ()-> isGripperFullyExtended()
+                                );
+  }
+
+  public Command retractCommand(){
+    return new FunctionalCommand( ()-> retractGripper(),
+                                  null,
+                                  null,
+                                  ()-> isExtensionRetracted()
+                                );
+  }
+
+  public Command openCommand(){
+    return new FunctionalCommand( ()-> openGripper(),
+                                  null,
+                                  null,
+                                  ()-> isGripperOpen()
+                                );
+  }
+
+  public Command closeCommand(){
+    return new FunctionalCommand( ()-> closeGripper(),
+                                  null,
+                                  null,
+                                  ()-> isGripperClosed()
+                                );
   }
 
   @Override
