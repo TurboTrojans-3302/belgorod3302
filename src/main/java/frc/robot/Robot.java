@@ -152,6 +152,11 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+  
+    SmartDashboard.putData("GoToCommand 4, 4", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 4, 4, 0));
+
+
+  
   }
 
   /** This function is called periodically during operator control. */
