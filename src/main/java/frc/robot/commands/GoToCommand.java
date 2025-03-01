@@ -124,6 +124,7 @@ public class GoToCommand extends Command {
     Translation2d unitTranslation = toDest.div(toDest.getNorm());
     double turn = m_drive.turnToHeadingDegrees(m_dest.getRotation().getDegrees());
     System.out.println("driveFieldOriented( " + unitTranslation.times(speed).toString() + ", " + turn );
+    System.out.println("distance() == "+ distance());
     m_drive.driveFieldOriented(unitTranslation.times(speed), turn);
   }
 
