@@ -32,7 +32,7 @@ public class AutoIntake extends Command {
   public void initialize() {
     m_gripper.openGripper();
     m_gripper.retractGripper();
-    m_Elevator.setPositionPID(Constants.ElevatorConstants.kLoadPosition);
+    m_Elevator.setPosition(Constants.ElevatorConstants.kLoadPosition);
     m_intake.stop();
     m_arm.elevatorPosition();
   }

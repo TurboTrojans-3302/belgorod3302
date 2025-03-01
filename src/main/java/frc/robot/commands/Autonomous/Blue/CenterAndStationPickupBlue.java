@@ -73,7 +73,7 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
                 new WaitCommand(0.2),
                 m_gripper.openCommand(),
                 new WaitCommand(0.2),
-                new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() + Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
+                new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() + Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kPickupLevel),
                 //the change to the pose is supposed to move the robot so it is facing the right side of the station, to minimize the chances of getting in someones way
                 new AutoCoralPickupGround(m_drive, m_nav, m_intake, m_intakeArm, 1.0)
                         .until(()->m_intake.lowerObjectDetected()), //just drives forward with intake on, I want something that isn't just guesswork, maybe color detection

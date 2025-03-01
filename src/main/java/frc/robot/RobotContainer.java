@@ -26,6 +26,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.commands.DriveToAprilTag;
+import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
@@ -49,7 +50,7 @@ import frc.robot.subsystems.IntakeArm;
  */
 public class RobotContainer {
 
-  private static boolean ELEVATOR_ENABLE = false;
+  private static boolean ELEVATOR_ENABLE = true;
   private static boolean INTAKE_ENABLE = false;
   private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
@@ -141,45 +142,53 @@ public class RobotContainer {
     /**
      * Driver's Controller
      */
-    new Trigger(()->{ return m_driverController.getPOV() == 0; })
-      .onTrue(new RunCommand(()->{ targetTagId = (int) LimelightHelpers.getFiducialID("limelight"); }));
-    new Trigger(()->{ return m_driverController.getPOV() == 180; })
-      .whileTrue(Commands.defer(()->new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ),
-                                Set.of(m_robotDrive, m_nav)));
+    new Trigger(() -> {
+      return m_driverController.getPOV() == 0;
+    })
+        .onTrue(new RunCommand(() -> {
+          targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
+        }));
+    new Trigger(() -> {
+      return m_driverController.getPOV() == 180;
+    })
+        .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
+            Set.of(m_robotDrive, m_nav)));
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
+        .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
-      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+        .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
 
-    if(INTAKE_ENABLE){
-        new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-            .whileTrue(new RunCommand( () -> m_intake.in(), m_intake));
-        new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-            .whileTrue(new RunCommand( () -> m_intake.out(), m_intake));
+    if (INTAKE_ENABLE) {
+      new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+          .whileTrue(new RunCommand(() -> m_intake.in(), m_intake));
+      new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+          .whileTrue(new RunCommand(() -> m_intake.out(), m_intake));
     }
 
     /**
      * Copilot's Controller
      *
-     */        
+     */
     if (ELEVATOR_ENABLE) {
       new JoystickButton(m_copilotController, XboxController.Button.kA.value)
           .onTrue(new MoveElevator(m_elevator,
-              Constants.ElevatorConstants.kLevel1Trough,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+              Constants.ElevatorConstants.kLevel1Trough));
 
       new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
 
       new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
 
       new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
 
       // get dpad position as a boolean (they are automatically returned by getPOV()
       // as an exact value)
@@ -192,11 +201,8 @@ public class RobotContainer {
       Trigger elevatorDown = new Trigger(dpadDown);
 
       // dpad causes the elevator to go up/down slowly during teleop
-      elevatorUp.whileTrue(new MoveElevator(m_elevator,
-          Constants.ElevatorConstants.kLevel4,
-          Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
-      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
-          Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      elevatorUp.whileTrue(new ElevatorManualMove(m_elevator, Constants.ElevatorConstants.kManualRate));
+      elevatorDown.whileTrue(new ElevatorManualMove(m_elevator, -Constants.ElevatorConstants.kManualRate));
 
 
     }
