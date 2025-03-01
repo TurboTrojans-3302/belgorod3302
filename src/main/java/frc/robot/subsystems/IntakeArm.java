@@ -30,7 +30,8 @@ import frc.robot.Robot;
 
 public class IntakeArm extends SubsystemBase {
 
-  private SparkMax m_armSparkMax;
+  private SparkMax m_armLeftSparkMax;
+  private SparkMax m_armRightSparkMax;
   private SparkMaxSim m_armSparkMaxSim;
   private DutyCycleEncoder m_ArmEncoder;
   private DutyCycleEncoderSim m_ArmEncoderSim;
@@ -46,11 +47,25 @@ public class IntakeArm extends SubsystemBase {
   private double kFloorPosition = IntakeConstants.kFloorPosition;
   private double kElevatorPosition = IntakeConstants.kElevatorPosition;
   private double kTroughPosition = IntakeConstants.kTroughPosition;
-  private final double kGearRatio = 100.0;
-  private final double kVelocityConversionFactor = (360.0 / 60.0) / kGearRatio; // converts RPM to deg/sec
-  private final double kPositionConversionFactor = 360.0 / kGearRatio; // converts Revolutions to degrees
-  private SparkMaxConfig sparkConfig;
-  
+  private static final double kGearRatio = 100.0;
+  private static final double kVelocityConversionFactor = (360.0 / 60.0) / kGearRatio; // converts RPM to deg/sec
+  private static final double kPositionConversionFactor = 360.0 / kGearRatio; // converts Revolutions to degrees
+
+  private static final SparkMaxConfig leftSparkConfig = new SparkMaxConfig();
+  private static final SparkMaxConfig rightSparkConfig = new SparkMaxConfig();
+  static {
+    leftSparkConfig
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(50);
+    leftSparkConfig.encoder
+          .positionConversionFactor(kPositionConversionFactor) 
+          .velocityConversionFactor(kVelocityConversionFactor);
+    rightSparkConfig
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(50)
+          .follow(Constants.CanIds.intakeArmLeftMotorID, true);
+  }
+
   // simulation constants
   private final double kMoment = SingleJointedArmSim.estimateMOI(0.355, 9.1);
   private final double kArmLength = .355;
@@ -66,14 +81,13 @@ public class IntakeArm extends SubsystemBase {
   /** Creates a new IntakeArm. */
   public IntakeArm() {
 
-    sparkConfig = new SparkMaxConfig();
-    sparkConfig.idleMode(IdleMode.kBrake)
-               .smartCurrentLimit(50);
-    sparkConfig.encoder.positionConversionFactor(kPositionConversionFactor) 
-                       .velocityConversionFactor(kVelocityConversionFactor);
-    m_armSparkMax = new SparkMax(Constants.CanIds.intakeArmMotorID, MotorType.kBrushed);
-    m_armSparkMax.configure(sparkConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    m_ArmEncoder = new DutyCycleEncoder(IntakeConstants.armEncoderDInput);
+    m_armLeftSparkMax = new SparkMax(Constants.CanIds.intakeArmLeftMotorID, MotorType.kBrushed);
+    m_armLeftSparkMax.configure(leftSparkConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+    m_armRightSparkMax = new SparkMax(Constants.CanIds.intakeArmRightMotorID, MotorType.kBrushed);
+    m_armRightSparkMax.configure(rightSparkConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    
+    m_ArmEncoder = new DutyCycleEncoder(Constants.DigitalIO.kIntakeArmEncoderDIO);
     m_ArmEncoder.setDutyCycleRange(1.0 / 1025.0, 1024.0 / 1025.0);
     m_PidController = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
                                                 new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
@@ -82,8 +96,8 @@ public class IntakeArm extends SubsystemBase {
     m_lastArmAngle = getArmAngleDegrees();
 
     m_ArmEncoderSim = new DutyCycleEncoderSim(m_ArmEncoder);
-    DCMotor plant = DCMotor.getAndymark9015(1);
-    m_armSparkMaxSim = new SparkMaxSim(m_armSparkMax, plant);
+    DCMotor plant = DCMotor.getAndymark9015(2);
+    m_armSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
     m_sim = new SingleJointedArmSim(plant,
                                     kGearRatio,
                                     kMoment,
@@ -115,7 +129,7 @@ public class IntakeArm extends SubsystemBase {
     ff = m_Feedforward.calculate(Math.toRadians(intermediate.position),
                                         Math.toRadians(intermediate.velocity));
 
-    m_armSparkMax.set( (pid + ff));
+    m_armLeftSparkMax.set( (pid + ff));
   }
 
   public void setPositionAngleSetpoint(double angle) {
@@ -125,6 +139,11 @@ public class IntakeArm extends SubsystemBase {
 
   public boolean atSetpoint(){
     return m_PidController.atSetpoint();
+  }
+
+  public void changeSetPoint(double delta){
+    double p = getPositionAngleSetpoint();
+    setPositionAngleSetpoint(p + delta);
   }
 
   public double getPositionAngleSetpoint() {
@@ -174,7 +193,7 @@ public class IntakeArm extends SubsystemBase {
     });
     builder.addStringProperty("pid", ()->String.format("%.2f", pid), null);
     builder.addStringProperty("ff", ()->String.format("%.2f", ff), null);
-    builder.addDoubleProperty("motorVoltage", ()->m_armSparkMax.getAppliedOutput()*12, null);
+    builder.addDoubleProperty("motorVoltage", ()->m_armLeftSparkMax.getAppliedOutput()*12, null);
   }
 
   @Override

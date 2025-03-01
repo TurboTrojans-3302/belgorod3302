@@ -35,6 +35,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
   private final RelativeEncoder m_drivingEncoder;
   private final AbsoluteEncoder m_turningEncoder;
   private final SparkAbsoluteEncoderSim m_turningEncoderSim;
+  private final SparkAbsoluteEncoderSim m_drivingEncoderSim;
 
   private final SparkClosedLoopController m_drivingClosedLoopController;
   private final SparkClosedLoopController m_turningClosedLoopController;
@@ -59,7 +60,9 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
 
     m_drivingEncoder = m_drivingSpark.getEncoder();
     m_turningEncoder = m_turningSpark.getAbsoluteEncoder();
+
     m_turningEncoderSim = new SparkAbsoluteEncoderSim(m_turningSpark);
+    m_drivingEncoderSim = new SparkAbsoluteEncoderSim(m_drivingSpark);
 
     m_drivingClosedLoopController = m_drivingSpark.getClosedLoopController();
     m_turningClosedLoopController = m_turningSpark.getClosedLoopController();
@@ -75,6 +78,10 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
     m_drivingEncoder.setPosition(0);
+    if(Robot.isSimulation()){
+      m_drivingSparkSim.setPosition(0);
+      m_drivingEncoderSim.setPosition(0);
+    }
 
     steerP = m_turningSpark.configAccessor.closedLoop.getP();
     steerI = m_turningSpark.configAccessor.closedLoop.getI();
@@ -173,6 +180,7 @@ public class MAXSwerveModule implements SwerveModule, Sendable {
 
   public void iterateSim(double dt) {
     m_drivingSparkSim.iterate(m_desiredState.speedMetersPerSecond, RoboRioSim.getVInVoltage(), dt);
+    m_drivingEncoderSim.iterate(m_desiredState.speedMetersPerSecond, dt);
     m_turningSparkSim.setPosition(m_desiredState.angle.getRadians());
     m_turningEncoderSim.setPosition(m_desiredState.angle.getRadians());
   }

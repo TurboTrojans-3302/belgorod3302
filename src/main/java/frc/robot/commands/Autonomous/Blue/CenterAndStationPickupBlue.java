@@ -13,11 +13,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.commands.AutoCoralPickupGround;
 import frc.robot.commands.DriveToAprilTag;
-import frc.robot.commands.ExtendGripper;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.IntakeCycle;
 import frc.robot.commands.MoveRobotAndElevator;
-import frc.robot.commands.OpenGripper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Gripper;
@@ -71,19 +69,21 @@ public class CenterAndStationPickupBlue extends SequentialCommandGroup {
     addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition1), 
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset1, 0.0), //I think this is the only time it makes sense to use relative so we dont have to have coordinates which are different for each side of the reef.
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 new WaitCommand(0.2),
-                new OpenGripper(m_gripper),
+                m_gripper.openCommand(),
                 new WaitCommand(0.2),
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() + Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
                 //the change to the pose is supposed to move the robot so it is facing the right side of the station, to minimize the chances of getting in someones way
-                new AutoCoralPickupGround(m_drive, m_nav, m_intake, 1.0), //just drives forward with intake on, I want something that isn't just guesswork, maybe color detection
-                new IntakeCycle(m_intake, m_intakeArm, m_gripper), //intake cycle does everything from spinning the intake, moving the arm, and transferring from the arm to the gripper, it skips the steps that have already been done
+                new AutoCoralPickupGround(m_drive, m_nav, m_intake, m_intakeArm, 1.0)
+                        .until(()->m_intake.lowerObjectDetected()), //just drives forward with intake on, I want something that isn't just guesswork, maybe color detection
+                new IntakeCycle(m_intake, m_intakeArm, m_gripper, m_elevator), //intake cycle does everything from spinning the intake, moving the arm, and transferring from the arm to the gripper, it skips the steps that have already been done
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition2),
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset2, 0.0),
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 new WaitCommand(0.2),
-                new OpenGripper(gripper));
+                gripper.openCommand()
+                );
 }
 }

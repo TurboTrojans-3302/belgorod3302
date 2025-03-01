@@ -8,9 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.commands.DriveToAprilTag;
-import frc.robot.commands.ExtendGripper;
 import frc.robot.commands.MoveRobotAndElevator;
-import frc.robot.commands.OpenGripper;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Gripper;
@@ -34,15 +32,15 @@ public class ReefSideTestL1Blue extends SequentialCommandGroup {
     m_nav = nav;
     m_gripper = gripper;
     m_elevator = elevator;
-    aprilTagPose = m_nav.getPose2dInFrontOfTag(aprilTag, 1.0);
+    aprilTagPose = Navigation.getPose2dInFrontOfTag(aprilTag, 1.0);
 
     
     addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPose, Constants.ElevatorConstants.kLevel1Trough),
                 //gripper closing runs at the same time as the main command
                 new DriveToAprilTag(drive, nav, aprilTag),
                 //keep gripper closed runs at the same time as the main command
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 //some time for the gripper extension to settle before dropping the coral
-                new OpenGripper(m_gripper));
+                m_gripper.openCommand());
   }
 }
