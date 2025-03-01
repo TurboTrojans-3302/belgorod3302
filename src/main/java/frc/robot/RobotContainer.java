@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.DriveCloseToReef;
 import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
@@ -70,7 +71,7 @@ public class RobotContainer {
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
   GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
 
-  private int targetTagId = 0;
+  public int targetTagId = 0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -136,14 +137,16 @@ public class RobotContainer {
 
     /**
      * Driver's Controller
+     * 
      */
     new Trigger(() -> m_driverController.getPOV() == 0)
         .onTrue(new RunCommand(() -> {
           targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
         }));
     new Trigger(() -> m_driverController.getPOV() == 180)
-        .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
-            Set.of(m_robotDrive, m_nav)));
+        //.whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
+        .whileTrue(new DriveCloseToReef(m_robotDrive, m_nav));
+            //Set.of(m_robotDrive, m_nav));
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));

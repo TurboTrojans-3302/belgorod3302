@@ -32,10 +32,10 @@ public class DriveConstants {
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(0.175);
-    public static final double kFrontRightChassisAngularOffset = Math.toRadians(0.17);
-    public static final double kBackLeftChassisAngularOffset = Math.toRadians(0.1);
-    public static final double kBackRightChassisAngularOffset = Math.toRadians(0.18); 
+    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(0);
+    public static final double kFrontRightChassisAngularOffset = Math.toRadians(0);
+    public static final double kBackLeftChassisAngularOffset = Math.toRadians(0);
+    public static final double kBackRightChassisAngularOffset = Math.toRadians(0); 
 
     public static final double headingP = 0.02;
     public static final double headingI = 0.0001;
