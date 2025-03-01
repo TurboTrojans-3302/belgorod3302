@@ -116,6 +116,10 @@ public class Robot extends TimedRobot {
           m_robotContainer.initBlue();
         }
       }
+    }else{
+      if(m_robotContainer.m_reefController.isConnected()){
+          m_robotContainer.targetTagId = m_robotContainer.m_reefController.getAprilTagId();
+      }
     }
   }
 

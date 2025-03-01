@@ -70,10 +70,8 @@ public class RobotContainer {
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
   GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
   ReefController m_reefController = new ReefController(OIConstants.kReefControllerPort);
-  
-  
 
-  private int targetTagId = 0;
+  public int targetTagId = 0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -140,16 +138,8 @@ public class RobotContainer {
     /**
      * Driver's Controller
      */
-    new Trigger(() -> {
-      return m_driverController.getPOV() == 0;
-    })
-        .onTrue(new RunCommand(() -> {
-          targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
-        }));
-    new Trigger(() -> {
-      return m_driverController.getPOV() == 180;
-    })
-        .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
+    new Trigger(() -> { return m_driverController.getPOV() == 180; })
+        .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> m_reefController.getAprilTagId()),
             Set.of(m_robotDrive, m_nav)));
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
@@ -266,6 +256,13 @@ public class RobotContainer {
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
           .onTrue(new InstantCommand(()->m_elevator.changeSetPoint(-1.0)));
     }
+
+    m_reefController.getChangeTrigger()
+      .onChange(new InstantCommand(()->{
+            Pose2d tgt = m_reefController.getTargetPose2d();
+            m_nav.m_dashboardField.getObject("dest").setPose(tgt);
+          }
+      ));
   }
 
   /**

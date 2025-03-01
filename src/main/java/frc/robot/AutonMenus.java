@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import java.util.Set;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DoNothing;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
@@ -21,6 +24,12 @@ public class AutonMenus {
     
         SendableChooser<Command> blueCommands = new SendableChooser<Command>();
         blueCommands.setDefaultOption("Do Nothing (blue)", new DoNothing());
+
+        blueCommands.addOption("TroughScore Controller",
+                               Commands.defer(()->new AutonCoralTrough(bot, bot.targetTagId),
+                               Set.of(bot.m_robotDrive, bot.m_nav, bot.m_elevator))
+                              );
+
         blueCommands.addOption("TroughScore 17", new AutonCoralTrough(bot, 17));
         blueCommands.addOption("TroughScore 18", new AutonCoralTrough(bot, 18));
         blueCommands.addOption("TroughScore 19", new AutonCoralTrough(bot, 19));

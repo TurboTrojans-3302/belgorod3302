@@ -1,14 +1,17 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+/*
+ * TODO can controller be read while disabled?
+ * TODO is the does the defered AutonCoralTrough work?
+ * 
+ */
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.GenericHID;
 import frc.robot.subsystems.Navigation;
 import frc.robot.subsystems.Navigation.ReefPole;
+import frc.utils.IntegerChange;
 
 /** Add your docs here. */
 public class ReefController {
@@ -57,6 +60,10 @@ public class ReefController {
 
     }
 
+    public boolean isConnected(){
+        return m_controller.isConnected();
+    }
+
     public int getSwitchPosition(){
         for(int i = 1; i < 13; i++){
             if(m_controller.getRawButton(i)){
@@ -80,5 +87,9 @@ public class ReefController {
         } else {
             return BlueReefPosition[getSwitchPosition()];
         }
+    }
+
+    public Trigger getChangeTrigger(){
+        return new Trigger(new IntegerChange(this::getSwitchPosition));
     }
 }
