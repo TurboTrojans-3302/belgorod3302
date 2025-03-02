@@ -18,6 +18,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystemBase;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
@@ -29,15 +30,19 @@ public class YDriveSubsystem extends DriveSubsystemBase {
   /** Creates a new YDriveSubsystem. */
 
   private SwerveDrive m_SwerveDrive;
-  double maximumSpeed = 4.0;
 
-  public YDriveSubsystem() {
+  public YDriveSubsystem(){
+    this(Constants.DriveConstants.ConfigFolder);
+  }
 
-    File directory = new File(Filesystem.getDeployDirectory(), "swerve");
+  public YDriveSubsystem(String configFolder) {
+
+    File directory = new File(Filesystem.getDeployDirectory(), configFolder);
     try {
-      m_SwerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed);
+      System.out.println("loading SwerveDrive: " + directory);
+      m_SwerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.DriveConstants.kMaxVelocityMetersPerSec);
     } catch (Exception e) {
-      System.out.println("Swerve Configuration failed! " + e);
+      System.out.println("Swerve Configuration failed! " + e); //todo throw a fatal exception here?
     }
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -115,7 +120,7 @@ public class YDriveSubsystem extends DriveSubsystemBase {
 
   @Override
   public double getMaxSpeedLimit() {
-    return maximumSpeed;
+    return m_SwerveDrive.getMaximumChassisVelocity();
   }
 
   @Override

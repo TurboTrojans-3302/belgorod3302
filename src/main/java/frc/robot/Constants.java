@@ -78,6 +78,11 @@ public final class Constants {
         public static final int kClimberLimitSwitchId = 9;
       }
 
+  public static final class DriveConstants {
+    public static final double kMaxVelocityMetersPerSec = 4.0;
+    public static final String ConfigFolder = "2025/swerve";
+    //public static final String ConfigFolder = "2023/swerve";
+  }
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
