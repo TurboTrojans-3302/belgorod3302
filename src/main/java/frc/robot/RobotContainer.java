@@ -120,12 +120,15 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
+  }
+
+  public void setDefaultCommands(){
     // Configure default commands
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
     m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
 
-    m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
 
   public static RobotContainer getInstance() {
