@@ -4,9 +4,13 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -15,9 +19,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.GoToCommand;
+import frc.robot.commands.NavRoute;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.StopCommand;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TestDrive;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -54,6 +61,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    // Starts recording to data log
+    DataLogManager.start();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
@@ -168,6 +178,8 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
+    m_robotContainer.m_robotDrive.setDefaultCommand(new TestDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController));
+
     SmartDashboard.putData("TeleopDrive", new TeleopDrive(m_robotContainer.m_robotDrive,
                                                               m_robotContainer.m_driverController));
     SmartDashboard.putData("GoToCommand 0, 0", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 0, 0, 0));
@@ -183,6 +195,15 @@ public class Robot extends TimedRobot {
                                                                   ()->{return 8;}
                                                                   ));
     SmartDashboard.putData("StopCommand", new StopCommand(m_robotContainer.m_robotDrive));
+
+    SmartDashboard.putData("TestRoute", new NavRoute(m_robotContainer.m_robotDrive,
+                                                      m_robotContainer.m_nav,
+                                                      List.of(new Pose2d(0, 0, new Rotation2d(0)),
+                                                              new Pose2d(6, 0, new Rotation2d(0)),
+                                                              new Pose2d(6, 6, new Rotation2d(0)),
+                                                              new Pose2d(0, 6, new Rotation2d(0))
+                                                              )
+                                                      ));
   }
 
   /** This function is called periodically during test mode. */

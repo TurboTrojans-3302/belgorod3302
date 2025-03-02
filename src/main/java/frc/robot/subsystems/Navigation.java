@@ -5,13 +5,11 @@
 package frc.robot.subsystems;
 
 import org.littletonrobotics.frc2025.FieldConstants;
-import org.littletonrobotics.frc2025.FieldConstants.Reef;
 
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,15 +21,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
-import frc.robot.Robot;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.Robot;
 
 public class Navigation extends SubsystemBase {
   private static final String cameraName = "limelight";
+  private static AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
 
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
-  private AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
@@ -100,17 +98,17 @@ public class Navigation extends SubsystemBase {
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 
-  public Pose2d getTagPose2d(int tagId) {
+  public static Pose2d getTagPose2d(int tagId) {
     return m_fieldLayout.getTagPose(tagId).get().toPose2d();
   }
 
-  public Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
+  public static Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
     Transform2d delta = new Transform2d(distance, 0.0, Rotation2d.fromDegrees(180.0));
     Pose2d tagPose = getTagPose2d(tagId);
     return tagPose.plus(delta);
   }
 
-  public Pose2d getPose2dInFrontOfTag(int tagId, double distance, ReefPole side) {
+  public static Pose2d getPose2dInFrontOfTag(int tagId, double distance, ReefPole side) {
     return getPose2dInFrontOfTag(tagId, 0.0).plus(side.transform);
   }
 

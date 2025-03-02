@@ -117,7 +117,12 @@ public class GoToCommand extends Command {
 
     double speed = m_trapezoid.calculate(dT, currentState, goalState).velocity;
 
-    Translation2d unitTranslation = translation2dest().div(translation2dest().getNorm());
+    Translation2d toDest = translation2dest();
+    if(toDest.getNorm() < 1e-6){
+      return; // do nothing
+    }
+
+    Translation2d unitTranslation = toDest.div(toDest.getNorm());
 
     double heading = SwerveUtils.StepTowardsCircular(m_nav.getAngleRadians(), m_dest.getRotation().getRadians(), rotationRateLimit);
     double turn = m_drive.turnToHeadingDegrees(heading);

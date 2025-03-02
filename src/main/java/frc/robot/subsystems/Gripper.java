@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -33,8 +35,8 @@ public class Gripper extends SubsystemBase {
   double kI = Constants.GripperConstants.kI;
   double kD = Constants.GripperConstants.kD;
 
-  
-  public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID, int objectDetectionID) {
+  public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID,
+      int objectDetectionID) {
     gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
     gripperExtension = new SparkMax(gripperExtensionID, MotorType.kBrushless);
     extensionMotorEncoder = gripperExtension.getEncoder();
@@ -45,65 +47,73 @@ public class Gripper extends SubsystemBase {
     gripperPID = new PIDController(kP, kI, kD);
   }
 
-  public double getGripperPosition(){
+  public double getGripperPosition() {
     return gripperEncoder.getPosition();
   }
-  public boolean isGripperClosed(){
+
+  public boolean isGripperClosed() {
     return getGripperPosition() <= Constants.GripperConstants.closedPosition;
   }
 
-  public boolean isGripperOpen(){
+  public boolean isGripperOpen() {
     return getGripperPosition() >= Constants.GripperConstants.openPosition;
   }
 
-  public boolean isExtensionRetracted(){
+  public boolean isExtensionRetracted() {
     return !gripperFullyRetracted.get();
   }
 
-  public void closeGripper(){
+  public void closeGripper() {
     gripperPID.setSetpoint(Constants.GripperConstants.closedPosition);
-  
-
   }
 
-  public void openGripper(){
+  public void openGripper() {
     gripperPID.setSetpoint(Constants.GripperConstants.openPosition);
   }
 
-  public void extendGripper(){
-    if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - extensionToleranceMedium){
+  public void toggleGripper() {
+    if (isGripperOpen()) {
+      closeGripper();
+    } else {
+      openGripper();
+    }
+  }
+
+  public void extendGripper() {
+    if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - extensionToleranceMedium) {
       gripperExtension.set(extensionSpeed * 0.75);
-    } else if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - extensionToleranceSmall){
+    } else if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - extensionToleranceSmall) {
       gripperExtension.set(extensionSpeed * 0.25);
-    } else if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - stopTolerance){
+    } else if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - stopTolerance) {
       gripperExtension.set(0);
 
     }
   }
 
-  public void retractGripper(){
-    if (isExtensionRetracted()){
+  public void retractGripper() {
+    if (isExtensionRetracted()) {
       gripperExtension.set(0);
     } else {
       gripperExtension.set(-extensionSpeed);
     }
   }
 
-  public boolean isGripperFullyExtended(){
+  public boolean isGripperFullyExtended() {
     return (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - stopTolerance);
   }
-  
-  public void setGripperPosition(double setpoint){
+
+  public void setGripperPosition(double setpoint) {
     gripperPID.setSetpoint(setpoint);
   }
 
-  public double getExtensionPosition(){
+  public double getExtensionPosition() {
     return extensionMotorEncoder.getPosition();
   }
 
-  public boolean objectInGripper(){
+  public boolean objectInGripper() {
     return (!gripperObjectDetected.get());
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -112,11 +122,49 @@ public class Gripper extends SubsystemBase {
     gripperMotor.set(speed);
   }
 
+  public Command extendCommand(){
+    return new FunctionalCommand( ()-> extendGripper(),
+                                  null,
+                                  null,
+                                  ()-> isGripperFullyExtended()
+                                );
+  }
+
+  public Command retractCommand(){
+    return new FunctionalCommand( ()-> retractGripper(),
+                                  null,
+                                  null,
+                                  ()-> isExtensionRetracted()
+                                );
+  }
+
+  public Command openCommand(){
+    return new FunctionalCommand( ()-> openGripper(),
+                                  null,
+                                  null,
+                                  ()-> isGripperOpen()
+                                );
+  }
+
+  public Command closeCommand(){
+    return new FunctionalCommand( ()-> closeGripper(),
+                                  null,
+                                  null,
+                                  ()-> isGripperClosed()
+                                );
+  }
+
   @Override
-  public void initSendable(SendableBuilder builder){
+  public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("gripperP", ()-> kP, (x)->{ kP = x;});
-    builder.addDoubleProperty("gripperI", ()-> kI, (x)->{ kI = x;});
-    builder.addDoubleProperty("gripperD", ()-> kD, (x)->{ kD = x;});
+    builder.addDoubleProperty("gripperP", () -> kP, (x) -> {
+      kP = x;
+    });
+    builder.addDoubleProperty("gripperI", () -> kI, (x) -> {
+      kI = x;
+    });
+    builder.addDoubleProperty("gripperD", () -> kD, (x) -> {
+      kD = x;
+    });
   }
 }

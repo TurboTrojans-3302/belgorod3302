@@ -6,37 +6,34 @@ package frc.robot;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
-import frc.robot.commands.DriveToAprilTag;
-import frc.robot.commands.GoToCommand;
+import frc.robot.Constants.OIConstants;
+import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
 import frc.robot.commands.TeleopDrive;
-import frc.robot.commands.TestDrive;
-import frc.robot.commands.TurnToAprilTag;
 import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.Navigation;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeArm;
+import frc.robot.subsystems.Navigation;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -71,6 +68,7 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
+  GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
 
   private int targetTagId = 0;
 
@@ -91,14 +89,18 @@ public class RobotContainer {
           DigitalIO.kElevatorHighLimitSwitchId,
           DigitalIO.kElevatorLowLimitSwitchId);
       SmartDashboard.putData("Elevator", m_elevator);
+      // SmartDashboard.putData("Elevator L PID", m_elevator.leftPID);
+      // SmartDashboard.putData("Elevator R PID", m_elevator.rightPID);
     }
     if (INTAKE_ENABLE) {
-      m_intake = new Intake(CanIds.kIntakeMotorCanId, DigitalIO.kIntakeLimitSwitchId);
+      m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,
+          DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kLowerIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
+      SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -122,7 +124,6 @@ public class RobotContainer {
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
     m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
-   // m_robotDrive.setDefaultCommand(new TestDrive(m_robotDrive, m_driverController));
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
@@ -136,45 +137,55 @@ public class RobotContainer {
     /**
      * Driver's Controller
      */
-    new Trigger(()->{ return m_driverController.getPOV() == 0; })
-      .onTrue(new RunCommand(()->{ targetTagId = (int) LimelightHelpers.getFiducialID("limelight"); }));
-    new Trigger(()->{ return m_driverController.getPOV() == 180; })
-      .whileTrue(Commands.defer(()->new NavigateToTag(m_robotDrive, m_nav, ()->targetTagId ),
-                                Set.of(m_robotDrive, m_nav)));
+    new Trigger(() -> m_driverController.getPOV() == 0)
+        .onTrue(new RunCommand(() -> {
+          targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
+        }));
+    new Trigger(() -> m_driverController.getPOV() == 180)
+        .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
+            Set.of(m_robotDrive, m_nav)));
 
     new JoystickButton(m_driverController, XboxController.Button.kB.value)
-      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
+        .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
-      .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+        .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+        .onTrue(new InstantCommand(() -> {
+          double stream = LimelightHelpers.getLimelightNTDouble("limelight", "stream");
+          LimelightHelpers.setLimelightNTDouble("limelight", "stream",
+              (stream == 0.0 ? 2.0 : 0.0));
+        }));
 
-    if(INTAKE_ENABLE){
-        new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-            .whileTrue(new RunCommand( () -> m_intake.in(), m_intake));
-        new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-            .whileTrue(new RunCommand( () -> m_intake.out(), m_intake));
+    if (INTAKE_ENABLE) {
+      new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
+          .whileTrue(new RunCommand(() -> m_intake.in(), m_intake));
+      new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+          .whileTrue(new RunCommand(() -> m_intake.out(), m_intake));
     }
 
     /**
      * Copilot's Controller
      *
-     */        
+     */
     if (ELEVATOR_ENABLE) {
       new JoystickButton(m_copilotController, XboxController.Button.kA.value)
           .onTrue(new MoveElevator(m_elevator,
-              Constants.ElevatorConstants.kLevel1Trough,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+              Constants.ElevatorConstants.kLevel1Trough));
 
       new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
 
       new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
 
       new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4,
-              Constants.ElevatorConstants.kElevatorAutoSpeedToLevel));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
 
       // get dpad position as a boolean (they are automatically returned by getPOV()
       // as an exact value)
@@ -187,13 +198,79 @@ public class RobotContainer {
       Trigger elevatorDown = new Trigger(dpadDown);
 
       // dpad causes the elevator to go up/down slowly during teleop
-      elevatorUp.whileTrue(new MoveElevator(m_elevator,
-          Constants.ElevatorConstants.kLevel4,
-          Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
-      elevatorDown.whileTrue(new MoveElevator(m_elevator, 0,
-          Constants.ElevatorConstants.kElevatorPrecisionControlSpeed));
+      elevatorUp.whileTrue(new ElevatorManualMove(m_elevator, Constants.ElevatorConstants.kManualRate));
+      elevatorDown.whileTrue(new ElevatorManualMove(m_elevator, -Constants.ElevatorConstants.kManualRate));
+
+    }
+
+    if (GRIPPER_ENABLE) {
+      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
+          .onTrue(new InstantCommand(() -> m_gripper.toggleGripper()));
+      Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
+      Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
+
+      extensionOut.onTrue(new InstantCommand(() -> m_gripper.extendGripper()));
+      extensionIn.onTrue(new InstantCommand(() -> m_gripper.retractGripper()));
+
+    }
+    if (CLIMBERS_ENABLE) {
+      new Trigger(() -> m_buttonBoard
+          .getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
+          .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
+      new Trigger(() -> m_buttonBoard
+          .getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickDown)
+          .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
+
+      Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
+      Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
+
+      safetySwitch.and(lockClimbers).onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
+    }
+
+    if (INTAKE_ARM_ENABLE) {
+      new Trigger(() -> {
+        return m_copilotController.getRightY() < -0.9;
+      })
+          .onTrue(new InstantCommand(() -> m_intakeArm.floorPosition()));
+      new Trigger(() -> {
+        return m_copilotController.getRightY() > 0.9;
+      })
+          .onTrue(new InstantCommand(() -> m_intakeArm.elevatorPosition()));
+      new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
+          .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
     }
   };
+
+  public void configureTestControls() {
+    if (INTAKE_ARM_ENABLE) {
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Up)
+          .whileTrue(new InstantCommand(() -> m_intakeArm.changeSetPoint(0.5)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down)
+          .whileTrue(new InstantCommand(() -> m_intakeArm.changeSetPoint(-0.5)));
+    }
+
+    if (INTAKE_ENABLE) {
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
+          .onTrue(new InstantCommand(() -> m_intake.out()))
+          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down)
+          .onTrue(new InstantCommand(() -> m_intake.in()))
+          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up)
+          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down)
+          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
+          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+    }
+
+    if (ELEVATOR_ENABLE) {
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+    }
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
