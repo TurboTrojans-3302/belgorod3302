@@ -30,7 +30,7 @@ import edu.wpi.first.math.util.Units;
  */
 public class FieldConstants {  
     
-  private static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+  private static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   public static final double fieldLength = APRIL_TAG_FIELD_LAYOUT.getFieldLength();
   public static final double fieldWidth = APRIL_TAG_FIELD_LAYOUT.getFieldWidth();
