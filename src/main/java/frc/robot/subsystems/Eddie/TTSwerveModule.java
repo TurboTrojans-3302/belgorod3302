@@ -109,7 +109,7 @@ public class TTSwerveModule implements SwerveModule {
                 .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder);
     
             SparkMaxConfig steerConfig = new SparkMaxConfig();
-            steerConfig.inverted(!mechanicalConfiguration.isSteerInverted()) //TODO should this be inverted here?
+            steerConfig.inverted(!mechanicalConfiguration.isSteerInverted())
                 .voltageCompensation(nominalVoltage)
                 .smartCurrentLimit((int)currentLimit)
                 .idleMode(IdleMode.kBrake)
@@ -128,7 +128,7 @@ public class TTSwerveModule implements SwerveModule {
             mSteerController = new SteerControllerImplementation(steerMotor, absoluteEncoder);
         }            
     
-        public void calibrateSterrRelativeEncoder(){
+        public void calibrateSteerRelativeEncoder(){
     
             mSteerController.calibrateRelativeEncoder();
     
@@ -259,10 +259,6 @@ public class TTSwerveModule implements SwerveModule {
                 } else { 
                     return REVLibError.kError;
                 }
-            }
-    
-            public boolean getInverted() {
-                return encoder.configGetSensorDirection();
             }
     
         }

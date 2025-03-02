@@ -1,8 +1,8 @@
 package frc.robot.subsystems.Ludwig;
 
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 public final class Configs {
     public static final class MAXSwerveModule {

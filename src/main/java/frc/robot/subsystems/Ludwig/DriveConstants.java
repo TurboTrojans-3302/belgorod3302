@@ -13,7 +13,7 @@ public class DriveConstants {
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxSpeedMetersPerSecond = 4.0; // meters per second
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
@@ -32,23 +32,10 @@ public class DriveConstants {
             new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(17.5);
-    public static final double kFrontRightChassisAngularOffset = Math.toRadians(185.7);
-    public static final double kBackLeftChassisAngularOffset = Math.toRadians(0.0);
-    public static final double kBackRightChassisAngularOffset = Math.toRadians(58.0);
-
-    // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 4;
-    public static final int kRearLeftDrivingCanId = 6;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kRearRightDrivingCanId = 8;
-
-    public static final int kFrontLeftTurningCanId = 3;
-    public static final int kRearLeftTurningCanId = 5;
-    public static final int kFrontRightTurningCanId = 1;
-    public static final int kRearRightTurningCanId = 7;
-
-    public static final int kDXSensorCanId = 0;
+    public static final double kFrontLeftChassisAngularOffset = Math.toRadians(0.175);
+    public static final double kFrontRightChassisAngularOffset = Math.toRadians(0.17);
+    public static final double kBackLeftChassisAngularOffset = Math.toRadians(0.1);
+    public static final double kBackRightChassisAngularOffset = Math.toRadians(0.18); 
 
     public static final double headingP = 0.02;
     public static final double headingI = 0.0001;
