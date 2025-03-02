@@ -30,12 +30,24 @@ public class TestDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    double speed = -m_driverController.getLeftY();
+    
     Translation2d command = new Translation2d(
-      -m_driverController.getLeftY() * 0.2,
-      -m_driverController.getLeftX() * 0.2
+      -m_driverController.getRightY(),
+      -m_driverController.getRightX()
     );
 
-    m_robotDrive.testSetAll(12 * command.getNorm(), command.getAngle().getRadians());
+    double direction;
+    int pov = m_driverController.getPOV();
+
+    if(pov==-1){
+      direction = command.getAngle().getDegrees();
+    } else {
+      direction = 360 - pov;
+    }
+
+    m_robotDrive.testSetAll(speed, Math.toRadians(direction));
 
   }
 

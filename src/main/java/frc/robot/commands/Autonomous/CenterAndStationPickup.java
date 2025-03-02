@@ -3,20 +3,20 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands.Autonomous;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.commands.AutoCoralPickupGround;
 import frc.robot.commands.ChangeLimelightPipeline;
 import frc.robot.commands.CoralChaser;
 import frc.robot.commands.DriveToAprilTag;
-import frc.robot.commands.ExtendGripper;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.IntakeCycle;
 import frc.robot.commands.MoveRobotAndElevator;
-import frc.robot.commands.OpenGripper;
-import frc.robot.commands.WaitCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Gripper;
@@ -100,28 +100,26 @@ public class CenterAndStationPickup extends SequentialCommandGroup {
     } else if (stationRight) {
       limitPickupLeft = true;
     }
-    
-    aprilTagPoseReef = m_nav.getPose2dInFrontOfTag(aprilTagReef, 1.0);
-    aprilTagPoseStation = m_nav.getPose2dInFrontOfTag(aprilTagStation, 2.5);
-
+    aprilTagPoseReef = Navigation.getPose2dInFrontOfTag(aprilTagReef, 1.0);
+    aprilTagPoseStation = Navigation.getPose2dInFrontOfTag(aprilTagStation, 2.5);
     addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition1), 
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset1, 0.0), //I think this is the only time it makes sense to use relative so we dont have to have coordinates which are different for each side of the reef.
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 new WaitCommand(0.2),
-                new OpenGripper(m_gripper),
+                m_gripper.openCommand(),
                 new WaitCommand(0.2),
-                new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + stationRightXOffset, aprilTagPoseStation.getY() + stationRightYOffset, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kGround),
+                new MoveRobotAndElevator(m_drive, m_nav, m_elevator, new Pose2d(aprilTagPoseStation.getX() + Constants.FieldConstants.poseOffsetStationRightX, aprilTagPoseStation.getY() + Constants.FieldConstants.poseOffsetStationRightY, aprilTagPoseStation.getRotation()), Constants.ElevatorConstants.kPickupLevel),
                 //the change to the pose is supposed to move the robot so it is facing the right side of the station, to minimize the chances of getting in someones way
-            
-                new CoralChaser(m_drive, m_nav, m_intake, 0.5, limitPickupRight, limitPickupLeft, angleToleranceOfStationPickup, true),
-                new ChangeLimelightPipeline(m_nav, Constants.LimelightConstants.PipelineIdx.AprilTag),
-                new IntakeCycle(m_intake, m_intakeArm, m_gripper), //intake cycle does everything from spinning the intake, moving the arm, and transferring from the arm to the gripper, it skips the steps that have already been done
+                new AutoCoralPickupGround(m_drive, m_nav, m_intake, m_intakeArm, 1.0)
+                        .until(()->m_intake.lowerObjectDetected()), //just drives forward with intake on, I want something that isn't just guesswork, maybe color detection
+                new IntakeCycle(m_intake, m_intakeArm, m_gripper, m_elevator), //intake cycle does everything from spinning the intake, moving the arm, and transferring from the arm to the gripper, it skips the steps that have already been done
                 new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPoseReef, elevatorScoringPosition2),
                 new DriveToAprilTag(m_drive, m_nav, aprilTagReef),
                 GoToCommand.relative(m_drive, m_nav, 0.0, poleOffset2, 0.0),
-                new ExtendGripper(m_gripper),
+                m_gripper.extendCommand(),
                 new WaitCommand(0.2),
-                new OpenGripper(m_gripper));
+                m_gripper.openCommand()
+                );
 }
 }

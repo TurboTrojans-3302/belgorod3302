@@ -4,15 +4,27 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.GoToCommand;
+import frc.robot.commands.NavRoute;
+import frc.robot.commands.NavigateToTag;
+import frc.robot.commands.StopCommand;
+import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TestDrive;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -49,6 +61,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    // Starts recording to data log
+    DataLogManager.start();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
@@ -63,7 +78,6 @@ public class Robot extends TimedRobot {
                                               Constants.LimelightConstants.Offset.pitch,
                                               Constants.LimelightConstants.Offset.yaw
                                             );
-    m_robotContainer.m_nav.resetOdometry(m_robotContainer.getStartPosition());
   }
 
   /**
@@ -74,7 +88,7 @@ public class Robot extends TimedRobot {
    * <p>
    * This runs after the mode specific periodic functions, but before LiveWindow
    * and
-   * SmartDashboard integrated updating.
+   * Dashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
@@ -97,13 +111,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-
-    Optional<Alliance> a = DriverStation.getAlliance();
-    if (a.isPresent()) {
-      alliance = a.get();
+    if(alliance == null) {
+      Optional<Alliance> a = DriverStation.getAlliance();
+      if (a.isPresent()) {
+        alliance = a.get();
+        if(alliance == Alliance.Red) {
+          m_robotContainer.initRed();
+        } else {
+          m_robotContainer.initBlue();
+        }
+      }
     }
-
   }
+
 
   /**
    * This autonomous runs the autonomous command selected by your
@@ -112,7 +132,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     setLED(LEDmode.Auton);
-    m_robotContainer.m_nav.resetOdometry(m_robotContainer.getStartPosition());
     System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_nav.getPose());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println("Starting command: " + m_autonomousCommand.getName());
@@ -130,6 +149,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+
+    m_robotContainer.setDefaultCommands();
+    
     setLED(LEDmode.Teleop);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -158,11 +180,43 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    Command testDriveCommand = new TeleopDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController);
+    m_robotContainer.m_robotDrive.setDefaultCommand(new TestDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController));
+    SmartDashboard.putData("TestDrive", testDriveCommand);
+
+    SmartDashboard.putData("GoToCommand 0, 0", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 0, 0, 0));
+    SmartDashboard.putData("GoToCommand 0, 6", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 0, 6, 0));
+    SmartDashboard.putData("GoToCommand 6, 0", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 6, 0, 0));
+    SmartDashboard.putData("GoToCommand 6, 6", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 6, 6, 0));
+    SmartDashboard.putData("Nav to tag 21", new NavigateToTag(m_robotContainer.m_robotDrive,
+                                                                  m_robotContainer.m_nav,
+                                                                  ()->{return 21;}
+                                                                  ));
+    SmartDashboard.putData("Nav to tag  8", new NavigateToTag(m_robotContainer.m_robotDrive,
+                                                                  m_robotContainer.m_nav,
+                                                                  ()->{return 8;}
+                                                                  ));
+    SmartDashboard.putData("StopCommand", new StopCommand(m_robotContainer.m_robotDrive));
+
+    SmartDashboard.putData("TestRoute", new NavRoute(m_robotContainer.m_robotDrive,
+                                                      m_robotContainer.m_nav,
+                                                      List.of(new Pose2d(0, 0, new Rotation2d(0)),
+                                                              new Pose2d(6, 0, new Rotation2d(0)),
+                                                              new Pose2d(6, 6, new Rotation2d(0)),
+                                                              new Pose2d(0, 6, new Rotation2d(0))
+                                                              )
+                                                      ));
   }
 
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
+  }
+
+  @Override
+  public void testExit() {
+    m_robotContainer.m_robotDrive.removeDefaultCommand();
   }
 
   private enum LEDmode {

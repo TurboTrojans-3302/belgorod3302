@@ -4,11 +4,12 @@
 
 package frc.robot.subsystems;
 
+import org.littletonrobotics.frc2025.FieldConstants;
+
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,13 +22,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.Robot;
 
 public class Navigation extends SubsystemBase {
   private static final String cameraName = "limelight";
+  private static AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
 
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
-  private AprilTagFieldLayout m_fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
@@ -87,20 +89,22 @@ public class Navigation extends SubsystemBase {
   }
 
   public Double getDxToObjectMeters() {
+    if(!Robot.isReal()){return 0.0;}
     Measurement m = m_dxSensor.getMeasurement();
     return m.distance_mm * 0.001;
   }
 
   public boolean dxMeasurmentGood() {
+    if(!Robot.isReal()){return true;}
     Measurement m = m_dxSensor.getMeasurement();
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 
-  public Pose2d getTagPose2d(int tagId) {
+  public static Pose2d getTagPose2d(int tagId) {
     return m_fieldLayout.getTagPose(tagId).get().toPose2d();
   }
 
-  public Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
+  public static Pose2d getPose2dInFrontOfTag(int tagId, double distance) {
     Transform2d delta = new Transform2d(distance, 0.0, Rotation2d.fromDegrees(180.0));
     Pose2d tagPose = getTagPose2d(tagId);
     return tagPose.plus(delta);
@@ -128,11 +132,12 @@ public class Navigation extends SubsystemBase {
   public double getTargetDistanceFiducial(){
     return targetDistanceNeuralNetwork;
   }
+
   /**
    * @return heading angle of the bot, according to the odometry, in degrees
    */
   public double getAngleDegrees() {
-    return m_odometry.getEstimatedPosition().getRotation().getDegrees();
+    return getPose().getRotation().getDegrees();
   }
 
   @Override
@@ -145,5 +150,17 @@ public class Navigation extends SubsystemBase {
       builder.addStringProperty("ClassiferFound", () -> {return LimelightHelpers.getClassifierClass(cameraName);}, null);
       builder.addBooleanProperty("DxGood", this::dxMeasurmentGood, null);
       builder.addDoubleProperty("DxSensor", this::getDxToObjectMeters, null);
+      builder.addStringProperty("EstimatedPosition", ()->getPose().toString(), null);
     }
+
+    static public enum ReefPole { 
+      left(new Transform2d(0.0, 0.165, Rotation2d.kZero)),
+      right(new Transform2d(0.0, -0.165, Rotation2d.kZero));
+  
+      public Transform2d transform;
+  
+      private ReefPole(Transform2d t) {
+        this.transform = t;
+      }
+    };
 }
