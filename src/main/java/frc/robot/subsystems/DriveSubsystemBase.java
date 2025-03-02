@@ -84,6 +84,8 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract void drive(ChassisSpeeds speeds, Translation2d centerOfRotation);
 
+    public abstract void testSetAll(double voltage, double angleRadians);
+
     public void drive(ChassisSpeeds speeds){
         drive(speeds, Translation2d.kZero);
     }
