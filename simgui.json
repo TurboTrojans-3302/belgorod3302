@@ -1,11 +1,4 @@
 {
-  "HALProvider": {
-    "Other Devices": {
-      "window": {
-        "visible": false
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -13,24 +6,39 @@
       "/SmartDashboard/DriveSubsystem": "Subsystem",
       "/SmartDashboard/Encoders": "Alerts",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/GoToCommand 0, 0": "Command",
+      "/SmartDashboard/GoToCommand 0, 6": "Command",
+      "/SmartDashboard/GoToCommand 6, 0": "Command",
+      "/SmartDashboard/GoToCommand 6, 6": "Command",
       "/SmartDashboard/IMU": "Alerts",
       "/SmartDashboard/IntakeArm": "Subsystem",
       "/SmartDashboard/IntakeArmPID": "ProfiledPIDController",
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/Nav to tag  8": "Command",
+      "/SmartDashboard/Nav to tag 21": "Command",
       "/SmartDashboard/Navigation": "Subsystem",
+      "/SmartDashboard/StopCommand": "Command",
       "/SmartDashboard/Swerve Drive": "Alerts",
       "/SmartDashboard/TeleopCommand": "Command",
+      "/SmartDashboard/TestDrive": "Command",
+      "/SmartDashboard/TestRoute": "Command",
       "/SmartDashboard/headingPIDcontroller": "PIDController"
     },
     "windows": {
       "/SmartDashboard/Field": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
+        "bottom": 1638,
+        "builtin": "2025 Reefscape",
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/GoToCommand 6, 6": {
         "window": {
           "visible": true
         }

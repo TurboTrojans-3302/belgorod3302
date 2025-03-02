@@ -153,4 +153,33 @@ public class YDriveSubsystem extends DriveSubsystemBase {
       mod.setDesiredState(state, false, false);
     }
   }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+      super.initSendable(builder);
+      builder.addDoubleProperty("gyroAngleDegrees", this::getGyroAngleDegrees, this::setGyroAngleDeg);
+      builder.addDoubleProperty("MaxSpeedLimit", () -> {
+          return m_SwerveDrive.getMaximumChassisAngularVelocity();
+      }, (x) -> {
+          m_SwerveDrive.setMaximumAllowableSpeeds(x, m_SwerveDrive.getMaximumChassisAngularVelocity());
+      });
+      builder.addDoubleProperty("MaxRotationLimit", () -> {
+          return m_SwerveDrive.getMaximumChassisAngularVelocity();
+      }, (x) -> {
+          m_SwerveDrive.setMaximumAllowableSpeeds(getMaxSpeed(), x);
+      });
+      builder.addStringProperty("CommandedSpeeds",
+      ()->{ChassisSpeeds CommandedSpeeds = m_SwerveDrive.getRobotVelocity();
+           return String.format("x:%5.2f y:%5.2f (%5.2f %5.2f deg) %4.2f",
+                        CommandedSpeeds.vxMetersPerSecond,
+                        CommandedSpeeds.vyMetersPerSecond,
+                        Math.hypot(CommandedSpeeds.vxMetersPerSecond, CommandedSpeeds.vyMetersPerSecond),
+                        Math.toDegrees(Math.atan2(CommandedSpeeds.vxMetersPerSecond, CommandedSpeeds.vyMetersPerSecond)),
+                        CommandedSpeeds.omegaRadiansPerSecond
+                        );},
+      null
+      );
+
+  }
+
 }
