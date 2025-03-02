@@ -12,7 +12,6 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.commands.AutoCoralPickupGround;
 import frc.robot.commands.ChangeLimelightPipeline;
-import frc.robot.commands.CoralChaser;
 import frc.robot.commands.DriveToAprilTag;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.IntakeCycle;
