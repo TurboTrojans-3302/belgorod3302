@@ -23,6 +23,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -202,5 +204,13 @@ public class IntakeArm extends SubsystemBase {
     m_sim.update(Robot.kDefaultPeriod);
     m_armSparkMaxSim.iterate(Math.toDegrees(m_sim.getVelocityRadPerSec()), 12.0, Robot.kDefaultPeriod);
     m_ArmEncoderSim.set(m_sim.getAngleRads()/6.28318);
+  }
+
+  public Command floorPositionCommand() {
+      return new FunctionalCommand(this::floorPosition,
+                                   null,
+                                   null,
+                                   this::atSetpoint,
+                                   this);
   }
 }

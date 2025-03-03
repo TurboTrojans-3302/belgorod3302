@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -116,5 +118,9 @@ public class Intake extends SubsystemBase {
   public void loadGripper() {
     setLowerSpeed(outSpeed);
     setUpperSpeed(upperLoadSpeed);
+  }
+
+  public Command startPickupCommand(){
+    return new InstantCommand(()->this.in());
   }
 }

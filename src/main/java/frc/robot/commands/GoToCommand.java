@@ -30,20 +30,29 @@ public class GoToCommand extends Command {
   private TrapezoidProfile m_trapezoid;
   protected boolean m_relativeFlag;
   protected Navigation m_nav;
+  protected double speedLimit;
 
-  static double speedLimit = AutoConstants.kMaxSpeedMetersPerSecond;
   static double accelLimit = AutoConstants.kMaxAccelerationMetersPerSecondSquared;
   static double kDistanceTolerance = Constants.AutoConstants.kDistanceTolerance;
   static double kHeadingTolerance = Constants.AutoConstants.kHeadingTolerance;
 
   protected GoToCommand(DriveSubsystem drive, Navigation nav) {
+    this(drive, nav, AutoConstants.kMaxSpeedMetersPerSecond);
+  }
+  
+  protected GoToCommand(DriveSubsystem drive, Navigation nav, double MaxSpeed) {
+    speedLimit = MaxSpeed;
     m_drive = drive;
     this.m_nav = nav;
     addRequirements(m_drive);
   }
 
   public GoToCommand(DriveSubsystem drive, Navigation nav, Pose2d dest) {
-    this(drive, nav);
+    this(drive, nav, dest, AutoConstants.kMaxSpeedMetersPerSecond);
+  }
+
+  public GoToCommand(DriveSubsystem drive, Navigation nav, Pose2d dest, double MaxSpeed) {
+    this(drive, nav, MaxSpeed);
     m_dest = dest;
     m_relativeFlag = false;
   }
@@ -52,18 +61,31 @@ public class GoToCommand extends Command {
     return new GoToCommand(drive, nav, dest);
   }
 
+  public static GoToCommand absolute(DriveSubsystem drive, Navigation nav, Pose2d dest, double MaxSpeed) {
+    return new GoToCommand(drive, nav, dest, MaxSpeed);
+  }
+
   public static GoToCommand absolute(DriveSubsystem drive, Navigation nav, double x, double y, double heading) {
     Pose2d dest = new Pose2d(x, y, Rotation2d.fromDegrees(heading));
     return new GoToCommand(drive, nav, dest);
   }
 
+  public static GoToCommand relative(DriveSubsystem drive, Navigation nav, double x, double y, double theta, double MaxSpeed) {
+    Transform2d delta = new Transform2d(x, y, Rotation2d.fromDegrees(theta));
+    return new GoToCommand(drive, nav, delta, MaxSpeed);
+  }
+  
   public static GoToCommand relative(DriveSubsystem drive, Navigation nav, double x, double y, double theta) {
     Transform2d delta = new Transform2d(x, y, Rotation2d.fromDegrees(theta));
     return new GoToCommand(drive, nav, delta);
   }
   
   public GoToCommand(DriveSubsystem drive, Navigation nav, Transform2d delta) {
-    this(drive, nav);
+    this(drive, nav, delta, AutoConstants.kMaxSpeedMetersPerSecond);
+  }
+
+  public GoToCommand(DriveSubsystem drive, Navigation nav, Transform2d delta, double MaxSpeed) {
+    this(drive, nav, MaxSpeed);
     m_delta = delta;
     m_relativeFlag = true;
   }
