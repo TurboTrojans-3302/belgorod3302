@@ -32,7 +32,7 @@ public class AutonTwoCoralTrough extends SequentialCommandGroup {
                         new GoNearestIceCream(bot.m_robotDrive, bot.m_nav),
                         
                         new AutoCoralPickupGround(bot.m_robotDrive, bot.m_nav, bot.m_intake, bot.m_intakeArm, 1.3),
-                        new AutoIntake(null, null, null, null),
+                        new AutoIntake(bot.m_intake, bot.m_intakeArm, bot.m_gripper, bot.m_elevator),
                         new DriveCloseToReef(bot.m_robotDrive, bot.m_nav),
                         Commands.parallel(new OrbitReefToTag(bot.m_robotDrive, bot.m_nav, tagid),
                                           bot.m_elevator.level1Command()
