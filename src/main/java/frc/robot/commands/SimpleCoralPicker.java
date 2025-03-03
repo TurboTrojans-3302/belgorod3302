@@ -61,7 +61,7 @@ public class SimpleCoralPicker extends Command {
 
     if (results.targets_Detector.length > 1){
 
-      for (int i = 0; i == results.targets_Detector.length; i++){
+      for (int i = 0; i < results.targets_Detector.length; i++){
 
         double targetAreaInstance = results.targets_Detector[i].ta;
         double targetTXInstance = results.targets_Detector[i].tx;
