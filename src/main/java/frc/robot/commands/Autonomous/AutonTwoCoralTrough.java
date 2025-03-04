@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.commands.AutoCoralPickupGround;
 import frc.robot.commands.AutoIntake;
+import frc.robot.commands.AutoLoadGripper;
 import frc.robot.commands.DriveCloseToReef;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.OrbitReefToTag;
@@ -33,6 +34,8 @@ public class AutonTwoCoralTrough extends SequentialCommandGroup {
                         
                         new AutoCoralPickupGround(bot.m_robotDrive, bot.m_nav, bot.m_intake, bot.m_intakeArm, 1.3),
                         new AutoIntake(bot.m_intake, bot.m_intakeArm, bot.m_gripper, bot.m_elevator),
+                        new AutoLoadGripper(bot.m_intake, bot.m_gripper),
+                        
                         new DriveCloseToReef(bot.m_robotDrive, bot.m_nav),
                         Commands.parallel(new OrbitReefToTag(bot.m_robotDrive, bot.m_nav, tagid),
                                           bot.m_elevator.level1Command()
