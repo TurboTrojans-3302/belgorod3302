@@ -106,7 +106,7 @@
           },
           {
             "title": "ClimberLocked",
-            "x": 1024.0,
+            "x": 256.0,
             "y": 256.0,
             "width": 128.0,
             "height": 128.0,
@@ -123,8 +123,8 @@
           },
           {
             "title": "Lower Object Detected",
-            "x": 896.0,
-            "y": 128.0,
+            "x": 1024.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -157,22 +157,29 @@
           },
           {
             "title": "ArmAngle",
-            "x": 1024.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
             "properties": {
               "topic": "/SmartDashboard/IntakeArm/ArmAngle",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "start_angle": -120.0,
+              "end_angle": 20.0,
+              "min_value": -20.0,
+              "max_value": 120.0,
+              "number_of_labels": 4,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
             }
           },
           {
             "title": "ValidTarget",
-            "x": 1024.0,
-            "y": 128.0,
+            "x": 384.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",

@@ -56,7 +56,7 @@ public class Climbers extends SubsystemBase {
     m_rightController = m_rightClimber.getClosedLoopController();
     m_leftEncoder = m_leftClimber.getEncoder();
     m_rightEncoder = m_rightClimber.getEncoder();
-    limitSwitchClimber = new DigitalInput(0);
+    limitSwitchClimber = new DigitalInput(limitSwitchId);
   }
 
   public static SparkMaxConfig leftConfig = new SparkMaxConfig();
