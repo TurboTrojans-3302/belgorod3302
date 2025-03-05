@@ -50,8 +50,8 @@ public class Climbers extends SubsystemBase {
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
     m_rightClimber = new SparkMax(rightMotorId, MotorType.kBrushless);
-    m_leftClimber.configure(leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    m_rightClimber.configure(rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    //m_leftClimber.configure(leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    //m_rightClimber.configure(rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m_leftController = m_leftClimber.getClosedLoopController();
     m_rightController = m_rightClimber.getClosedLoopController();
     m_leftEncoder = m_leftClimber.getEncoder();

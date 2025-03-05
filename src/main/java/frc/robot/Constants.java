@@ -66,7 +66,7 @@ public final class Constants {
   }
 
   public static final class DigitalIO {
-        public static final int kElevatorHighLimitSwitchId = 0;
+        public static final int kElevatorHighLimitSwitchId = 10;
         public static final int kElevatorLowLimitSwitchId = 1;
         public static final int kLowerIntakeLimitSwitchId = 2;
         public static final int kUpperIntakeLimitSwitchId = 3;        

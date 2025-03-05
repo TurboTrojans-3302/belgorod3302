@@ -124,33 +124,33 @@ public class Gripper extends SubsystemBase {
 
   public Command extendCommand(){
     return new FunctionalCommand( ()-> extendGripper(),
-                                  null,
-                                  null,
+                                  ()->{},
+                                  (x)->{},
                                   ()-> isGripperFullyExtended()
                                 );
   }
 
   public Command retractCommand(){
     return new FunctionalCommand( ()-> retractGripper(),
-                                  null,
-                                  null,
+                                  ()->{},
+                                  (x)->{},
                                   ()-> isExtensionRetracted()
                                 );
   }
 
   public Command openCommand(){
     return new FunctionalCommand( ()-> openGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperOpen()
+    ()->{},
+    (x)->{},
+    ()-> isGripperOpen()
                                 );
   }
 
   public Command closeCommand(){
     return new FunctionalCommand( ()-> closeGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperClosed()
+    ()->{},
+    (x)->{},
+    ()-> isGripperClosed()
                                 );
   }
 
