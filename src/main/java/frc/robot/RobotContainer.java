@@ -84,8 +84,7 @@ public class RobotContainer {
     m_nav = new Navigation(m_robotDrive);
     SmartDashboard.putData("Navigation", m_nav);
     if (ELEVATOR_ENABLE) {
-      m_elevator = new Elevator(CanIds.kLeftMotorElevatorCanId,
-          CanIds.kRightMotorElevatorCanId,
+      m_elevator = new Elevator(CanIds.kElevatorCanId,
           DigitalIO.kElevatorHighLimitSwitchId,
           DigitalIO.kElevatorLowLimitSwitchId);
       SmartDashboard.putData("Elevator", m_elevator);
