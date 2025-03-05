@@ -10,10 +10,17 @@ import com.swervedrivespecialties.swervelib.rev.NeoSteerConfiguration;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.AnalogEncoderSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import frc.robot.Robot;
 
 import com.swervedrivespecialties.swervelib.ctre.CanCoderAbsoluteConfiguration;
 import com.swervedrivespecialties.swervelib.ctre.CtreUtils;
 import com.revrobotics.*;
+import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.EncoderConfig;
@@ -24,6 +31,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
+import com.ctre.phoenix.sensors.CANCoderSimCollection;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -148,11 +156,15 @@ public class TTSwerveModule implements SwerveModule {
     
         private static class DriveControllerImplementation implements DriveController {
             private final SparkMax motor;
+            private final SparkMaxSim motorSim;
             private final RelativeEncoder encoder;
+            private final SparkRelativeEncoderSim encoderSim;
     
             private DriveControllerImplementation(SparkMax motor, RelativeEncoder encoder) {
                 this.motor = motor;
+                this.motorSim = new SparkMaxSim(motor, DCMotor.getNEO(1));
                 this.encoder = encoder;
+                this.encoderSim = new SparkRelativeEncoderSim(motor);
             }
     
             @Override
@@ -164,9 +176,15 @@ public class TTSwerveModule implements SwerveModule {
             public double getStateVelocity() {
                 return encoder.getVelocity();
             }
+            public void iterateSim(double dt){
+                double v = getStateVelocity();
+                motorSim.iterate(v, 12.0, dt);
+                encoderSim.iterate(v, dt);
+            }
 
             public void setVelocity(double driveVelocity) {
                 motor.getClosedLoopController().setReference(driveVelocity, ControlType.kVelocity);
+                if(Robot.isSimulation()){ encoderSim.setVelocity(driveVelocity); }
             }
         }
         
@@ -174,7 +192,9 @@ public class TTSwerveModule implements SwerveModule {
     
             @SuppressWarnings({"FieldCanBeLocal", "unused"})
             private final SparkMax motor;
+            private final SparkMaxSim motorSim;
             private final RelativeEncoder motorEncoder;
+            private final SparkRelativeEncoderSim motorEncoderSim;
             private final EncoderImplementation absoluteEncoder;
     
             private double referenceAngleRadians = 0;
@@ -183,6 +203,8 @@ public class TTSwerveModule implements SwerveModule {
                 this.motor = motor;
                 this.motorEncoder = motor.getEncoder();
                 this.absoluteEncoder = absoluteEncoder;
+                this.motorSim = new SparkMaxSim(motor, DCMotor.getNEO(1));
+                this.motorEncoderSim = new SparkRelativeEncoderSim(motor);
             }
     
             @Override
@@ -218,6 +240,7 @@ public class TTSwerveModule implements SwerveModule {
                 this.referenceAngleRadians = referenceAngleRadians;
     
                 motor.getClosedLoopController().setReference(adjustedReferenceAngleRadians, ControlType.kPosition);
+                if(Robot.isSimulation()){ setSimPosition(adjustedReferenceAngleRadians);}
             }
     
             public void testSetAngleRadians(double angleRadians){
@@ -238,13 +261,22 @@ public class TTSwerveModule implements SwerveModule {
             public double getAbsoluteAngle(){
                 return absoluteEncoder.getAbsoluteAngle();
             }
+
+            public void setSimPosition(double position){
+                motorSim.setPosition(position); //todo are these really all radians?
+                absoluteEncoder.setSimPosition(position);
+                motorEncoderSim.setPosition(position);
+            }
+
         }
     
         private static class EncoderImplementation implements AbsoluteEncoder {
             private final CANCoder encoder;
+            private final CANCoderSimCollection encoderSim;
     
             private EncoderImplementation(CANCoder encoder) {
                 this.encoder = encoder;
+                encoderSim = new CANCoderSimCollection(encoder);
             }
     
             public double getAbsoluteAngle() {
@@ -274,6 +306,10 @@ public class TTSwerveModule implements SwerveModule {
                 } else { 
                     return REVLibError.kError;
                 }
+            }
+
+            public void setSimPosition(double positionRads){
+                encoderSim.setRawPosition((int)(positionRads / (2*Math.PI) * 4096));
             }
     
         }
@@ -362,5 +398,10 @@ public class TTSwerveModule implements SwerveModule {
     public void testSet(double voltage, double angleRadians){
         mDriveController.setReferenceVoltage(voltage);
         mSteerController.testSetAngleRadians(angleRadians);
+    }
+
+    public void iterateSim(double dt) {
+        mDriveController.iterateSim(dt);
+        mSteerController.setSimPosition(dt);
     }
 }

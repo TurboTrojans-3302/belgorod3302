@@ -12,7 +12,7 @@ public class DriveConstants {
 
         public static final double TRACKWIDTH = 19.5 * 0.0254; // distance between the left and right wheels
         public static final double WHEELBASE = 23.5 * 0.0254; // front to back distance
-        public static final double kMaxSpeedMetersPerSecond = 12.0;
+        public static final double kMaxSpeedMetersPerSecond = 4.0;
         public static final double drivingVelocityFeedForward = 0.2;
         public static final double kP = 0.04;
         public static final double kI = 0;
@@ -27,6 +27,6 @@ public class DriveConstants {
 
         public static final double AutonSpeedLimit = 4.0;
         public static final double AutonAccelLimit = 2.0;
-        public static final double kMaxRotation = 8.0;
+        public static final double kMaxRotation = 3.14;
         public static final double ORBIT_SPEED = 3.0;
 }
