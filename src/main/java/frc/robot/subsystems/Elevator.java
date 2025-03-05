@@ -58,9 +58,12 @@ public class Elevator extends SubsystemBase {
   
     public Elevator(int leftMotorID, int rightMotorId, int highSwitchId, int lowSwitchId) {
       leftElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushed);
-      rightElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushed);
+      //todo is something else using canid 16?
+      rightElevatorMotor = new SparkMax(25, MotorType.kBrushed);
       elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
       elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
+      leftEncoder = leftElevatorMotor.getEncoder();
+      rightEncoder = rightElevatorMotor.getEncoder();
       updateCfg();
 
       // true because elevator would start at lowest point
@@ -70,8 +73,6 @@ public class Elevator extends SubsystemBase {
       // getEncoder() is a function already in the SparkBase class that creates a
       // relative encoder if there isnt one
       // I would assume we only need one of the motors to use an encoder
-      leftEncoder = leftElevatorMotor.getEncoder();
-      rightEncoder = rightElevatorMotor.getEncoder();
     }
   
     private void updateCfg(){
@@ -131,9 +132,10 @@ public class Elevator extends SubsystemBase {
   
     public Command setPostionCommand(double setpoint){
       return new FunctionalCommand(()->setPosition(setpoint),
-                                 null,
-                                 null,
-                                 ()->isNear(setpoint)
+                                 ()->{},
+                                 (x)->{},
+                                 ()->isNear(setpoint),
+                                 this
                                 );
     }
 

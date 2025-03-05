@@ -50,13 +50,14 @@ public class Climbers extends SubsystemBase {
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
     m_rightClimber = new SparkMax(rightMotorId, MotorType.kBrushless);
-    m_leftClimber.configure(leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    m_rightClimber.configure(rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    //todo fix this configuration
+    //m_leftClimber.configure(leftConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    //m_rightClimber.configure(rightConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m_leftController = m_leftClimber.getClosedLoopController();
     m_rightController = m_rightClimber.getClosedLoopController();
     m_leftEncoder = m_leftClimber.getEncoder();
     m_rightEncoder = m_rightClimber.getEncoder();
-    limitSwitchClimber = new DigitalInput(0);
+    limitSwitchClimber = new DigitalInput(limitSwitchId);
   }
 
   public static SparkMaxConfig leftConfig = new SparkMaxConfig();

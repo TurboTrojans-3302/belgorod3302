@@ -5,11 +5,76 @@
     {
       "name": "Teleoperated",
       "grid_layout": {
-        "layouts": [],
+        "layouts": [
+          {
+            "title": "List Layout",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "AtLevel4",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Elevator/AtLevel4",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "AtLevel3",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Elevator/AtLevel3",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "AtLevel2",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Elevator/AtLevel2",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          }
+        ],
         "containers": [
           {
             "title": "limelight",
-            "x": 640.0,
+            "x": 512.0,
             "y": 0.0,
             "width": 384.0,
             "height": 384.0,
@@ -23,8 +88,8 @@
             "title": "Field",
             "x": 0.0,
             "y": 0.0,
-            "width": 640.0,
-            "height": 384.0,
+            "width": 512.0,
+            "height": 256.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -40,14 +105,14 @@
             }
           },
           {
-            "title": "IsRedAlliance",
-            "x": 1024.0,
-            "y": 0.0,
+            "title": "ClimberLocked",
+            "x": 256.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/FMSInfo/IsRedAlliance",
+              "topic": "/SmartDashboard/Climbers/limitSwitch",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -57,31 +122,93 @@
             }
           },
           {
-            "title": "ApriltagFound",
-            "x": 1152.0,
+            "title": "Lower Object Detected",
+            "x": 1024.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Navigation/ApriltagFound",
+              "topic": "/SmartDashboard/Intake/Lower Object Detected",
               "period": 0.06,
-              "data_type": "int",
-              "show_submit_button": false
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Upper Object Detected",
+            "x": 896.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/Upper Object Detected",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "ArmAngle",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/ArmAngle",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -120.0,
+              "end_angle": 20.0,
+              "min_value": -20.0,
+              "max_value": 120.0,
+              "number_of_labels": 4,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": false
+            }
+          },
+          {
+            "title": "ValidTarget",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Navigation/ValidTarget",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
             "title": "DxSensor",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 128.0,
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Number Bar",
             "properties": {
               "topic": "/SmartDashboard/Navigation/DxSensor",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "min_value": -1.0,
+              "max_value": 1.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
             }
           }
         ]
@@ -135,8 +262,7 @@
             "properties": {
               "topic": "/SmartDashboard/Start Position",
               "period": 0.06,
-              "sort_options": false,
-              "show_submit_button":true
+              "sort_options": false
             }
           }
         ]
@@ -163,9 +289,9 @@
           },
           {
             "title": "MaxRotationLimit",
-            "x": 1024.0,
+            "x": 1152.0,
             "y": 128.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -177,9 +303,9 @@
           },
           {
             "title": "MaxSpeedLimit",
-            "x": 1024.0,
+            "x": 1152.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -193,21 +319,14 @@
             "title": "gyroAngleDegrees",
             "x": 384.0,
             "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
             "properties": {
               "topic": "/SmartDashboard/DriveSubsystem/gyroAngleDegrees",
               "period": 0.06,
               "data_type": "double",
-              "start_angle": 180.0,
-              "end_angle": 180.0,
-              "min_value": -180.0,
-              "max_value": 180.0,
-              "number_of_labels": 8,
-              "wrap_value": true,
-              "show_pointer": true,
-              "show_ticks": true
+              "show_submit_button": false
             }
           }
         ]

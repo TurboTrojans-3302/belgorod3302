@@ -122,36 +122,48 @@ public class Gripper extends SubsystemBase {
     gripperMotor.set(speed);
   }
 
-  public Command extendCommand(){
-    return new FunctionalCommand( ()-> extendGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperFullyExtended()
-                                );
+  public Command extendCommand() {
+    return new FunctionalCommand(() -> extendGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isGripperFullyExtended(),
+        this
+    );
   }
 
-  public Command retractCommand(){
-    return new FunctionalCommand( ()-> retractGripper(),
-                                  null,
-                                  null,
-                                  ()-> isExtensionRetracted()
-                                );
+  public Command retractCommand() {
+    return new FunctionalCommand(() -> retractGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isExtensionRetracted(),
+        this
+    );
   }
 
-  public Command openCommand(){
-    return new FunctionalCommand( ()-> openGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperOpen()
-                                );
+  public Command openCommand() {
+    return new FunctionalCommand(() -> openGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isGripperOpen(),
+        this
+    );
   }
 
-  public Command closeCommand(){
-    return new FunctionalCommand( ()-> closeGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperClosed()
-                                );
+  public Command closeCommand() {
+    return new FunctionalCommand(() -> closeGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isGripperClosed(),
+        this
+    );
   }
 
   @Override
@@ -166,5 +178,6 @@ public class Gripper extends SubsystemBase {
     builder.addDoubleProperty("gripperD", () -> kD, (x) -> {
       kD = x;
     });
+    builder.addBooleanProperty("Obj In Gripper", this::objectInGripper, null);
   }
 }
