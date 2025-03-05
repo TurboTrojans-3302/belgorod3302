@@ -10,15 +10,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Add your docs here. */
 public abstract class DriveSubsystemBase extends SubsystemBase {
 
-    public static final Pose2d defaultStartPosition = new Pose2d(Translation2d.kZero, Rotation2d.kZero);
-
-    private double m_maxSpeed = 0.0;
+    
 
     //todo upload the field map to the camera?
 
@@ -69,16 +66,6 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract SwerveDriveKinematics getKinematics();
 
-    public double getMaxSpeed() {
-        return m_maxSpeed;
-    }
-
-    public void setMaxSpeed() {
-        double speed = getSpeed();
-        if (speed >= m_maxSpeed) {
-            m_maxSpeed = (speed + m_maxSpeed) / 2.0;
-        }
-    }
 
     public abstract double turnToHeadingDegrees(double heading);
 
@@ -86,64 +73,8 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public abstract void testSetAll(double voltage, double angleRadians);
 
-    public void drive(ChassisSpeeds speeds){
-        drive(speeds, Translation2d.kZero);
-    }
-
-
-    public void stop(){
-        drive(new ChassisSpeeds(0, 0, 0));
-    };
-
-    public void driveHeadingField(Translation2d translationMetersPerSecond, double heading) {
-        double yawCommand = turnToHeadingDegrees(heading);
-        driveFieldOriented(translationMetersPerSecond, yawCommand);
-    }
-
-    public void driveHeadingRobot(Translation2d translationMetersPerSecond, double heading) {
-        double yawCommand = turnToHeadingDegrees(heading);
-        driveRobotOriented(translationMetersPerSecond, yawCommand);
-    }
-
-    public void driveFieldOriented(ChassisSpeeds speeds){
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds.vxMetersPerSecond,
-                                                                         speeds.vyMetersPerSecond,
-                                                                         speeds.omegaRadiansPerSecond,
-                                                                         Rotation2d.fromDegrees(getGyroAngleDegrees()));
-
-        drive(robotSpeeds);
-    }
-
-    public void driveFieldOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
-        driveFieldOriented(speeds);
-    }
-
-    public void driveRobotOriented(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
-        drive(speeds);
-    }
-
-    public double getSpeed() {
-        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
-        return Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-      }
     
-    /*
-     * Returns the velocity vector of the robot, in the Robot Frame, in meters per second.
-     */
-    public Translation2d getVelocityVector() {
-        ChassisSpeeds chassisSpeeds = getChassisSpeeds();
-        return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-    }
 
-    public void orbitRobotFrame(double orbitSpeed, Translation2d center) {
-        drive(new ChassisSpeeds(0, 0, orbitSpeed), center);
-    }
+    
 
-    @Override
-    public void initSendable(SendableBuilder builder){
-        super.initSendable(builder);
-        builder.addDoubleProperty("maxSpeed", this::getMaxSpeed, null);
-    }
 }
