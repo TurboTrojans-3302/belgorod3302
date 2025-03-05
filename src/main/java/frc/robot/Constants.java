@@ -24,34 +24,9 @@ public final class Constants {
 
   public final class CanIds {
     public static final int DX_SENSOR_CAN_ID = 0;
-
-    // Eddie DriveTrain
-    public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 1;
-    public static final int DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR = 2;
-    public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 3;
-    public static final int DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR = 4;
-    public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 5;
-    public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR = 6;
-    public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 7;
-    public static final int DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR = 8;
-    public static final int DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER = 9;
-    public static final int DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER = 10;
-    public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER = 11;
-    public static final int DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER = 12;
-
-    // Ludwig DriveTrain
-    public static final int kFrontRightTurningCanId = 1;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kFrontLeftTurningCanId = 3;
-    public static final int kFrontLeftDrivingCanId = 4;
-    public static final int kRearLeftTurningCanId = 5;
-    public static final int kRearLeftDrivingCanId = 6;
-    public static final int kRearRightTurningCanId = 7;
-    public static final int kRearRightDrivingCanId = 8;
-    // 9
-    // 10
-    // 11
-    // 12
+    /*
+     *  IDs 1 - 12 reserved for swervedrive
+     */
     public static final int kLowerIntakeMotorCanId = 13;    
     public static final int kUpperIntakeMotorCanId = 14;    
     public static final int kLeftMotorElevatorCanId = 15;
@@ -82,6 +57,7 @@ public final class Constants {
     public static final double kMaxVelocityMetersPerSec = 4.0;
     public static final String ConfigFolder = "2025/swerve";
     //public static final String ConfigFolder = "2023/swerve";
+    public static final double ORBIT_SPEED = 3.0;
   }
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;

@@ -14,10 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystemBase;
 import swervelib.SwerveDrive;
@@ -46,30 +43,6 @@ public class YDriveSubsystem extends DriveSubsystemBase {
     }
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-
-    // todo add the swerve drive to the dashboard
-    SwerveModule[] module = m_SwerveDrive.getModules();
-    SmartDashboard.putData("Swerve Drive", new Sendable() {
-      @Override
-      public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("SwerveDrive");
-
-        builder.addDoubleProperty("Front Left Angle", () -> Math.toRadians(module[0].getAbsolutePosition()), null);
-        builder.addDoubleProperty("Front Left Velocity", () -> module[0].getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty("Front Right Angle", () -> Math.toRadians(module[1].getAbsolutePosition()), null);
-        builder.addDoubleProperty("Front Right Velocity", () -> module[1].getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty("Back Left Angle", () -> Math.toRadians(module[2].getAbsolutePosition()), null);
-        builder.addDoubleProperty("Back Left Velocity", () -> module[2].getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty("Back Right Angle", () -> Math.toRadians(module[3].getAbsolutePosition()), null);
-        builder.addDoubleProperty("Back Right Velocity", () -> module[3].getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty("Robot Angle", () -> getGyroAngleRadians(), null);
-      }
-    });
-
   }
 
   @Override
