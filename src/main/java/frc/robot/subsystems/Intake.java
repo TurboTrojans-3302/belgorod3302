@@ -42,7 +42,7 @@ public class Intake extends SubsystemBase {
     m_upperIntakeMotor = new SparkMax(upperSparkId, MotorType.kBrushless);
 
     m_lowerObjectDetectSwitch = new DigitalInput(lowerLimitSwitchId);
-    m_upperObjectDetectSwitch = new DigitalInput(lowerLimitSwitchId);
+    m_upperObjectDetectSwitch = new DigitalInput(upperLimitSwitchId);
     stop();
   }
 
