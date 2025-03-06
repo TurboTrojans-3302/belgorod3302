@@ -55,7 +55,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   private final ADIS16448_IMUSim m_gyroSim = new ADIS16448_IMUSim(m_gyro);
   private double m_gyroOffsetDeg = 0.0;
 
-  private PIDController headingPidController;
+  public PIDController headingPidController;
   private ChassisSpeeds CommandedSpeeds = new ChassisSpeeds();
 
   /** Creates a new DriveSubsystem. */
