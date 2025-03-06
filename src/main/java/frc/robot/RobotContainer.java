@@ -218,10 +218,10 @@ public class RobotContainer {
     }
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
-          .getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickUp)
+          .getPOV() == Constants.OIConstants.ButtonBox.StickUp)
           .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
       new Trigger(() -> m_buttonBoard
-          .getRawAxis(Constants.OIConstants.ButtonBox.kStickAxis) == Constants.OIConstants.ButtonBox.StickDown)
+          .getPOV() == Constants.OIConstants.ButtonBox.StickDown)
           .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
 
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));

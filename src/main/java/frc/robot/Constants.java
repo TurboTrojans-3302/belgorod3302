@@ -110,15 +110,14 @@ public final class Constants {
       public static final int LeftKnobPush = 24;
       public static final int RightKnobPush = 25;
 
-      public static final double StickUp = -1.0;
-      public static final double StickUpRight = -0.71429;
-      public static final double StickRight = -0.42857;
-      public static final double StickDownRight = -0.14286;
-      public static final double StickDown = 0.14286;
-      public static final double StickDownLeft = 0.42857;
-      public static final double StickLeft = 0.71429;
-      public static final double StickUpLeft = 1.0;
-      public static final int kStickAxis = 5;
+      public static final int StickUp = 0;
+      public static final int StickUpRight = 45;
+      public static final int StickRight = 90;
+      public static final int StickDownRight = 135;
+      public static final int StickDown = 180;
+      public static final int StickDownLeft = 225;
+      public static final int StickLeft = 270;
+      public static final int StickUpLeft = 315;
     }
   }
 
