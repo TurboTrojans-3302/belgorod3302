@@ -181,6 +181,8 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
+    m_robotContainer.configureTestControls();
+
     Command testDriveCommand = new TeleopDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController);
     m_robotContainer.m_robotDrive.setDefaultCommand(new TestDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController));
     SmartDashboard.putData("TestDrive", testDriveCommand);

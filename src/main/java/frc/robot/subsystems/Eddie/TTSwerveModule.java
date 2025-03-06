@@ -157,7 +157,7 @@ public class TTSwerveModule implements SwerveModule {
         
         public static class SteerControllerImplementation implements SteerController {
     
-            @SuppressWarnings({"FieldCanBeLocal", "unused"})
+            //@SuppressWarnings({"FieldCanBeLocal", "unused"})
             private final SparkMax motor;
             private final RelativeEncoder motorEncoder;
             private final EncoderImplementation absoluteEncoder;

@@ -14,14 +14,23 @@
       "/SmartDashboard/DriveSubsystem": "Subsystem",
       "/SmartDashboard/Elevator": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/GoToCommand 0, 0": "Command",
+      "/SmartDashboard/GoToCommand 0, 6": "Command",
+      "/SmartDashboard/GoToCommand 6, 0": "Command",
+      "/SmartDashboard/GoToCommand 6, 6": "Command",
       "/SmartDashboard/Gripper": "Subsystem",
       "/SmartDashboard/IMU": "Gyro",
       "/SmartDashboard/Intake": "Subsystem",
       "/SmartDashboard/IntakeArm": "Subsystem",
       "/SmartDashboard/IntakeArmPID": "ProfiledPIDController",
+      "/SmartDashboard/Nav to tag  8": "Command",
+      "/SmartDashboard/Nav to tag 21": "Command",
       "/SmartDashboard/Navigation": "Subsystem",
       "/SmartDashboard/Start Position": "String Chooser",
+      "/SmartDashboard/StopCommand": "Command",
       "/SmartDashboard/TeleopCommand": "Command",
+      "/SmartDashboard/TestDrive": "Command",
+      "/SmartDashboard/TestRoute": "Command",
       "/SmartDashboard/Yaw PID": "PIDController",
       "/SmartDashboard/headingPIDcontroller": "PIDController"
     }
@@ -52,7 +61,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 317,
+          "height": 171,
           "series": [
             {
               "color": [
@@ -81,7 +90,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 317,
+          "height": 171,
           "series": [
             {
               "color": [
