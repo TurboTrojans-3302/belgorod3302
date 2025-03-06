@@ -43,11 +43,11 @@ import frc.robot.subsystems.Navigation;
  */
 public class RobotContainer {
 
-  private static boolean ELEVATOR_ENABLE = false;
-  private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
-  private static boolean GRIPPER_ENABLE = false;
-  private static boolean CLIMBERS_ENABLE = false;
+  private static boolean ELEVATOR_ENABLE = true;
+  private static boolean INTAKE_ENABLE = true;
+  private static boolean INTAKE_ARM_ENABLE = true;
+  private static boolean GRIPPER_ENABLE = true;
+  private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
 
@@ -81,6 +81,7 @@ public class RobotContainer {
     // The robot's subsystems
     m_robotDrive = new DriveSubsystem();
     SmartDashboard.putData("DriveSubsystem", m_robotDrive);
+    SmartDashboard.putData("Yaw PID", m_robotDrive.headingPidController);
     m_nav = new Navigation(m_robotDrive);
     SmartDashboard.putData("Navigation", m_nav);
     if (ELEVATOR_ENABLE) {

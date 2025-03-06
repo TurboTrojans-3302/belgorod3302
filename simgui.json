@@ -9,11 +9,13 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Climbers": "Subsystem",
       "/SmartDashboard/DriveSubsystem": "Subsystem",
-      "/SmartDashboard/Encoders": "Alerts",
+      "/SmartDashboard/Elevator": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/IMU": "Alerts",
+      "/SmartDashboard/Gripper": "Subsystem",
+      "/SmartDashboard/IMU": "Gyro",
+      "/SmartDashboard/Intake": "Subsystem",
       "/SmartDashboard/IntakeArm": "Subsystem",
       "/SmartDashboard/IntakeArmPID": "ProfiledPIDController",
       "/SmartDashboard/JSON": "Alerts",
@@ -21,6 +23,7 @@
       "/SmartDashboard/Navigation": "Subsystem",
       "/SmartDashboard/Swerve Drive": "Alerts",
       "/SmartDashboard/TeleopCommand": "Command",
+      "/SmartDashboard/Yaw PID": "PIDController",
       "/SmartDashboard/headingPIDcontroller": "PIDController"
     },
     "windows": {
