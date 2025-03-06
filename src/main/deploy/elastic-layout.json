@@ -1,13 +1,13 @@
 {
   "version": 1.0,
-  "grid_size": 128,
+  "grid_size": 64,
   "tabs": [
     {
       "name": "Teleoperated",
       "grid_layout": {
         "layouts": [
           {
-            "title": "List Layout",
+            "title": "Elevator",
             "x": 1152.0,
             "y": 0.0,
             "width": 128.0,
@@ -60,6 +60,40 @@
                 "type": "Boolean Box",
                 "properties": {
                   "topic": "/SmartDashboard/Elevator/AtLevel2",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "AtLevel1",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Elevator/AtLevel1",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "AtPickup",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Elevator/AtPickup",
                   "period": 0.06,
                   "data_type": "boolean",
                   "true_color": 4283215696,
