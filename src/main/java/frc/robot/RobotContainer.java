@@ -60,8 +60,8 @@ public class RobotContainer {
   public Gripper m_gripper;
   public Climbers m_climbers;
 
-  private SendableChooser<Command> m_autonomousChooser;
-  private SendableChooser<Pose2d> m_startPosChooser;
+  private SendableChooser<Command> m_autonomousChooser = new SendableChooser<Command>();
+  private SendableChooser<Pose2d> m_startPosChooser = new SendableChooser<Pose2d>();
 
   private final REVBlinkinLED m_BlinkinLED;
 

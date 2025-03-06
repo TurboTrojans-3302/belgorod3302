@@ -291,7 +291,7 @@
             "title": "MaxRotationLimit",
             "x": 384.0,
             "y": 128.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -305,7 +305,7 @@
             "title": "gyroAngleDegrees",
             "x": 384.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -319,7 +319,7 @@
             "title": "MaxSpeedLimit",
             "x": 384.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -444,7 +444,7 @@
             "x": 384.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 512.0,
+            "height": 384.0,
             "type": "ProfiledPIDController",
             "properties": {
               "topic": "/SmartDashboard/IntakeArmPID",
@@ -582,8 +582,8 @@
         "containers": [
           {
             "title": "AtLevel1",
-            "x": 256.0,
-            "y": 128.0,
+            "x": 128.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -599,8 +599,8 @@
           },
           {
             "title": "AtLevel2",
-            "x": 0.0,
-            "y": 256.0,
+            "x": 256.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -616,8 +616,8 @@
           },
           {
             "title": "AtLevel3",
-            "x": 0.0,
-            "y": 128.0,
+            "x": 384.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -633,7 +633,7 @@
           },
           {
             "title": "AtLevel4",
-            "x": 0.0,
+            "x": 512.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -650,8 +650,8 @@
           },
           {
             "title": "AtPickup",
-            "x": 256.0,
-            "y": 256.0,
+            "x": 0.0,
+            "y": 0.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -667,7 +667,7 @@
           },
           {
             "title": "Level1Trough",
-            "x": 384.0,
+            "x": 128.0,
             "y": 128.0,
             "width": 128.0,
             "height": 128.0,
@@ -681,8 +681,8 @@
           },
           {
             "title": "Level2",
-            "x": 128.0,
-            "y": 256.0,
+            "x": 256.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -695,7 +695,7 @@
           },
           {
             "title": "Level3",
-            "x": 128.0,
+            "x": 384.0,
             "y": 128.0,
             "width": 128.0,
             "height": 128.0,
@@ -709,8 +709,8 @@
           },
           {
             "title": "Level4",
-            "x": 128.0,
-            "y": 0.0,
+            "x": 512.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -723,8 +723,8 @@
           },
           {
             "title": "PickupLevel",
-            "x": 384.0,
-            "y": 256.0,
+            "x": 0.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -737,10 +737,10 @@
           },
           {
             "title": "Position",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 384.0,
+            "x": 0.0,
+            "y": 256.0,
+            "width": 640.0,
+            "height": 128.0,
             "type": "Number Bar",
             "properties": {
               "topic": "/SmartDashboard/Elevator/Position",
@@ -750,7 +750,7 @@
               "max_value": 100.0,
               "divisions": 5,
               "inverted": false,
-              "orientation": "vertical"
+              "orientation": "horizontal"
             }
           },
           {
@@ -961,6 +961,82 @@
             "type": "Text Display",
             "properties": {
               "topic": "/SmartDashboard/Gripper/kOpen",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Extended",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Gripper/Extended",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Extension Pos.",
+            "x": 640.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Gripper/Extension Pos.",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Retracted",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Gripper/Retracted",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "kRetractedPos",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Gripper/kRetractedPos",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "kExtendedPos",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Gripper/kExtendedPos",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false

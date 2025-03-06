@@ -237,8 +237,8 @@ public final class Constants {
 
   public static final class GripperConstants {
     public static final double gripperExtendedPosition = 100.0;
+    public static final double gripperRetractedPosition = 0.0;
     // only one speed necessary
-    public static final double gripperMotorSpeed = 0.6;
     public static final double gripperExtensionSpeed = 0.5;
     public static final double kP = 0;
     public static final double kI = 0;
