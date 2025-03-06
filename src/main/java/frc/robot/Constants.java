@@ -54,14 +54,13 @@ public final class Constants {
     // 12
     public static final int kLowerIntakeMotorCanId = 13;    
     public static final int kUpperIntakeMotorCanId = 14;    
-    public static final int kLeftMotorElevatorCanId = 15;
-    public static final int kRightMotorElevatorCanId = 16;
-    public static final int kGripperMotorCanId = 17;
-    public static final int kGripperExtensionMotorCanId = 18;
-    public static final int kClimberLeftMotorCanId = 19;
-    public static final int kClimberRightMotorCanId = 20;
-    public static final int intakeArmLeftMotorID = 21;
-    public static final int intakeArmRightMotorID = 22;
+    public static final int kElevatorCanId = 15;
+    public static final int kGripperMotorCanId = 16;
+    public static final int kGripperExtensionMotorCanId = 17;
+    public static final int kClimberLeftMotorCanId = 18;
+    public static final int kClimberRightMotorCanId = 19;
+    public static final int intakeArmLeftMotorID = 20;
+    public static final int intakeArmRightMotorID = 21;
 
   }
 

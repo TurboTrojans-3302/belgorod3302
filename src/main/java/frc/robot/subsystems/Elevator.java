@@ -33,16 +33,14 @@ public class Elevator extends SubsystemBase {
   private double kTolerance = ElevatorConstants.kTolerance;
   private double kElevatorMaxSpeed = ElevatorConstants.kElevatorMaxSpeed;
 
-  public SparkMax leftElevatorMotor;
-  public SparkMax rightElevatorMotor;
-  public ProfiledPIDController leftPID, rightPID;
+  public SparkMax elevatorMotor;
+  public ProfiledPIDController PID;
   double kP = Constants.ElevatorConstants.kP;
   double kI = Constants.ElevatorConstants.kI;
   double kD = Constants.ElevatorConstants.kD;
   public DigitalInput elevatorHighLimitSwitch;
   public DigitalInput elevatorLowLimitSwitch;
-  public RelativeEncoder leftEncoder;
-  public RelativeEncoder rightEncoder;
+  public RelativeEncoder encoder;
 
   public double kLimitLow = ElevatorConstants.kLimitLow;
   public double kLimitHigh = ElevatorConstants.kLimitHigh;
@@ -56,14 +54,11 @@ public class Elevator extends SubsystemBase {
   public double kLevel4 = ElevatorConstants.kLevel4;
   private double kElevatorMaxAccel = ElevatorConstants.kElevatorMaxAccel;
   
-    public Elevator(int leftMotorID, int rightMotorId, int highSwitchId, int lowSwitchId) {
-      leftElevatorMotor = new SparkMax(leftMotorID, MotorType.kBrushed);
-      //todo is something else using canid 16?
-      rightElevatorMotor = new SparkMax(25, MotorType.kBrushed);
+    public Elevator(int MotorID, int highSwitchId, int lowSwitchId) {
+      elevatorMotor = new SparkMax(MotorID, MotorType.kBrushed);
       elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
       elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
-      leftEncoder = leftElevatorMotor.getEncoder();
-      rightEncoder = rightElevatorMotor.getEncoder();
+      encoder = elevatorMotor.getEncoder();
       updateCfg();
 
       // true because elevator would start at lowest point
@@ -76,21 +71,18 @@ public class Elevator extends SubsystemBase {
     }
   
     private void updateCfg(){
-      leftPID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
-      leftPID.setTolerance(kTolerance);
-      leftPID.reset(getElevatorPosition());
-      rightPID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
-      rightPID.setTolerance(kTolerance);
-      rightPID.reset(getElevatorPosition());
+      PID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
+      PID.setTolerance(kTolerance);
+      PID.reset(getElevatorPosition());
     }
 
     public double getElevatorSpeed() {
-      return leftEncoder.getVelocity();
+      return encoder.getVelocity();
     }
   
     public double getElevatorPosition() {
       // returns relative encoder position from one of the motors in full rotations
-      return leftEncoder.getPosition();
+      return encoder.getPosition();
     }
   
     public void changeSetPoint(double delta){
@@ -99,7 +91,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public void resetElevatorPositionEncoder(double position) {
-      leftEncoder.setPosition(position);
+      encoder.setPosition(position);
       updateCfg();
     }
   
@@ -122,8 +114,7 @@ public class Elevator extends SubsystemBase {
     
     public void setPosition(double setpoint) {
       setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
-      leftPID.setGoal(setpoint);
-      rightPID.setGoal(setpoint);
+      PID.setGoal(setpoint);
     }
   
     public boolean isNear(double position) {
@@ -146,18 +137,15 @@ public class Elevator extends SubsystemBase {
   public Command level4Command() { return setPostionCommand(kLevel4); }
 
   public boolean atSetpoint(){
-    return leftPID.atGoal();
+    return PID.atGoal();
   }
   
   
     @Override
     public void periodic() {
       // todo I bet we need some feedforward here
-      double leftSpeed = leftPID.calculate(leftEncoder.getPosition());
-      leftElevatorMotor.set(leftSpeed);
-      double rightSpeed = rightPID.calculate(rightEncoder.getPosition());
-      rightElevatorMotor.set(rightSpeed);
-  
+      double speed = PID.calculate(encoder.getPosition());
+      elevatorMotor.set(speed);
       // important to check the limits after setting the speed
       checkLimits();
     }
