@@ -81,7 +81,7 @@ public class Intake extends SubsystemBase {
    *  Object detected in the upper conveyor
    */
   public boolean upperObjectDetected(){
-    return !m_lowerObjectDetectSwitch.get();
+    return !m_upperObjectDetectSwitch.get();
   }
 
 

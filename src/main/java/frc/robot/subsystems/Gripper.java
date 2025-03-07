@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.GripperConstants;
 
 public class Gripper extends SubsystemBase {
   /** Creates a new Gripper. */
@@ -25,17 +25,18 @@ public class Gripper extends SubsystemBase {
   DigitalInput gripperObjectDetected;
   RelativeEncoder extensionMotorEncoder;
   RelativeEncoder gripperEncoder;
-  double gripperSpeed = Constants.GripperConstants.gripperMotorSpeed;
-  double extensionSpeed = Constants.GripperConstants.gripperExtensionSpeed;
+  double extensionSpeed = GripperConstants.gripperExtensionSpeed;
   final double extensionToleranceMedium = 4.0;
   final double extensionToleranceSmall = 2.0;
   final double stopTolerance = 0.5;
   PIDController gripperPID;
-  double kP = Constants.GripperConstants.kP;
-  double kI = Constants.GripperConstants.kI;
-  double kD = Constants.GripperConstants.kD;
-  double kClosed = Constants.GripperConstants.closedPosition;
-  double kOpen = Constants.GripperConstants.openPosition;
+  double kP = GripperConstants.kP;
+  double kI = GripperConstants.kI;
+  double kD = GripperConstants.kD;
+  double kClosed = GripperConstants.closedPosition;
+  double kOpen = GripperConstants.openPosition;
+  double kExtendedPos = GripperConstants.gripperExtendedPosition;
+  double kRetractedPos = GripperConstants.gripperRetractedPosition;
 
   public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID,
       int objectDetectionID) {
@@ -66,11 +67,11 @@ public class Gripper extends SubsystemBase {
   }
 
   public void closeGripper() {
-    gripperPID.setSetpoint(Constants.GripperConstants.closedPosition);
+    gripperPID.setSetpoint(kClosed);
   }
 
   public void openGripper() {
-    gripperPID.setSetpoint(Constants.GripperConstants.openPosition);
+    gripperPID.setSetpoint(kOpen);
   }
 
   public void toggleGripper() {
@@ -82,11 +83,11 @@ public class Gripper extends SubsystemBase {
   }
 
   public void extendGripper() {
-    if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - extensionToleranceMedium) {
+    if (getExtensionPosition() > kExtendedPos - extensionToleranceMedium) {
       gripperExtension.set(extensionSpeed * 0.75);
-    } else if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - extensionToleranceSmall) {
+    } else if (getExtensionPosition() > kExtendedPos - extensionToleranceSmall) {
       gripperExtension.set(extensionSpeed * 0.25);
-    } else if (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - stopTolerance) {
+    } else if (getExtensionPosition() > kExtendedPos - stopTolerance) {
       gripperExtension.set(0);
 
     }
@@ -101,7 +102,7 @@ public class Gripper extends SubsystemBase {
   }
 
   public boolean isGripperFullyExtended() {
-    return (getExtensionPosition() > Constants.GripperConstants.gripperExtendedPosition - stopTolerance);
+    return (getExtensionPosition() > kExtendedPos - stopTolerance);
   }
 
   public void setGripperPosition(double setpoint) {
@@ -189,5 +190,16 @@ public class Gripper extends SubsystemBase {
     builder.addBooleanProperty("Obj In Gripper", this::objectInGripper, null);
     builder.addBooleanProperty("Open", this::isGripperOpen, null);
     builder.addBooleanProperty("Closed", this::isGripperClosed, null);
+
+    
+    builder.addDoubleProperty("Extension Pos.", this::getExtensionPosition, null);
+    builder.addBooleanProperty("Extended", this::isGripperFullyExtended, null);
+    builder.addBooleanProperty("Retracted", this::isExtensionRetracted, null);
+    builder.addDoubleProperty("kExtendedPos", () -> kExtendedPos, (x) -> {
+      kExtendedPos = x;
+    });
+    builder.addDoubleProperty("kRetractedPos", () -> kRetractedPos, (x) -> {
+      kRetractedPos = x;
+    });
   }
 }

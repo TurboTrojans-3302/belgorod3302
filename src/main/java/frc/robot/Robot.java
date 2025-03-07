@@ -120,6 +120,10 @@ public class Robot extends TimedRobot {
           m_robotContainer.initBlue();
         }
       }
+    }else{
+      if(m_robotContainer.m_reefController.isConnected()){
+          m_robotContainer.targetTagId = m_robotContainer.m_reefController.getAprilTagId();
+      }
     }
   }
 
@@ -179,6 +183,8 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    m_robotContainer.configureTestControls();
 
     Command testDriveCommand = new TestDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController);
     m_robotContainer.m_robotDrive.setDefaultCommand(testDriveCommand);

@@ -42,7 +42,11 @@ public class TestDrive extends Command {
     int pov = m_driverController.getPOV();
 
     if(pov==-1){
-      direction = command.getAngle().getDegrees();
+      if(command.getNorm() > 0.0){
+          direction = command.getAngle().getDegrees();
+      } else {
+          direction = m_robotDrive.getSwerveModulePositions()[0].angle.getDegrees();
+      }
     } else {
       direction = 360 - pov;
     }

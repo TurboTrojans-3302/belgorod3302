@@ -29,14 +29,13 @@ public final class Constants {
      */
     public static final int kLowerIntakeMotorCanId = 13;    
     public static final int kUpperIntakeMotorCanId = 14;    
-    public static final int kLeftMotorElevatorCanId = 15;
-    public static final int kRightMotorElevatorCanId = 16;
-    public static final int kGripperMotorCanId = 17;
-    public static final int kGripperExtensionMotorCanId = 18;
-    public static final int kClimberLeftMotorCanId = 19;
-    public static final int kClimberRightMotorCanId = 20;
-    public static final int intakeArmLeftMotorID = 21;
-    public static final int intakeArmRightMotorID = 22;
+    public static final int kElevatorCanId = 15;
+    public static final int kGripperMotorCanId = 16;
+    public static final int kGripperExtensionMotorCanId = 17;
+    public static final int kClimberLeftMotorCanId = 18;
+    public static final int kClimberRightMotorCanId = 19;
+    public static final int intakeArmLeftMotorID = 20;
+    public static final int intakeArmRightMotorID = 21;
 
   }
 
@@ -63,6 +62,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.05;
     public static final int kCopilotControllerPort = 1;
+    public static final int kReefControllerPort = 3;
     public static final int kButtonBoardPort = 2;
     public static final class ButtonBox {
       public static final int Left1 = 0;
@@ -92,15 +92,14 @@ public final class Constants {
       public static final int LeftKnobPush = 24;
       public static final int RightKnobPush = 25;
 
-      public static final double StickUp = -1.0;
-      public static final double StickUpRight = -0.71429;
-      public static final double StickRight = -0.42857;
-      public static final double StickDownRight = -0.14286;
-      public static final double StickDown = 0.14286;
-      public static final double StickDownLeft = 0.42857;
-      public static final double StickLeft = 0.71429;
-      public static final double StickUpLeft = 1.0;
-      public static final int kStickAxis = 5;
+      public static final int StickUp = 0;
+      public static final int StickUpRight = 45;
+      public static final int StickRight = 90;
+      public static final int StickDownRight = 135;
+      public static final int StickDown = 180;
+      public static final int StickDownLeft = 225;
+      public static final int StickLeft = 270;
+      public static final int StickUpLeft = 315;
     }
   }
 
@@ -218,8 +217,8 @@ public final class Constants {
 
   public static final class GripperConstants {
     public static final double gripperExtendedPosition = 100.0;
+    public static final double gripperRetractedPosition = 0.0;
     // only one speed necessary
-    public static final double gripperMotorSpeed = 0.6;
     public static final double gripperExtensionSpeed = 0.5;
     public static final double kP = 0;
     public static final double kI = 0;
