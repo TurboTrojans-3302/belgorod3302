@@ -22,7 +22,6 @@ import frc.robot.commands.GoToCommand;
 import frc.robot.commands.NavRoute;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.StopCommand;
-import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.TestDrive;
 
 
@@ -181,8 +180,8 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    Command testDriveCommand = new TeleopDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController);
-    m_robotContainer.m_robotDrive.setDefaultCommand(new TestDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController));
+    Command testDriveCommand = new TestDrive(m_robotContainer.m_robotDrive, m_robotContainer.m_driverController);
+    m_robotContainer.m_robotDrive.setDefaultCommand(testDriveCommand);
     SmartDashboard.putData("TestDrive", testDriveCommand);
 
     SmartDashboard.putData("GoToCommand 0, 0", GoToCommand.absolute(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 0, 0, 0));

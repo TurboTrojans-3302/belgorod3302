@@ -34,6 +34,8 @@ public class Gripper extends SubsystemBase {
   double kP = Constants.GripperConstants.kP;
   double kI = Constants.GripperConstants.kI;
   double kD = Constants.GripperConstants.kD;
+  double kClosed = Constants.GripperConstants.closedPosition;
+  double kOpen = Constants.GripperConstants.openPosition;
 
   public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID,
       int objectDetectionID) {
@@ -52,11 +54,11 @@ public class Gripper extends SubsystemBase {
   }
 
   public boolean isGripperClosed() {
-    return getGripperPosition() <= Constants.GripperConstants.closedPosition;
+    return getGripperPosition() <= kClosed;
   }
 
   public boolean isGripperOpen() {
-    return getGripperPosition() >= Constants.GripperConstants.openPosition;
+    return getGripperPosition() >= kOpen;
   }
 
   public boolean isExtensionRetracted() {
@@ -122,36 +124,48 @@ public class Gripper extends SubsystemBase {
     gripperMotor.set(speed);
   }
 
-  public Command extendCommand(){
-    return new FunctionalCommand( ()-> extendGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperFullyExtended()
-                                );
+  public Command extendCommand() {
+    return new FunctionalCommand(() -> extendGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isGripperFullyExtended(),
+        this
+    );
   }
 
-  public Command retractCommand(){
-    return new FunctionalCommand( ()-> retractGripper(),
-                                  null,
-                                  null,
-                                  ()-> isExtensionRetracted()
-                                );
+  public Command retractCommand() {
+    return new FunctionalCommand(() -> retractGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isExtensionRetracted(),
+        this
+    );
   }
 
-  public Command openCommand(){
-    return new FunctionalCommand( ()-> openGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperOpen()
-                                );
+  public Command openCommand() {
+    return new FunctionalCommand(() -> openGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isGripperOpen(),
+        this
+    );
   }
 
-  public Command closeCommand(){
-    return new FunctionalCommand( ()-> closeGripper(),
-                                  null,
-                                  null,
-                                  ()-> isGripperClosed()
-                                );
+  public Command closeCommand() {
+    return new FunctionalCommand(() -> closeGripper(),
+        () -> {
+        },
+        (x) -> {
+        },
+        () -> isGripperClosed(),
+        this
+    );
   }
 
   @Override
@@ -166,5 +180,14 @@ public class Gripper extends SubsystemBase {
     builder.addDoubleProperty("gripperD", () -> kD, (x) -> {
       kD = x;
     });
+    builder.addDoubleProperty("kClosed", () -> kClosed, (x) -> {
+      kClosed = x;
+    });
+    builder.addDoubleProperty("kOpen", () -> kOpen, (x) -> {
+      kOpen = x;
+    });
+    builder.addBooleanProperty("Obj In Gripper", this::objectInGripper, null);
+    builder.addBooleanProperty("Open", this::isGripperOpen, null);
+    builder.addBooleanProperty("Closed", this::isGripperClosed, null);
   }
 }
