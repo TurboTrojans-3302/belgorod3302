@@ -69,8 +69,9 @@ public class RobotContainer {
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
   GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
+  ReefController m_reefController = new ReefController(OIConstants.kReefControllerPort);
 
-  private int targetTagId = 0;
+  public int targetTagId = 0;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -242,6 +243,15 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
           .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
     }
+
+    m_reefController.getChangeTrigger()
+      .onChange(new InstantCommand(()->{
+            targetTagId = m_reefController.getAprilTagId();
+            Pose2d tgt = m_reefController.getTargetPose2d();
+            m_nav.m_dashboardField.getObject("dest").setPose(tgt);
+            SmartDashboard.putString("ReefController", m_reefController.label());
+          }
+      ));
   };
 
   public void configureTestControls() {

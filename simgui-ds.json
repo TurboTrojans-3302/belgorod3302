@@ -1,4 +1,9 @@
 {
+  "Keyboard 3 Settings": {
+    "window": {
+      "visible": true
+    }
+  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -20,10 +25,10 @@
       "axisCount": 5,
       "buttonCount": 10,
       "buttonKeys": [
-        90,
-        88,
-        67,
-        86,
+        -1,
+        -1,
+        -1,
+        -1,
         -1,
         -1,
         -1,
@@ -66,10 +71,10 @@
       "axisCount": 6,
       "buttonCount": 10,
       "buttonKeys": [
-        77,
-        44,
-        46,
-        47,
+        -1,
+        -1,
+        -1,
+        -1,
         -1,
         -1,
         -1,
@@ -78,7 +83,7 @@
         59,
         -1
       ],
-      "povCount": 1
+      "povCount": 2
     },
     {
       "axisConfig": [
@@ -92,14 +97,20 @@
         }
       ],
       "axisCount": 2,
-      "buttonCount": 6,
+      "buttonCount": 12,
       "buttonKeys": [
-        260,
-        268,
-        266,
+        90,
+        88,
+        67,
         261,
         269,
-        267
+        267,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
       ],
       "povCount": 0
     },
@@ -115,6 +126,10 @@
     },
     {
       "guid": "Keyboard1"
+    },
+    {},
+    {
+      "guid": "Keyboard2"
     }
   ]
 }

@@ -26,10 +26,9 @@ import frc.robot.Robot;
 
 public class Navigation extends SubsystemBase {
   private static final String cameraName = "limelight";
-  private static AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
-
   private DriveSubsystem m_drive;
   public Field2d m_dashboardField = new Field2d();
+  private static AprilTagFieldLayout m_fieldLayout = FieldConstants.getAprilTagFieldLayout();
   protected SwerveDrivePoseEstimator m_odometry;
   private LaserCan m_dxSensor = new LaserCan(Constants.CanIds.DX_SENSOR_CAN_ID);
   private String limelightPipeline;
