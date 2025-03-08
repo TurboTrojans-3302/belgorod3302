@@ -5,6 +5,7 @@
  * Confirm negative right speed sends elevator up
  * Confirm encoder increases as elevator goes up
  * Find upper and lower position limits
+ * Tune Feedforward constants
  * Tune PID constants
  * Tune profile velocity and accel values
  * Find maximum up speed with no cable slack (fully loaded)
@@ -17,6 +18,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -41,6 +43,7 @@ public class Elevator extends SubsystemBase {
   public DigitalInput elevatorHighLimitSwitch;
   public DigitalInput elevatorLowLimitSwitch;
   public RelativeEncoder encoder;
+  private ElevatorFeedforward feedforward;
 
   public double kLimitLow = ElevatorConstants.kLimitLow;
   public double kLimitHigh = ElevatorConstants.kLimitHigh;
@@ -53,12 +56,17 @@ public class Elevator extends SubsystemBase {
   public double kLevel3 = ElevatorConstants.kLevel3;
   public double kLevel4 = ElevatorConstants.kLevel4;
   private double kElevatorMaxAccel = ElevatorConstants.kElevatorMaxAccel;
+  private double kG = ElevatorConstants.kG;
+  private double kS = ElevatorConstants.kS;
+  private double kV = ElevatorConstants.kV;
+  
   
     public Elevator(int MotorID, int highSwitchId, int lowSwitchId) {
       elevatorMotor = new SparkMax(MotorID, MotorType.kBrushed);
       elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
       elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
       encoder = elevatorMotor.getEncoder();
+      feedforward = new ElevatorFeedforward(kS, kG, kV);
       updateCfg();
 
       // true because elevator would start at lowest point
@@ -74,6 +82,8 @@ public class Elevator extends SubsystemBase {
       PID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
       PID.setTolerance(kTolerance);
       PID.reset(getElevatorPosition());
+
+      feedforward = new ElevatorFeedforward(kS, kG, kV);
     }
 
     public double getElevatorSpeed() {
@@ -144,8 +154,8 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
       // todo I bet we need some feedforward here
-      double speed = PID.calculate(encoder.getPosition());
-      elevatorMotor.set(speed);
+      double pid_speed = PID.calculate(encoder.getPosition());
+      elevatorMotor.set(pid_speed);
       // important to check the limits after setting the speed
       checkLimits();
     }
@@ -183,14 +193,20 @@ public class Elevator extends SubsystemBase {
     builder.addBooleanProperty("AtLevel2", ()->isNear(kLevel2), null );
     builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
     builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );
-    builder.addDoubleProperty("elevator kP", () -> kP, (x) -> {
+    builder.addDoubleProperty("kP", () -> kP, (x) -> {
       kP = x; updateCfg();
     });
-    builder.addDoubleProperty("elevator kI", () -> kI, (x) -> {
+    builder.addDoubleProperty("kI", () -> kI, (x) -> {
       kI = x; updateCfg();
     });
-    builder.addDoubleProperty("elevator kD", () -> kD, (x) -> {
+    builder.addDoubleProperty("kD", () -> kD, (x) -> {
       kD = x; updateCfg();
+    });builder.addDoubleProperty("kS", () -> kS, (x) -> {
+      kS = x; updateCfg();
+    });builder.addDoubleProperty("kG", () -> kG, (x) -> {
+      kG = x; updateCfg();
+    });builder.addDoubleProperty("kV", () -> kV, (x) -> {
+      kV = x; updateCfg();
     });
   }
 

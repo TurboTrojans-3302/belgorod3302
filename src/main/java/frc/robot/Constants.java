@@ -195,6 +195,9 @@ public final class Constants {
     public static final double kD = 0.0;
     public static final double kLoadPosition = 0;
     public static final double kTolerance = 3; //position tolerance
+    public static final double kG = 0;
+    public static final double kS = 0;
+    public static final double kV = 0;
   }
 
   public static final class IntakeConstants {
