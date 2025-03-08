@@ -31,27 +31,11 @@ public class TestDrive extends Command {
   @Override
   public void execute() {
 
-    double speed = -m_driverController.getLeftY();
+    double drive = -m_driverController.getLeftY();
+    double steer = -m_driverController.getRightY();
     
-    Translation2d command = new Translation2d(
-      -m_driverController.getRightY(),
-      -m_driverController.getRightX()
-    );
 
-    double direction;
-    int pov = m_driverController.getPOV();
-
-    if(pov==-1){
-      if(command.getNorm() > 0.0){
-          direction = command.getAngle().getDegrees();
-      } else {
-          direction = m_robotDrive.getSwerveModulePositions()[0].angle.getDegrees();
-      }
-    } else {
-      direction = 360 - pov;
-    }
-
-    m_robotDrive.testSetAll(speed, Math.toRadians(direction));
+    m_robotDrive.testSetAll(drive, steer);
 
   }
 

@@ -16,11 +16,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import swervelib.SwerveDrive;
 import swervelib.SwerveModule;
+import swervelib.parser.PIDFConfig;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -30,7 +32,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   public static final Pose2d defaultStartPosition = new Pose2d(Translation2d.kZero, Rotation2d.kZero);
   public SwerveDrive m_SwerveDrive;
-
+  public double kP;
+  public double kI;
+  public double kD;
   public DriveSubsystem() {
     this(Constants.DriveConstants.ConfigFolder);
   }
@@ -44,7 +48,9 @@ public class DriveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       System.out.println("Swerve Configuration failed! " + e); // todo throw a fatal exception here?
     }
-
+    kP = m_SwerveDrive.getModules()[0].getAnglePIDF().p;
+    kI = m_SwerveDrive.getModules()[0].getAnglePIDF().i;
+    kD = m_SwerveDrive.getModules()[0].getAnglePIDF().d;
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
   }
 
@@ -113,12 +119,24 @@ public class DriveSubsystem extends SubsystemBase {
     drive(speeds, Translation2d.kZero);
   }
 
-  public void testSetAll(double voltage, double angleRadians) {
-    SwerveModuleState state = new SwerveModuleState(voltage, Rotation2d.fromRadians(angleRadians));
+  public void testSetAll(double drivePct, double steerPct) {
+    
     SwerveModule[] modules = m_SwerveDrive.getModules();
     for (SwerveModule mod : modules) {
-      mod.setDesiredState(state, false, false);
+        mod.getAngleMotor().set(steerPct);
+        mod.getDriveMotor().set(drivePct);
+        mod.setAngle(steerPct * 180);
     }
+  }
+
+  public void setPIDFConfig(){
+    PIDFConfig config = new PIDFConfig(kP, kI, kD);
+    SwerveModule[] modules = m_SwerveDrive.getModules();
+    for (SwerveModule mod : modules) {
+      mod.setAnglePIDF(config);
+
+    
+  }
   }
 
   public void stop() {
@@ -174,5 +192,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   public PIDController getYawPID(){
     return m_SwerveDrive.getSwerveController().thetaController;
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder){
+    builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; setPIDFConfig(); });
+    builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; setPIDFConfig(); });
+    builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; setPIDFConfig(); });
+    
   }
 }
