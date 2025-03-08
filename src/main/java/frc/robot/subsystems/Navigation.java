@@ -37,10 +37,9 @@ public class Navigation extends SubsystemBase {
   public Navigation(DriveSubsystem drive) {
     this.m_drive = drive;
 
-    m_odometry = new SwerveDrivePoseEstimator(
-        m_drive.getKinematics(), Rotation2d.fromDegrees(m_drive.getGyroAngleDegrees()),
-        m_drive.getSwerveModulePositions(),
-        Constants.FieldConstants.ZeroZero);
+    m_odometry = m_drive.m_SwerveDrive.swerveDrivePoseEstimator;
+
+    
 
     try {
       m_dxSensor.setRangingMode(LaserCan.RangingMode.LONG);
@@ -60,12 +59,9 @@ public class Navigation extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    SwerveModulePosition[] positions = m_drive.getSwerveModulePositions();
-    Double heading = m_drive.getGyroAngleDegrees();
-    m_odometry.update(Rotation2d.fromDegrees(heading), positions);
-
+  
     PoseEstimate est = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
-    // todo is this necessary? how often is the estimate invalid?
+    //TODO is this necessary? how often is the estimate invalid?
     if (LimelightHelpers.validPoseEstimate(est)) {
       m_odometry.addVisionMeasurement(est.pose, est.timestampSeconds);
     }

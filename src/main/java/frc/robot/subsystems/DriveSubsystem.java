@@ -29,7 +29,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new YDriveSubsystem. */
 
   public static final Pose2d defaultStartPosition = new Pose2d(Translation2d.kZero, Rotation2d.kZero);
-  private SwerveDrive m_SwerveDrive;
+  public SwerveDrive m_SwerveDrive;
 
   public DriveSubsystem() {
     this(Constants.DriveConstants.ConfigFolder);
