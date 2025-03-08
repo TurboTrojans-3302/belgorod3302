@@ -52,10 +52,11 @@ public final class Constants {
         public static final int kClimberLimitSwitchId = 9;
       }
 
+      //TODO check canid 2 on 25 bot config
   public static final class DriveConstants {
     public static final double kMaxVelocityMetersPerSec = 4.0;
-    public static final String ConfigFolder = "2025/swerve";
-    //public static final String ConfigFolder = "2023/swerve";
+    //public static final String ConfigFolder = "2025/swerve";
+    public static final String ConfigFolder = "2023/swerve";
     public static final double ORBIT_SPEED = 3.0;
   }
   public static final class OIConstants {
