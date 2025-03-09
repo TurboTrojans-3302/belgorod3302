@@ -4,10 +4,14 @@
 
 package frc.robot.subsystems;
 
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Constants.ClimberConstants;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
+
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -46,6 +50,8 @@ public class Climbers extends SubsystemBase {
   double kPositionTolerance = ClimberConstants.kPositionTolerance;
 
   double increment = ClimberConstants.increment;
+  //does this still work as private
+  private boolean safetySwitchEnabled = false;
 
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
@@ -118,9 +124,18 @@ public class Climbers extends SubsystemBase {
   }
 
   public void climbersFullDown(){
+    if (safetySwitchEnabled){
     setPosition(lockedPosition, true);
   }
+  }
 
+  public void setSafetyStatus(boolean ready){
+    safetySwitchEnabled = ready;
+  }
+
+  public boolean safetyStatus(){
+    return safetySwitchEnabled;
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanIds;
@@ -228,7 +230,10 @@ public class RobotContainer {
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
 
-      safetySwitch.and(lockClimbers).onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
+      safetySwitch.onTrue(new InstantCommand(() -> m_climbers.setSafetyStatus(true)));
+      if (m_climbers.safetyStatus()){
+      lockClimbers.onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
+    }
     }
 
     if (INTAKE_ARM_ENABLE) {
@@ -282,6 +287,8 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+
+          //presets
     }
   }
 
