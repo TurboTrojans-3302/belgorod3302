@@ -20,8 +20,8 @@ public class IntakeToScorePosition extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     
-    addCommands(new AutoIntake(null, null, null, null),
-                new AutoLoadGripper(null, null),
+    addCommands(new AutoIntake(bot.m_intake, bot.m_intakeArm, bot.m_gripper, bot.m_elevator),
+                new AutoLoadGripper(bot.m_intake, bot.m_gripper),
                 levelCommand);
   }
 }
