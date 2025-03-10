@@ -18,6 +18,7 @@ public class AutoIntake extends Command {
   IntakeArm m_arm;
   private Gripper m_gripper;
   private Elevator m_Elevator;
+  boolean floorFinished;
 
   public AutoIntake(Intake intake, IntakeArm arm, Gripper gripper, Elevator elevator) {
     m_arm = arm;
@@ -33,8 +34,32 @@ public class AutoIntake extends Command {
     m_gripper.openGripper();
     m_gripper.retractGripper();
     m_Elevator.setPosition(Constants.ElevatorConstants.kLoadPosition);
-    m_intake.stop();
-    m_arm.elevatorPosition();
+    
+    if (m_intake.lowerObjectDetected()){ 
+      m_intake.stop();
+      m_arm.elevatorPosition();
+      floorFinished = true; //because its not necessary to go to the floor when we already have a piece
+    } else {
+      m_intake.in();
+      m_arm.floorPosition();
+      floorFinished = false;
+
+    }
+   
+  }
+
+  @Override
+  public void execute(){
+
+    if (m_arm.atSetpoint() && floorFinished == false){
+      floorFinished = true;
+    }
+    if(m_intake.lowerObjectDetected()){
+      m_intake.stop();
+      m_arm.elevatorPosition();
+    }
+
+
   }
 
   // Called once the command ends or is interrupted.
@@ -47,6 +72,6 @@ public class AutoIntake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_arm.atSetpoint() && m_Elevator.atSetpoint();
+    return floorFinished && m_arm.atSetpoint() && m_Elevator.atSetpoint();
   }
 }

@@ -25,6 +25,8 @@ import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ElevatorManualMove;
+import frc.robot.commands.IntakeCycle;
+import frc.robot.commands.IntakeToScorePosition;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
@@ -290,6 +292,25 @@ public class RobotContainer {
 
           //presets
     }
+
+    if (INTAKE_ARM_ENABLE && INTAKE_ENABLE && ELEVATOR_ENABLE && GRIPPER_ENABLE){
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Left4)
+      .onTrue(new IntakeToScorePosition(getInstance(), m_elevator.level4Command()));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Right4)
+      .onTrue(new IntakeToScorePosition(getInstance(), m_elevator.level3Command()));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Left3)
+      .onTrue(new IntakeToScorePosition(getInstance(), m_elevator.level2Command()));
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Right3)
+      .onTrue(new IntakeToScorePosition(getInstance(), m_elevator.level1Command()));
+
+
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Left2)
+      .onTrue(new IntakeCycle(m_intake, m_intakeArm, m_gripper, m_elevator));
+    
+
+    }
+      
+   
   }
 
   /**
