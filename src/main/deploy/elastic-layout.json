@@ -302,20 +302,6 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Swerve Drive",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 384.0,
-            "type": "SwerveDrive",
-            "properties": {
-              "topic": "/SmartDashboard/Swerve Drive",
-              "period": 0.06,
-              "show_robot_rotation": true,
-              "rotation_unit": "Radians"
-            }
-          },
-          {
             "title": "MaxRotationLimit",
             "x": 384.0,
             "y": 128.0,
@@ -380,6 +366,21 @@
             "properties": {
               "topic": "/SmartDashboard/Yaw PID",
               "period": 0.06
+            }
+          },
+          {
+            "title": "swerve",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "YAGSL Swerve Drive",
+            "properties": {
+              "topic": "/SmartDashboard/swerve",
+              "period": 0.06,
+              "show_robot_rotation": true,
+              "show_desired_states": true,
+              "angle_offset": 0.0
             }
           }
         ]
