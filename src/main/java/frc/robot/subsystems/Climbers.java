@@ -144,7 +144,7 @@ public class Climbers extends SubsystemBase {
 
   public Command climbersUpCommand(){
     return new FunctionalCommand(()->{},
-                                 ()->setPosition(getSetpoint() + increment),
+                                 ()->setPosition(getPositionLeft() + increment),
                                  (x)->{},
                                  ()->false,
                                  this);
@@ -152,7 +152,7 @@ public class Climbers extends SubsystemBase {
 
   public Command climbersDownCommand(){
     return new FunctionalCommand(()->{},
-                                 ()->setPosition(getSetpoint() - increment),
+                                 ()->setPosition(getPositionLeft() - increment),
                                  (x)->{},
                                  ()->false,
                                  this);
