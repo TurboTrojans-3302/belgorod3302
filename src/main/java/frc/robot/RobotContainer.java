@@ -73,7 +73,7 @@ public class RobotContainer {
 
   public int targetTagId = 0;
 
-  public boolean climberLockActive = false;
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -226,10 +226,10 @@ public class RobotContainer {
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
       
-      safetySwitch.onTrue(new InstantCommand(() ->{ climberLockActive = true; }));
+      safetySwitch.onTrue(new InstantCommand(() ->{ m_climbers.climberLockActive = true; }));
 
       lockClimbers.onTrue(new InstantCommand(() -> {
-        if(climberLockActive) { m_climbers.climbersFullDown();}
+          m_climbers.climbersFullDown();
       }));
       
     }
@@ -345,5 +345,7 @@ public class RobotContainer {
       m_nav.resetOdometry(pose);
     }
   }
+
+
 
 }

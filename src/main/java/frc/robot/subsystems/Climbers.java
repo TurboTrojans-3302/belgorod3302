@@ -25,6 +25,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climbers extends SubsystemBase {
   /** Creates a new Climbers. */
@@ -50,6 +51,7 @@ public class Climbers extends SubsystemBase {
 
   double positionSetPoint = 0.0;
   double increment = ClimberConstants.increment;
+  public boolean climberLockActive = false;
 
   public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
@@ -157,7 +159,9 @@ public class Climbers extends SubsystemBase {
   }
 
   public void climbersFullDown(){
-    setPosition(lockedPosition, true);
+    if (climberLockActive){
+      setPosition(lockedPosition, true);
+    }
   }
 
   @Override
@@ -180,8 +184,8 @@ public class Climbers extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty("increment", ()->this.increment, (x)->increment=x);
     builder.addDoubleProperty("Setpoint", this::getSetpoint, this::setPosition);
-    builder.addDoubleProperty("Right Pos", this::getPositionLeft, null);
-    builder.addDoubleProperty("Left Pos", this::getPositionRight, null);
+    builder.addDoubleProperty("Right Pos", this::getPositionRight, null);
+    builder.addDoubleProperty("Left Pos", this::getPositionLeft, null);
     builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; updateConfig(); });
     builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; updateConfig(); });
     builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; updateConfig(); });
@@ -194,5 +198,10 @@ public class Climbers extends SubsystemBase {
     builder.addDoubleProperty("lockedPosition", ()->lockedPosition, (x)->{lockedPosition = x;});
     builder.addDoubleProperty("testSpeed", ()->testSpeed, (x)->{testSpeed = x;});
     builder.addBooleanProperty("limitSwitch", this::limitSwitch, null);
+    builder.addBooleanProperty("LockEnable", ()->climberLockActive, null);
+    
+    builder.addDoubleProperty("leftRPM", m_leftEncoder::getVelocity, null);
+    builder.addDoubleProperty("leftOutput", m_leftClimber::getAppliedOutput, null);
+   
   }
 }

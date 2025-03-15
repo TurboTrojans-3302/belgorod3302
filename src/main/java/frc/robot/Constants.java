@@ -94,8 +94,8 @@ public final class Constants {
       public static final int Right4 = 7;
       public static final int Esc = 8;
       public static final int Enter = 9;
-      public static final int EngineStart = 10;
-      public static final int SafetySwitch = 11;
+      public static final int SafetySwitch = 10;
+      public static final int EngineStart = 11;
       public static final int Switch1Up = 12;
       public static final int Switch1Down = 13;
       public static final int Switch2Up = 14;
@@ -225,12 +225,12 @@ public final class Constants {
     public static final double kP = 1.0;
     public static final double kI = 0;
     public static final double kD = 0.5;
-    public static final double kMaxVelocity = 3000; //RPM
-    public static final double kMaxAcceleration = 1500; //RPM/s
-    public static double kLowerLimit = 0;
-    public static double kLockedPosition = -25;
+    public static final double kMaxVelocity = 100000; //RPM
+    public static final double kMaxAcceleration = 100000; //RPM/s
+    public static double kLowerLimit = 75;
+    public static double kLockedPosition = 70;
     public static double kUpperLimitRight = 100;
-    public static double kUpperLimitLeft = 100;
+    public static double kUpperLimitLeft = 119;
     public static double kPositionTolerance = 5;
     public static double increment = 1.0;
   }
