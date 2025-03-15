@@ -289,11 +289,6 @@ public class RobotContainer {
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
     }
-    if (CLIMBERS_ENABLE_ENABLE) {
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
-          .onTrue(new InstantCommand(() -> m_climbers.))
-          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
-    }
   }
 
   /**

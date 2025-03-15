@@ -144,6 +144,7 @@ public class Climbers extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder){
     super.initSendable(builder);
+    builder.addDoubleProperty("position", this::getPosition, null);
     builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; updateConfig(); });
     builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; updateConfig(); });
     builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; updateConfig(); });
