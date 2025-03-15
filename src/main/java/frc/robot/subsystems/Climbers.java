@@ -44,6 +44,7 @@ public class Climbers extends SubsystemBase {
   double kMaxVelocity = ClimberConstants.kMaxVelocity;
   double kMaxAcceleration = ClimberConstants.kMaxAcceleration;
   double kPositionTolerance = ClimberConstants.kPositionTolerance;
+  public double testSpeed = 0;
 
   double increment = ClimberConstants.increment;
 
@@ -63,9 +64,10 @@ public class Climbers extends SubsystemBase {
   public static SparkMaxConfig leftConfig = new SparkMaxConfig();
   public static SparkMaxConfig rightConfig = new SparkMaxConfig();
   static {
+    // positive motor speed is lifting us up
       leftConfig.smartCurrentLimit(40)
         .idleMode(IdleMode.kBrake)
-        .inverted(true)
+        .inverted(false)
         .apply(new EncoderConfig().inverted(true))
         .apply(new ClosedLoopConfig().pid(ClimberConstants.kP, ClimberConstants.kI,
                                            ClimberConstants.kD)
@@ -80,6 +82,10 @@ public class Climbers extends SubsystemBase {
                                           ClimberConstants.kD));
   }
 
+  public void test(double speed){
+    m_leftClimber.set(speed);
+    m_rightClimber.set(speed);
+  }
 
   public double getPosition(){
     return m_leftEncoder.getPosition();
@@ -147,6 +153,7 @@ public class Climbers extends SubsystemBase {
     builder.addDoubleProperty("kUpperLimit", ()->kUpperLimit, (x)->{kUpperLimit = x;});
     builder.addDoubleProperty("kPositionTolerance", ()->kPositionTolerance, (x)->{kPositionTolerance = x;});
     builder.addDoubleProperty("lockedPosition", ()->lockedPosition, (x)->{lockedPosition = x;});
+    builder.addDoubleProperty("testSpeed", ()->testSpeed, (x)->{testSpeed = x;});
     builder.addBooleanProperty("limitSwitch", this::limitSwitch, null);
   }
 }

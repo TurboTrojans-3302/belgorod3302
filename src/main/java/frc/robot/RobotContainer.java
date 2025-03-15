@@ -44,9 +44,9 @@ import frc.robot.subsystems.Navigation;
 public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = true;
-  private static boolean INTAKE_ENABLE = true;
-  private static boolean INTAKE_ARM_ENABLE = true;
-  private static boolean GRIPPER_ENABLE = true;
+  private static boolean INTAKE_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
@@ -73,12 +73,13 @@ public class RobotContainer {
 
   public int targetTagId = 0;
 
+  public boolean climberLockActive = false;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     instance = this;
-
+    
     // The robot's subsystems
     m_robotDrive = new DriveSubsystem();
     SmartDashboard.putData("DriveSubsystem", m_robotDrive);
@@ -227,8 +228,13 @@ public class RobotContainer {
 
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
+      
+      safetySwitch.onTrue(new InstantCommand(() ->{ climberLockActive = true; }));
 
-      safetySwitch.and(lockClimbers).onTrue(new InstantCommand(() -> m_climbers.climbersFullDown()));
+      lockClimbers.onTrue(new InstantCommand(() -> {
+        if(climberLockActive) { m_climbers.climbersFullDown();}
+      }));
+      
     }
 
     if (INTAKE_ARM_ENABLE) {
@@ -282,6 +288,11 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+    }
+    if (CLIMBERS_ENABLE_ENABLE) {
+      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
+          .onTrue(new InstantCommand(() -> m_climbers.))
+          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
     }
   }
 

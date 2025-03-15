@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Ludwig;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,11 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.ADIS16448_IMU;
-import edu.wpi.first.wpilibj.ADIS16448_IMU.CalibrationTime;
-import edu.wpi.first.wpilibj.ADIS16448_IMU.IMUAxis;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.simulation.ADIS16448_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CanIds;
 import frc.robot.Robot;
@@ -50,9 +47,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
-  private final ADIS16448_IMU m_gyro = new ADIS16448_IMU(IMUAxis.kX, SPI.Port.kMXP, CalibrationTime._1s);
-  private final ADIS16448_IMUSim m_gyroSim = new ADIS16448_IMUSim(m_gyro);
+  private final AHRS m_gyro = new AHRS();
   private double m_gyroOffsetDeg = 0.0;
 
   public PIDController headingPidController;
@@ -143,11 +138,11 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
 
-    if(Robot.isSimulation()) {
-      double turnRate = speeds.omegaRadiansPerSecond;
-      m_gyroSim.setGyroRateX(-Math.toDegrees(turnRate));
-      m_gyroSim.setGyroAngleX(-Math.toDegrees(turnRate * Robot.kDefaultPeriod) + m_gyro.getAngle());
-    }
+    //if(Robot.isSimulation()) {
+      //double turnRate = speeds.omegaRadiansPerSecond;
+     // m_gyroSim.setGyroRateX(-Math.toDegrees(turnRate));
+      //m_gyroSim.setGyroAngleX(-Math.toDegrees(turnRate * Robot.kDefaultPeriod) + m_gyro.getAngle());
+   // }
   }
 
   /**
