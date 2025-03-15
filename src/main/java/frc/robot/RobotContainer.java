@@ -119,9 +119,6 @@ public class RobotContainer {
       SmartDashboard.putData("Climbers", m_climbers);
     }
 
-    // Configure the button bindings
-    configureButtonBindings();
-
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
 
@@ -137,7 +134,7 @@ public class RobotContainer {
     return instance;
   }
 
-  private void configureButtonBindings() {
+  public void configureButtonBindings() {
 
     /**
      * Driver's Controller
@@ -221,10 +218,10 @@ public class RobotContainer {
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
           .getPOV() == Constants.OIConstants.ButtonBox.StickUp)
-          .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
+          .whileTrue(m_climbers.climbersUpCommand());
       new Trigger(() -> m_buttonBoard
           .getPOV() == Constants.OIConstants.ButtonBox.StickDown)
-          .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
+          .whileTrue(m_climbers.climbersDownCommand());
 
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
@@ -288,6 +285,17 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
           .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+    }
+    if (CLIMBERS_ENABLE) {
+      new Trigger(() -> m_buttonBoard
+          .getPOV() == Constants.OIConstants.ButtonBox.StickLeft)
+          .whileTrue(new InstantCommand(() -> m_climbers.test(0.10)));
+      new Trigger(() -> m_buttonBoard
+          .getPOV() == Constants.OIConstants.ButtonBox.StickRight)
+          .whileTrue(new InstantCommand(() -> m_climbers.test(-0.10)));
+      new Trigger(() -> m_buttonBoard
+          .getPOV() == -1)
+          .whileTrue(new InstantCommand(() -> m_climbers.test(0.0)));
     }
   }
 

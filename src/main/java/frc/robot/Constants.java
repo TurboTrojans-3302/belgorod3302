@@ -222,16 +222,17 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final double kP = 0.01;
+    public static final double kP = 1.0;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 0.5;
     public static final double kMaxVelocity = 3000; //RPM
     public static final double kMaxAcceleration = 1500; //RPM/s
     public static double kLowerLimit = 0;
     public static double kLockedPosition = -25;
-    public static double kUpperLimit = 100;
+    public static double kUpperLimitRight = 100;
+    public static double kUpperLimitLeft = 100;
     public static double kPositionTolerance = 5;
-    public static double increment = 15.0;
+    public static double increment = 1.0;
   }
 
   public static final class GripperConstants {
