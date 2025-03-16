@@ -13,8 +13,12 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -55,19 +59,19 @@ public class Elevator extends SubsystemBase {
   private double kElevatorMaxAccel = ElevatorConstants.kElevatorMaxAccel;
   
     public Elevator(int MotorID, int highSwitchId, int lowSwitchId) {
-      elevatorMotor = new SparkMax(MotorID, MotorType.kBrushed);
+      elevatorMotor = new SparkMax(MotorID, MotorType.kBrushless);
+      elevatorMotor.configure(new SparkMaxConfig().inverted(true)
+                                                  .idleMode(IdleMode.kBrake),
+                              ResetMode.kResetSafeParameters,
+                              PersistMode.kNoPersistParameters
+                             );
       elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
       elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
       encoder = elevatorMotor.getEncoder();
       updateCfg();
 
-      // true because elevator would start at lowest point
-  
+      encoder.setPosition(kLimitLow);
       stop();
-  
-      // getEncoder() is a function already in the SparkBase class that creates a
-      // relative encoder if there isnt one
-      // I would assume we only need one of the motors to use an encoder
     }
   
     private void updateCfg(){
@@ -89,6 +93,18 @@ public class Elevator extends SubsystemBase {
       double p = getElevatorPosition();
       setPosition(p + delta);
     }
+
+    public Command testMoveCommand(double speed){
+      return new FunctionalCommand(()->{elevatorMotor.set(speed);
+                                        System.out.println("Speed: " + speed);},
+                                   ()->{},
+                                   (x)->{elevatorMotor.set(0.0);
+                                         System.out.println("stop");},
+                                   ()->false,
+                                   this 
+                                   );
+    }
+
 
     public void resetElevatorPositionEncoder(double position) {
       encoder.setPosition(position);
@@ -192,6 +208,8 @@ public class Elevator extends SubsystemBase {
     builder.addDoubleProperty("elevator kD", () -> kD, (x) -> {
       kD = x; updateCfg();
     });
+    builder.addDoubleProperty("motor output", elevatorMotor::getAppliedOutput, null);
+    builder.addDoubleProperty("setpoint", ()->PID.getGoal().position, null);
   }
 
   public void stop() {

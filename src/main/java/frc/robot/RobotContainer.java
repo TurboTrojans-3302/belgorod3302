@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.OIConstants.ButtonBox;
 import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
@@ -73,7 +74,7 @@ public class RobotContainer {
 
   public int targetTagId = 0;
 
-  public boolean climberLockActive = false;
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -114,13 +115,9 @@ public class RobotContainer {
     }
     if (CLIMBERS_ENABLE) {
       m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
-          CanIds.kClimberRightMotorCanId,
-          DigitalIO.kClimberLimitSwitchId);
+          CanIds.kClimberRightMotorCanId);
       SmartDashboard.putData("Climbers", m_climbers);
     }
-
-    // Configure the button bindings
-    configureButtonBindings();
 
     m_BlinkinLED = new REVBlinkinLED(Constants.BLINKIN_LED_PWM_CHANNEL);
   }
@@ -137,7 +134,7 @@ public class RobotContainer {
     return instance;
   }
 
-  private void configureButtonBindings() {
+  public void configureButtonBindings() {
 
     /**
      * Driver's Controller
@@ -173,24 +170,21 @@ public class RobotContainer {
      *
      */
     if (ELEVATOR_ENABLE) {
-      new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Right2)
           .onTrue(new MoveElevator(m_elevator,
               Constants.ElevatorConstants.kLevel1Trough));
 
-      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Left2)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
-      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+      
 
-      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Right1)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
-      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+      
 
-      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Left1)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
-      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+      
 
       // get dpad position as a boolean (they are automatically returned by getPOV()
       // as an exact value)
@@ -221,18 +215,18 @@ public class RobotContainer {
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
           .getPOV() == Constants.OIConstants.ButtonBox.StickUp)
-          .whileTrue(new InstantCommand(() -> m_climbers.climbersUp()));
+          .whileTrue(m_climbers.climbersUpCommand());
       new Trigger(() -> m_buttonBoard
           .getPOV() == Constants.OIConstants.ButtonBox.StickDown)
-          .whileTrue(new InstantCommand(() -> m_climbers.climbersDown()));
+          .whileTrue(m_climbers.climbersDownCommand());
 
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
       
-      safetySwitch.onTrue(new InstantCommand(() ->{ climberLockActive = true; }));
+      safetySwitch.onTrue(new InstantCommand(() ->{ m_climbers.climberLockActive = true; }));
 
       lockClimbers.onTrue(new InstantCommand(() -> {
-        if(climberLockActive) { m_climbers.climbersFullDown();}
+          m_climbers.climbersFullDown();
       }));
       
     }
@@ -285,14 +279,24 @@ public class RobotContainer {
 
     if (ELEVATOR_ENABLE) {
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
-          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(10)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
-          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-10)));
+      // new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
+      //     .whileTrue(m_elevator.testMoveCommand(0.4));
+      // new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
+      //     .whileTrue(m_elevator.testMoveCommand(-0.4));
     }
-    if (CLIMBERS_ENABLE_ENABLE) {
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
-          .onTrue(new InstantCommand(() -> m_climbers.))
-          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+    if (CLIMBERS_ENABLE) {
+      new Trigger(() -> m_buttonBoard
+          .getPOV() == Constants.OIConstants.ButtonBox.StickLeft)
+          .whileTrue(new InstantCommand(() -> m_climbers.test(0.10)));
+      new Trigger(() -> m_buttonBoard
+          .getPOV() == Constants.OIConstants.ButtonBox.StickRight)
+          .whileTrue(new InstantCommand(() -> m_climbers.test(-0.10)));
+      new Trigger(() -> m_buttonBoard
+          .getPOV() == -1)
+          .whileTrue(new InstantCommand(() -> m_climbers.test(0.0)));
     }
   }
 
@@ -342,5 +346,7 @@ public class RobotContainer {
       m_nav.resetOdometry(pose);
     }
   }
+
+
 
 }

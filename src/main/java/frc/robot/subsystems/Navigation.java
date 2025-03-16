@@ -87,13 +87,19 @@ public class Navigation extends SubsystemBase {
 
   public Double getDxToObjectMeters() {
     if(!Robot.isReal()){return 0.0;}
-    Measurement m = m_dxSensor.getMeasurement();
-    return m.distance_mm * 0.001;
+    if(dxMeasurmentGood()){
+      Measurement m = m_dxSensor.getMeasurement();
+      return m.distance_mm * 0.001; 
+    }  
+    return 0.0;
   }
 
   public boolean dxMeasurmentGood() {
     if(!Robot.isReal()){return true;}
     Measurement m = m_dxSensor.getMeasurement();
+    if(m == null) {
+      return false;
+    }
     return m.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
   }
 
