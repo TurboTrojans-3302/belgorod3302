@@ -46,14 +46,13 @@ public class Climbers extends SubsystemBase {
   double lockedPosition = ClimberConstants.kLockedPosition;
   double kMaxVelocity = ClimberConstants.kMaxVelocity;
   double kMaxAcceleration = ClimberConstants.kMaxAcceleration;
-  double kPositionTolerance = ClimberConstants.kPositionTolerance;
   public double testSpeed = 0;
 
   double positionSetPoint = 0.0;
   double increment = ClimberConstants.increment;
   public boolean climberLockActive = false;
 
-  public Climbers(int leftMotorId, int rightMotorId, int limitSwitchId) {
+  public Climbers(int leftMotorId, int rightMotorId) {
     m_leftClimber = new SparkMax(leftMotorId, MotorType.kBrushless);
     m_rightClimber = new SparkMax(rightMotorId, MotorType.kBrushless);
     //todo fix this configuration
@@ -63,7 +62,7 @@ public class Climbers extends SubsystemBase {
     m_rightController = m_rightClimber.getClosedLoopController();
     m_leftEncoder = m_leftClimber.getEncoder();
     m_rightEncoder = m_rightClimber.getEncoder();
-    limitSwitchClimber = new DigitalInput(limitSwitchId);
+   
 
     m_leftEncoder.setPosition(kUpperLimitLeft);
     m_rightEncoder.setPosition(kUpperLimitRight);
@@ -107,26 +106,22 @@ public class Climbers extends SubsystemBase {
     return m_rightEncoder.getPosition();
   }
 
-  public boolean isNearPosition(double p){
-    return MathUtil.isNear(p, getPositionLeft(), kPositionTolerance);
-  }
+ 
 
-  public boolean limitSwitch(){
-    return !limitSwitchClimber.get();
-  }
+  
 
   public void setPosition(double position){
     setPosition(position, false);
   }
   
   public void setPosition(double position, boolean override){
+    //TODO don't move if we're in the lock position)
+
     double Lposition, Rposition;
     if (override == false){
       Rposition = MathUtil.clamp(position, kLowerLimit, kUpperLimitRight);
       Lposition = MathUtil.clamp(position, kLowerLimit, kUpperLimitLeft);
-      // if(limitSwitch()){
-      //  position = Math.min(position, getPositionLeft());
-      // }
+      
     }else{
       Rposition = position;
       Lposition = position;
@@ -194,10 +189,8 @@ public class Climbers extends SubsystemBase {
     builder.addDoubleProperty("kLowerLimit", ()->kLowerLimit, (x)->{kLowerLimit = x;});
     builder.addDoubleProperty("kUpperLimitLeft", ()->kUpperLimitLeft, (x)->{kUpperLimitLeft = x;});
     builder.addDoubleProperty("kUpperLimitRight", ()->kUpperLimitRight, (x)->{kUpperLimitRight = x;});
-    builder.addDoubleProperty("kPositionTolerance", ()->kPositionTolerance, (x)->{kPositionTolerance = x;});
     builder.addDoubleProperty("lockedPosition", ()->lockedPosition, (x)->{lockedPosition = x;});
     builder.addDoubleProperty("testSpeed", ()->testSpeed, (x)->{testSpeed = x;});
-    builder.addBooleanProperty("limitSwitch", this::limitSwitch, null);
     builder.addBooleanProperty("LockEnable", ()->climberLockActive, null);
     
     builder.addDoubleProperty("leftRPM", m_leftEncoder::getVelocity, null);

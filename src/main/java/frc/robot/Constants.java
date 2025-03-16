@@ -74,7 +74,7 @@ public final class Constants {
         public static final int kGripperClosedSwitchId = 6;
         public static final int kGripperFullyRetractedSwitchId = 7;
         public static final int kGripperObjectDetectedSwitchId = 8;
-        public static final int kClimberLimitSwitchId = 9;
+        
       }
 
   public static final class OIConstants {
@@ -84,32 +84,32 @@ public final class Constants {
     public static final int kReefControllerPort = 3;
     public static final int kButtonBoardPort = 2;
     public static final class ButtonBox {
-      public static final int Left1 = 0;
-      public static final int Right1 = 1;
-      public static final int Left2 = 2;
-      public static final int Right2 = 3;
-      public static final int Left3 = 4;
-      public static final int Right3 = 5;
-      public static final int Left4 = 6;
-      public static final int Right4 = 7;
-      public static final int Esc = 8;
-      public static final int Enter = 9;
-      public static final int SafetySwitch = 10;
+      public static final int Left1 = 1;
+      public static final int Right1 = 2;
+      public static final int Left2 = 3;
+      public static final int Right2 = 4;
+      public static final int Left3 = 5;
+      public static final int Right3 = 6;
+      public static final int Left4 = 7;
+      public static final int Right4 = 8;
+      public static final int Esc = 9;
+      public static final int Enter = 10;
+      public static final int SafetySwitch = 12;
       public static final int EngineStart = 11;
-      public static final int Switch1Up = 12;
-      public static final int Switch1Down = 13;
-      public static final int Switch2Up = 14;
-      public static final int Switch2Down = 15;
-      public static final int Switch3Up = 16;
-      public static final int Switch3Down = 17;
-      public static final int Switch4Up = 18;
-      public static final int Switch4Down = 19;
-      public static final int LeftKnobCW = 20;
-      public static final int LeftKnobCCW = 21;
-      public static final int RightKnobCCW = 22;
-      public static final int RightKnobCW = 23;
-      public static final int LeftKnobPush = 24;
-      public static final int RightKnobPush = 25;
+      public static final int Switch1Up = 13;
+      public static final int Switch1Down = 14;
+      public static final int Switch2Up = 15;
+      public static final int Switch2Down = 16;
+      public static final int Switch3Up = 17;
+      public static final int Switch3Down = 18;
+      public static final int Switch4Up = 19;
+      public static final int Switch4Down = 20;
+      public static final int LeftKnobCW = 21;
+      public static final int LeftKnobCCW = 22;
+      public static final int RightKnobCCW = 23;
+      public static final int RightKnobCW = 24;
+      public static final int LeftKnobPush = 25;
+      public static final int RightKnobPush = 26;
 
       public static final int StickUp = 0;
       public static final int StickUpRight = 45;
@@ -173,21 +173,21 @@ public final class Constants {
     // numbers that need to be tested of course
     public static final double kLimitLow = 0;
     public static final double kSoftLimitLow = 10;
-    public static final double kPickupLevel = 25;
-    public static final double kLevel1Trough = 50;
-    public static final double kLevel2 = 75;
-    public static final double kLevel3 = 100;
-    public static final double kLevel4 = 125;
-    public static final double kSoftLimitHigh = 150;
-    public static final double kLimitHigh = 200;
+    public static final double kPickupLevel = 100;
+    public static final double kLevel1Trough = 200;
+    public static final double kLevel2 = 300;
+    public static final double kLevel3 = 400;
+    public static final double kLevel4 = 500;
+    public static final double kSoftLimitHigh = 600;
+    public static final double kLimitHigh = 620;
     // honestly the processor probably wouldn't require the elevator to move at all
     // from the start position, but if it is already up it could be useful to have a
     // preset position
     public static final double kProcessor = 15;
 
-    public static final double kElevatorAutoSpeedToLevel = 0.4;
-    public static final double kElevatorMaxSpeed = 0.75;
-    public static final double kElevatorMaxAccel = 0.75;
+    public static final double kElevatorAutoSpeedToLevel = 1.0;
+    public static final double kElevatorMaxSpeed = 100000;
+    public static final double kElevatorMaxAccel = 100000;
     public static final double kManualRate = 1.0;
 
     public static final double kP = 0.0;
@@ -231,7 +231,6 @@ public final class Constants {
     public static double kLockedPosition = 70;
     public static double kUpperLimitRight = 100;
     public static double kUpperLimitLeft = 119;
-    public static double kPositionTolerance = 5;
     public static double increment = 1.0;
   }
 

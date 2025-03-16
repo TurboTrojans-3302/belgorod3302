@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.OIConstants.ButtonBox;
 import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
@@ -114,8 +115,7 @@ public class RobotContainer {
     }
     if (CLIMBERS_ENABLE) {
       m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
-          CanIds.kClimberRightMotorCanId,
-          DigitalIO.kClimberLimitSwitchId);
+          CanIds.kClimberRightMotorCanId);
       SmartDashboard.putData("Climbers", m_climbers);
     }
 
@@ -170,24 +170,21 @@ public class RobotContainer {
      *
      */
     if (ELEVATOR_ENABLE) {
-      new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Right2)
           .onTrue(new MoveElevator(m_elevator,
               Constants.ElevatorConstants.kLevel1Trough));
 
-      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Left2)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
-      new JoystickButton(m_copilotController, XboxController.Button.kB.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+      
 
-      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Right1)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
-      new JoystickButton(m_copilotController, XboxController.Button.kX.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+      
 
-      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+      new JoystickButton(m_buttonBoard, ButtonBox.Left1)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
-      new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+      
 
       // get dpad position as a boolean (they are automatically returned by getPOV()
       // as an exact value)
@@ -282,9 +279,13 @@ public class RobotContainer {
 
     if (ELEVATOR_ENABLE) {
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
-          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(10)));
       new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
-          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-10)));
+      // new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
+      //     .whileTrue(m_elevator.testMoveCommand(0.4));
+      // new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
+      //     .whileTrue(m_elevator.testMoveCommand(-0.4));
     }
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
