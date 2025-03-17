@@ -28,20 +28,13 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
 
-  private double kTolerance = ElevatorConstants.kTolerance;
-  private double kElevatorMaxSpeed = ElevatorConstants.kElevatorMaxSpeed;
-
   public SparkMax elevatorMotor;
   public ProfiledPIDController PID;
-  double kP = Constants.ElevatorConstants.kP;
-  double kI = Constants.ElevatorConstants.kI;
-  double kD = Constants.ElevatorConstants.kD;
   public DigitalInput elevatorHighLimitSwitch;
   public DigitalInput elevatorLowLimitSwitch;
   public RelativeEncoder encoder;
@@ -56,7 +49,6 @@ public class Elevator extends SubsystemBase {
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
   public double kLevel4 = ElevatorConstants.kLevel4;
-  private double kElevatorMaxAccel = ElevatorConstants.kElevatorMaxAccel;
   
     public Elevator(int MotorID, int highSwitchId, int lowSwitchId) {
       elevatorMotor = new SparkMax(MotorID, MotorType.kBrushless);
@@ -68,18 +60,19 @@ public class Elevator extends SubsystemBase {
       elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
       elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
       encoder = elevatorMotor.getEncoder();
-      updateCfg();
-
       encoder.setPosition(kLimitLow);
+
+      PID = new ProfiledPIDController(ElevatorConstants.kP, 
+                                      ElevatorConstants.kI, 
+                                      ElevatorConstants.kD,
+                                      new Constraints(ElevatorConstants.kElevatorMaxSpeed,
+                                                      ElevatorConstants.kElevatorMaxAccel));
+      PID.setTolerance(ElevatorConstants.kTolerance);
+      PID.reset(getElevatorPosition());
+
       stop();
     }
   
-    private void updateCfg(){
-      PID = new ProfiledPIDController(kP, kI, kD, new Constraints(kElevatorMaxSpeed, kElevatorMaxAccel));
-      PID.setTolerance(kTolerance);
-      PID.reset(getElevatorPosition());
-    }
-
     public double getElevatorSpeed() {
       return encoder.getVelocity();
     }
@@ -108,7 +101,7 @@ public class Elevator extends SubsystemBase {
 
     public void resetElevatorPositionEncoder(double position) {
       encoder.setPosition(position);
-      updateCfg();
+      PID.reset(position);
     }
   
     // stopping elevator with limit switches
@@ -134,7 +127,7 @@ public class Elevator extends SubsystemBase {
     }
   
     public boolean isNear(double position) {
-      return MathUtil.isNear(position, getElevatorPosition(), kTolerance);
+      return MathUtil.isNear(position, getElevatorPosition(), PID.getPositionTolerance());
     }
   
     public Command setPostionCommand(double setpoint){
@@ -169,16 +162,9 @@ public class Elevator extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
       super.initSendable(builder);
-      builder.addDoubleProperty("Position", this::getElevatorPosition, null);
-      builder.addDoubleProperty("kElevatorMaxSpeed", () -> kElevatorMaxSpeed, (x) -> {
-        kElevatorMaxSpeed = x; updateCfg();
-      });
-      builder.addDoubleProperty("kElevatorMaxAccel", () -> kElevatorMaxAccel, (x) -> {
-      kElevatorMaxAccel = x; updateCfg();
-    });
-    builder.addDoubleProperty("Tolerance", () -> kTolerance, (x) -> {
-      kTolerance = x;
-    });
+      builder.addDoubleProperty("Position", this::getElevatorPosition, this::resetElevatorPositionEncoder);
+      builder.addDoubleProperty("Tolerance", () -> PID.getPositionTolerance(),
+                                                 (x) -> PID.setTolerance(x));
     builder.addDoubleProperty("PickupLevel", ()-> kPickupLevel, (x)-> {
       kPickupLevel = x;
     });
@@ -199,17 +185,7 @@ public class Elevator extends SubsystemBase {
     builder.addBooleanProperty("AtLevel2", ()->isNear(kLevel2), null );
     builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
     builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );
-    builder.addDoubleProperty("elevator kP", () -> kP, (x) -> {
-      kP = x; updateCfg();
-    });
-    builder.addDoubleProperty("elevator kI", () -> kI, (x) -> {
-      kI = x; updateCfg();
-    });
-    builder.addDoubleProperty("elevator kD", () -> kD, (x) -> {
-      kD = x; updateCfg();
-    });
     builder.addDoubleProperty("motor output", elevatorMotor::getAppliedOutput, null);
-    builder.addDoubleProperty("setpoint", ()->PID.getGoal().position, null);
   }
 
   public void stop() {

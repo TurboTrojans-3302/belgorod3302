@@ -92,8 +92,7 @@ public class RobotContainer {
           DigitalIO.kElevatorHighLimitSwitchId,
           DigitalIO.kElevatorLowLimitSwitchId);
       SmartDashboard.putData("Elevator", m_elevator);
-      // SmartDashboard.putData("Elevator L PID", m_elevator.leftPID);
-      // SmartDashboard.putData("Elevator R PID", m_elevator.rightPID);
+      SmartDashboard.putData("Elevator PID", m_elevator.PID);
     }
     if (INTAKE_ENABLE) {
       m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,

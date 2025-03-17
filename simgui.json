@@ -13,6 +13,7 @@
       "/SmartDashboard/Climbers": "Subsystem",
       "/SmartDashboard/DriveSubsystem": "Subsystem",
       "/SmartDashboard/Elevator": "Subsystem",
+      "/SmartDashboard/Elevator PID": "ProfiledPIDController",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/GoToCommand 0, 0": "Command",
       "/SmartDashboard/GoToCommand 0, 6": "Command",
@@ -52,6 +53,9 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Elevator": {
+          "open": true
+        },
         "open": true
       }
     }
