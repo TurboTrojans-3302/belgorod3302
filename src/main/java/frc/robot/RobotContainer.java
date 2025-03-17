@@ -45,9 +45,9 @@ import frc.robot.subsystems.Navigation;
 public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = true;
-  private static boolean INTAKE_ENABLE = true;
-  private static boolean INTAKE_ARM_ENABLE = true;
-  private static boolean GRIPPER_ENABLE = true;
+  private static boolean INTAKE_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
@@ -287,7 +287,7 @@ public class RobotContainer {
       JoystickButton testElevator = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down);
       testElevator.and(testPlus)
           .whileTrue(m_elevator.testMoveCommand(0.4));
-      testElevator.and(testPlus)
+      testElevator.and(testMinus)
           .whileTrue(m_elevator.testMoveCommand(-0.4));
     }
 

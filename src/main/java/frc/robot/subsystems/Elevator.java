@@ -25,6 +25,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -152,11 +153,11 @@ public class Elevator extends SubsystemBase {
   
     @Override
     public void periodic() {
-      // todo I bet we need some feedforward here
+      if (!DriverStation.isTest()){// todo I bet we need some feedforward here
       double speed = PID.calculate(encoder.getPosition());
       elevatorMotor.set(speed);
       // important to check the limits after setting the speed
-      checkLimits();
+      checkLimits();}
     }
   
     @Override
