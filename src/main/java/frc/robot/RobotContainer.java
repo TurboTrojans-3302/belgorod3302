@@ -45,9 +45,9 @@ import frc.robot.subsystems.Navigation;
 public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = true;
-  private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
-  private static boolean GRIPPER_ENABLE = false;
+  private static boolean INTAKE_ENABLE = true;
+  private static boolean INTAKE_ARM_ENABLE = true;
+  private static boolean GRIPPER_ENABLE = true;
   private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
@@ -111,6 +111,7 @@ public class RobotContainer {
           DigitalIO.kGripperFullyRetractedSwitchId,
           DigitalIO.kGripperObjectDetectedSwitchId);
       SmartDashboard.putData("Gripper", m_gripper);
+      SmartDashboard.putData("GripperPID", m_gripper.gripperPID);
     }
     if (CLIMBERS_ENABLE) {
       m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
@@ -207,8 +208,8 @@ public class RobotContainer {
       Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
       Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
 
-      extensionOut.onTrue(new InstantCommand(() -> m_gripper.extendGripper()));
-      extensionIn.onTrue(new InstantCommand(() -> m_gripper.retractGripper()));
+      extensionOut.onTrue(m_gripper.extendCommand());
+      extensionIn.onTrue(m_gripper.retractCommand());
 
     }
     if (CLIMBERS_ENABLE) {
@@ -254,38 +255,42 @@ public class RobotContainer {
   };
 
   public void configureTestControls() {
+    JoystickButton testPlus = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Up);
+    JoystickButton testMinus = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down);
+
+
     if (INTAKE_ARM_ENABLE) {
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Up)
-          .whileTrue(new InstantCommand(() -> m_intakeArm.changeSetPoint(0.5)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down)
-          .whileTrue(new InstantCommand(() -> m_intakeArm.changeSetPoint(-0.5)));
+      JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
+      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.test(0.1));
+      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.test(-0.1));    
     }
 
     if (INTAKE_ENABLE) {
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up)
+      JoystickButton testLowerConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
+      testLowerConveyor.and(testPlus)    
           .onTrue(new InstantCommand(() -> m_intake.out()))
           .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down)
+      testLowerConveyor.and(testMinus) 
           .onTrue(new InstantCommand(() -> m_intake.in()))
           .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up)
+
+      JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
+      testUpperConveyor.and(testPlus)
           .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
           .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down)
+      testUpperConveyor.and(testMinus)
           .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
           .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
     }
 
     if (ELEVATOR_ENABLE) {
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
-          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(10)));
-      new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
-          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-10)));
-      // new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up)
-      //     .whileTrue(m_elevator.testMoveCommand(0.4));
-      // new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down)
-      //     .whileTrue(m_elevator.testMoveCommand(-0.4));
+      JoystickButton testElevator = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down);
+      testElevator.and(testPlus)
+          .whileTrue(m_elevator.testMoveCommand(0.4));
+      testElevator.and(testPlus)
+          .whileTrue(m_elevator.testMoveCommand(-0.4));
     }
+
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
           .getPOV() == Constants.OIConstants.ButtonBox.StickLeft)
@@ -296,6 +301,20 @@ public class RobotContainer {
       new Trigger(() -> m_buttonBoard
           .getPOV() == -1)
           .whileTrue(new InstantCommand(() -> m_climbers.test(0.0)));
+    }
+
+    if (GRIPPER_ENABLE) {
+      JoystickButton testGripper = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up);
+      testGripper.and(testPlus)
+          .whileTrue(m_gripper.testGripperCommand(0.1));
+      testGripper.and(testMinus)
+          .whileTrue(m_gripper.testGripperCommand(-0.1));
+
+      JoystickButton testExtension = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down);
+      testExtension.and(testPlus)
+          .whileTrue(m_gripper.testExtensionCommand(0.1));
+      testExtension.and(testMinus)
+          .whileTrue(m_gripper.testExtensionCommand(-0.1));
     }
   }
 

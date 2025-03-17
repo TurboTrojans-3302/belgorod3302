@@ -20,6 +20,7 @@
       "/SmartDashboard/GoToCommand 6, 0": "Command",
       "/SmartDashboard/GoToCommand 6, 6": "Command",
       "/SmartDashboard/Gripper": "Subsystem",
+      "/SmartDashboard/GripperPID": "PIDController",
       "/SmartDashboard/IMU": "Gyro",
       "/SmartDashboard/Intake": "Subsystem",
       "/SmartDashboard/IntakeArm": "Subsystem",

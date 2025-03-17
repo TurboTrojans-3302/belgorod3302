@@ -70,12 +70,18 @@ Enter Button - move climber up
 
 Esc Button - move climber down
 
-Switch 1 (momentary) - Intake Arm up/down 
+Switch 1 (momentary) - Test-nove the enabled mechainsim (see below) 
 
-Switch 2 - Lower Conveyor
+Switch 2 Up - Enable testing Intake arm with Switch 1
 
-Switch 3 - Upper Conveyor
+Switch 2 Down - Enable testing Elevator with Switch 1
 
-Switch 4 - Elevator
+Switch 3 Up - Enable testing Upper Conveyor with Switch 1
+
+Switch 3 Down - Enable testing Lower Conveyor with Switch 1
+
+Switch 4 Up - Enable testing Gripper with Switch 1
+
+Switch 4 Down - Enable testing Extension with Switch 1
 
 * Switches are active in Test Mode only!!

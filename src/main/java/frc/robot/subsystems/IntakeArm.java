@@ -31,9 +31,12 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -140,7 +143,9 @@ public class IntakeArm extends SubsystemBase {
     ff = m_Feedforward.calculate(Math.toRadians(intermediate.position),
                                         Math.toRadians(intermediate.velocity));
 
-    m_armLeftSparkMax.set( (pid + ff));
+    if(!DriverStation.isTest()){
+      m_armLeftSparkMax.set( (pid + ff));
+    }
   }
 
   public void setPositionAngleSetpoint(double angle) {
@@ -172,6 +177,16 @@ public class IntakeArm extends SubsystemBase {
   public void floorPosition(){ setPositionAngleSetpoint(kFloorPosition); }
   public void troughPosition(){ setPositionAngleSetpoint(kTroughPosition); }
   public void elevatorPosition(){ setPositionAngleSetpoint(kElevatorPosition); }
+
+  public Command test(double speed){
+    return new FunctionalCommand(
+                          ()->m_armLeftSparkMax.set(speed),
+                          ()->{},
+                          (x)->m_armLeftSparkMax.set(0.0),
+                          ()->false,
+                          this
+                          );
+  }
 
   @Override
   public void initSendable(SendableBuilder builder) {

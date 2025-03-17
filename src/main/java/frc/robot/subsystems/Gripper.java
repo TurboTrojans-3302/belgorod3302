@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,10 +30,7 @@ public class Gripper extends SubsystemBase {
   final double extensionToleranceMedium = 4.0;
   final double extensionToleranceSmall = 2.0;
   final double stopTolerance = 0.5;
-  PIDController gripperPID;
-  double kP = GripperConstants.kP;
-  double kI = GripperConstants.kI;
-  double kD = GripperConstants.kD;
+  public PIDController gripperPID;
   double kClosed = GripperConstants.closedPosition;
   double kOpen = GripperConstants.openPosition;
   double kExtendedPos = GripperConstants.gripperExtendedPosition;
@@ -47,7 +45,7 @@ public class Gripper extends SubsystemBase {
     gripperClosedSwitch = new DigitalInput(closedSwitchID);
     gripperFullyRetracted = new DigitalInput(retractedSwitchID);
     gripperObjectDetected = new DigitalInput(objectDetectionID);
-    gripperPID = new PIDController(kP, kI, kD);
+    gripperPID = new PIDController(GripperConstants.kP, GripperConstants.kI, GripperConstants.kD);
   }
 
   public double getGripperPosition() {
@@ -101,6 +99,10 @@ public class Gripper extends SubsystemBase {
     }
   }
 
+  public void stopExtention(){
+    gripperExtension.set(0);
+  }
+
   public boolean isGripperFullyExtended() {
     return (getExtensionPosition() > kExtendedPos - stopTolerance);
   }
@@ -119,31 +121,31 @@ public class Gripper extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    double position = gripperEncoder.getPosition();
-    double speed = gripperPID.calculate(position);
-    gripperMotor.set(speed);
+    if(!DriverStation.isTest()){
+      // This method will be called once per scheduler run
+      double position = gripperEncoder.getPosition();
+      double speed = gripperPID.calculate(position);
+      gripperMotor.set(speed);
+    }
   }
 
   public Command extendCommand() {
-    return new FunctionalCommand(() -> extendGripper(),
-        () -> {
-        },
-        (x) -> {
-        },
-        () -> isGripperFullyExtended(),
+    return new FunctionalCommand(
+        ()->{},
+        this::extendGripper,
+        (x) -> this.stopExtention(),
+        this::isGripperFullyExtended,
         this
     );
   }
 
   public Command retractCommand() {
-    return new FunctionalCommand(() -> retractGripper(),
-        () -> {
-        },
-        (x) -> {
-        },
-        () -> isExtensionRetracted(),
-        this
+    return new FunctionalCommand(
+      ()->{},
+      this::retractGripper,
+      (x) -> this.stopExtention(),
+      this::isExtensionRetracted,
+      this
     );
   }
 
@@ -169,24 +171,36 @@ public class Gripper extends SubsystemBase {
     );
   }
 
+  public Command testGripperCommand(double speed) {
+    return new FunctionalCommand(
+        () -> gripperMotor.set(speed),
+        () -> {},
+        (x) -> gripperMotor.set(0.0),
+        () -> false,
+        this
+    );
+  }
+
+  public Command testExtensionCommand(double speed) {
+    return new FunctionalCommand(
+        () -> gripperExtension.set(speed),
+        () -> {},
+        (x) -> gripperExtension.set(0.0),
+        () -> false,
+        this
+    );
+  }
+
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("gripperP", () -> kP, (x) -> {
-      kP = x;
-    });
-    builder.addDoubleProperty("gripperI", () -> kI, (x) -> {
-      kI = x;
-    });
-    builder.addDoubleProperty("gripperD", () -> kD, (x) -> {
-      kD = x;
-    });
     builder.addDoubleProperty("kClosed", () -> kClosed, (x) -> {
       kClosed = x;
     });
     builder.addDoubleProperty("kOpen", () -> kOpen, (x) -> {
       kOpen = x;
     });
+    builder.addDoubleProperty("Gripper Pos.", this::getGripperPosition, null);
     builder.addBooleanProperty("Obj In Gripper", this::objectInGripper, null);
     builder.addBooleanProperty("Open", this::isGripperOpen, null);
     builder.addBooleanProperty("Closed", this::isGripperClosed, null);
