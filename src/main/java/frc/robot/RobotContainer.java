@@ -50,7 +50,7 @@ public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = true;
   private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = true;
 
@@ -106,7 +106,8 @@ public class RobotContainer {
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
-      SmartDashboard.putData("IntakeArmPID", m_intakeArm.m_PidController);
+      SmartDashboard.putData("ArmPIDright", m_intakeArm.m_PidControllerRight);
+      SmartDashboard.putData("ArmPIDleft", m_intakeArm.m_PidControllerLeft);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -280,8 +281,8 @@ public class RobotContainer {
 
     if (INTAKE_ARM_ENABLE) {
       JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
-      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.test(0.1));
-      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.test(-0.1));    
+      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.1));
+      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.1));    
     }
 
     if (INTAKE_ENABLE) {
