@@ -25,6 +25,8 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.ButtonBox;
 import frc.robot.commands.Coral;
 import frc.robot.commands.ElevatorManualMove;
+import frc.robot.commands.IntakeCycle;
+import frc.robot.commands.LoadGripper;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
@@ -210,6 +212,8 @@ public class RobotContainer {
       extensionOut.onTrue(m_gripper.extendCommand());
       extensionIn.onTrue(m_gripper.retractCommand());
 
+
+
     }
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
@@ -258,8 +262,15 @@ public class RobotContainer {
           }
       ));
 
-      new JoystickButton(m_copilotController, XboxController.Button.kA.value)
-      .onTrue(new TroughScore(m_intakeArm, m_intake));
+      
+
+      if (INTAKE_ENABLE && INTAKE_ARM_ENABLE && ELEVATOR_ENABLE && GRIPPER_ENABLE){
+        new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+          .onTrue(new LoadGripper(instance));
+
+        new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+          .onTrue(new TroughScore(m_intakeArm, m_intake));
+      }
   };
 
   public void configureTestControls() {

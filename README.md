@@ -47,7 +47,7 @@ B button
 
 X button 
 
-Y button - Level 4 elevator preset position
+Y button - Load coral from intake to gripper
  
 Left Bumper - Load elevator routine (planned)
 
