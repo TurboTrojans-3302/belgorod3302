@@ -16,7 +16,7 @@ public class AutonCoralTrough extends SequentialCommandGroup {
   public AutonCoralTrough(RobotContainer bot, int tagid) {
             addCommands(new DriveCloseToReef(bot.m_robotDrive, bot.m_nav),
                         Commands.parallel(new OrbitReefToTag(bot.m_robotDrive, bot.m_nav, tagid),
-                                          bot.m_elevator.level1Command()
+                                          bot.m_elevator.loadPosCommand()
                                         ),
                         Commands.parallel(new GoToCommand(bot.m_robotDrive, bot.m_nav, Navigation.getPose2dInFrontOfTag(tagid, 0.05)),
                                           bot.m_gripper.extendCommand()

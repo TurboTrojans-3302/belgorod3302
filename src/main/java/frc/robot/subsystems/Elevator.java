@@ -25,6 +25,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,7 +45,6 @@ public class Elevator extends SubsystemBase {
   public double kSoftLimitLow = ElevatorConstants.kSoftLimitLow;
   public double kSoftLimitHigh = ElevatorConstants.kSoftLimitHigh;
   public double kLoadPosition = ElevatorConstants.kLoadPosition;
-  public double kLevel1Trough = ElevatorConstants.kLevel1Trough;
   public double kPickupLevel = ElevatorConstants.kPickupLevel;
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
@@ -140,7 +140,6 @@ public class Elevator extends SubsystemBase {
     }
 
   public Command loadPosCommand() { return setPostionCommand(kLoadPosition); }
-  public Command level1Command() { return setPostionCommand(kLevel1Trough); }
   public Command level2Command() { return setPostionCommand(kLevel2); }
   public Command level3Command() { return setPostionCommand(kLevel3); }
   public Command level4Command() { return setPostionCommand(kLevel4); }
@@ -152,11 +151,11 @@ public class Elevator extends SubsystemBase {
   
     @Override
     public void periodic() {
-      // todo I bet we need some feedforward here
+      if (!DriverStation.isTest()){// todo I bet we need some feedforward here
       double speed = PID.calculate(encoder.getPosition());
       elevatorMotor.set(speed);
       // important to check the limits after setting the speed
-      checkLimits();
+      checkLimits();}
     }
   
     @Override
@@ -168,9 +167,6 @@ public class Elevator extends SubsystemBase {
     builder.addDoubleProperty("PickupLevel", ()-> kPickupLevel, (x)-> {
       kPickupLevel = x;
     });
-    builder.addDoubleProperty("Level1Trough", () -> kLevel1Trough, (x) -> {
-      kLevel1Trough = x;
-    });
     builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> {
       kLevel2 = x;
     });
@@ -181,7 +177,6 @@ public class Elevator extends SubsystemBase {
       kLevel4 = x;
     });
     builder.addBooleanProperty("AtPickup", ()->isNear(kLoadPosition), null);
-    builder.addBooleanProperty("AtLevel1", ()->isNear(kLevel1Trough), null );
     builder.addBooleanProperty("AtLevel2", ()->isNear(kLevel2), null );
     builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
     builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );

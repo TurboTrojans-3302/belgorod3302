@@ -23,11 +23,15 @@ import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.ButtonBox;
+import frc.robot.commands.Coral;
 import frc.robot.commands.ElevatorManualMove;
+import frc.robot.commands.IntakeCycle;
+import frc.robot.commands.LoadGripper;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TroughScore;
 import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
@@ -45,9 +49,9 @@ import frc.robot.subsystems.Navigation;
 public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = true;
-  private static boolean INTAKE_ENABLE = true;
-  private static boolean INTAKE_ARM_ENABLE = true;
-  private static boolean GRIPPER_ENABLE = true;
+  private static boolean INTAKE_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
@@ -170,9 +174,6 @@ public class RobotContainer {
      *
      */
     if (ELEVATOR_ENABLE) {
-      new JoystickButton(m_buttonBoard, ButtonBox.Right2)
-          .onTrue(new MoveElevator(m_elevator,
-              Constants.ElevatorConstants.kLevel1Trough));
 
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
@@ -211,6 +212,8 @@ public class RobotContainer {
       extensionOut.onTrue(m_gripper.extendCommand());
       extensionIn.onTrue(m_gripper.retractCommand());
 
+
+
     }
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
@@ -242,6 +245,12 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_intakeArm.elevatorPosition()));
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
           .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
+
+      new Trigger(() -> {
+        return m_intake.lowerObjectDetected();
+
+      })
+      .onTrue(new Coral(m_intakeArm, m_intake));    
     }
 
     m_reefController.getChangeTrigger()
@@ -252,6 +261,16 @@ public class RobotContainer {
             SmartDashboard.putString("ReefController", m_reefController.label());
           }
       ));
+
+      
+
+      if (INTAKE_ENABLE && INTAKE_ARM_ENABLE && ELEVATOR_ENABLE && GRIPPER_ENABLE){
+        new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+          .onTrue(new LoadGripper(instance));
+
+        new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+          .onTrue(new TroughScore(m_intakeArm, m_intake));
+      }
   };
 
   public void configureTestControls() {
@@ -287,7 +306,7 @@ public class RobotContainer {
       JoystickButton testElevator = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Down);
       testElevator.and(testPlus)
           .whileTrue(m_elevator.testMoveCommand(0.4));
-      testElevator.and(testPlus)
+      testElevator.and(testMinus)
           .whileTrue(m_elevator.testMoveCommand(-0.4));
     }
 
