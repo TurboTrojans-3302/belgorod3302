@@ -174,7 +174,6 @@ public final class Constants {
     public static final double kLimitLow = 0;
     public static final double kSoftLimitLow = 10;
     public static final double kPickupLevel = 100;
-    public static final double kLevel1Trough = 200;
     public static final double kLevel2 = 300;
     public static final double kLevel3 = 400;
     public static final double kLevel4 = 500;
@@ -219,6 +218,7 @@ public final class Constants {
     public static final double kElevatorPosition = 110;
     public static final double kTroughPosition = 60;
     public static final double upperLoadSpeed = 0;
+    public static final double ejectTime = 1.0;
   }
 
   public static final class ClimberConstants {

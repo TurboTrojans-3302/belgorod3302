@@ -38,9 +38,10 @@ Left Bumper -  intake out
 
 Left Stick 
 
-Right Stick -- Slam forward/back to extend/retract intake arm
+Right Stick -- Push stick forward to Extend arm down to floor and begin lower conveyor intake
+                Pull stick back to bring intake arm to top position and stop lower conveyor if needed
 
-A Button - Trough preset position
+A Button - Move intake arm forward and then eject coral into trough  
 
 B button
 

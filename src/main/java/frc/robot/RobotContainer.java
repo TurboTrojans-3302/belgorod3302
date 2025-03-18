@@ -23,11 +23,13 @@ import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.ButtonBox;
+import frc.robot.commands.Coral;
 import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.TroughScore;
 import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
@@ -170,9 +172,6 @@ public class RobotContainer {
      *
      */
     if (ELEVATOR_ENABLE) {
-      new JoystickButton(m_buttonBoard, ButtonBox.Right2)
-          .onTrue(new MoveElevator(m_elevator,
-              Constants.ElevatorConstants.kLevel1Trough));
 
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
@@ -242,6 +241,12 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_intakeArm.elevatorPosition()));
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
           .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
+
+      new Trigger(() -> {
+        return m_intake.lowerObjectDetected();
+
+      })
+      .onTrue(new Coral(m_intakeArm, m_intake));    
     }
 
     m_reefController.getChangeTrigger()
@@ -252,6 +257,9 @@ public class RobotContainer {
             SmartDashboard.putString("ReefController", m_reefController.label());
           }
       ));
+
+      new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+      .onTrue(new TroughScore(m_intakeArm, m_intake));
   };
 
   public void configureTestControls() {
