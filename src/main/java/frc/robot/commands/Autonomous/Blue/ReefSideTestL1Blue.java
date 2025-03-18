@@ -35,7 +35,7 @@ public class ReefSideTestL1Blue extends SequentialCommandGroup {
     aprilTagPose = Navigation.getPose2dInFrontOfTag(aprilTag, 1.0);
 
     
-    addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPose, Constants.ElevatorConstants.kLevel1Trough),
+    addCommands(new MoveRobotAndElevator(m_drive, m_nav, m_elevator, aprilTagPose, Constants.ElevatorConstants.kLoadPosition),
                 //gripper closing runs at the same time as the main command
                 new DriveToAprilTag(drive, nav, aprilTag),
                 //keep gripper closed runs at the same time as the main command
