@@ -203,9 +203,10 @@ public final class Constants {
     public static final double kP = 0.050;
     public static final double kD = 0.002;
     public static final double intakeSpeedMin = -0.75;
-    public static final double armAngleOffset = 0;
-    public static final double MaxArmAngle = 110.0;
-    public static final double MinArmAngle = -30.0;
+    public static final double armAngleOffsetLeft = -18.1;
+    public static final double armAngleOffsetRight = 113.4;
+    public static final double MaxArmAngle = 115.0;
+    public static final double MinArmAngle = -17.0;
     public static final double inSpeed = 0;
     public static final double outSpeed = 0;
     public static final double kS = 0.0;
@@ -214,9 +215,9 @@ public final class Constants {
     public static final double kA = 0.0;
     public static final double kMaxVelocity = 720;
     public static final double kMaxAcceleration = 200;
-    public static final double kFloorPosition = -30.;
-    public static final double kElevatorPosition = 110;
-    public static final double kTroughPosition = 60;
+    public static final double kFloorPosition = MinArmAngle;
+    public static final double kElevatorPosition = MaxArmAngle;
+    public static final double kTroughPosition = 73;
     public static final double upperLoadSpeed = 0;
     public static final double ejectTime = 1.0;
   }
