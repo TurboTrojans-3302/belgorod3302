@@ -15,13 +15,16 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkAbsoluteEncoderSim;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkRelativeEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -47,11 +50,12 @@ public class IntakeArm extends SubsystemBase {
   private SparkMax m_armLeftSparkMax;
   private SparkMax m_armRightSparkMax;
   private SparkMaxSim m_armSparkMaxSim;
-  private SparkAbsoluteEncoder m_ArmEncoderRight;
-  private SparkAbsoluteEncoderSim m_ArmEncoderRightSim;
-  private SparkAbsoluteEncoder m_ArmEncoderLeft;
-  private SparkAbsoluteEncoderSim m_ArmEncoderLeftSim;
-  private double m_armAngleOffset = IntakeConstants.armAngleOffset;
+  private RelativeEncoder m_ArmEncoderRight;
+  private SparkRelativeEncoderSim m_ArmEncoderRightSim;
+  private RelativeEncoder m_ArmEncoderLeft;
+  private SparkRelativeEncoderSim m_ArmEncoderLeftSim;
+  private double m_armAngleOffsetLeft = IntakeConstants.armAngleOffsetLeft;
+  private double m_armAngleOffsetRight = IntakeConstants.armAngleOffsetRight;
   public ProfiledPIDController m_PidControllerRight;
   public ProfiledPIDController m_PidControllerLeft;
   private ArmFeedforward m_Feedforward;
@@ -65,8 +69,8 @@ public class IntakeArm extends SubsystemBase {
   private double kElevatorPosition = IntakeConstants.kElevatorPosition;
   private double kTroughPosition = IntakeConstants.kTroughPosition;
   private static final double kGearRatio = 100.0;
-  private static final double kVelocityConversionFactor = (360.0 / 60.0) / kGearRatio; // converts RPM to deg/sec
-  private static final double kPositionConversionFactor = 360.0 / kGearRatio; // converts Revolutions to degrees
+  private static final double kPositionConversionFactor = 180.0; // converts to degrees
+  private static final double kVelocityConversionFactor = kPositionConversionFactor/ 60.0; // converts RPM to deg/sec
 
   private static final SparkMaxConfig leftSparkConfig = new SparkMaxConfig();
   private static final SparkMaxConfig rightSparkConfig = new SparkMaxConfig();
@@ -81,9 +85,9 @@ public class IntakeArm extends SubsystemBase {
     rightSparkConfig
           .inverted(true)
           .idleMode(IdleMode.kBrake)
-          .smartCurrentLimit(50)
-          .follow(Constants.CanIds.intakeArmLeftMotorID, true);
+          .smartCurrentLimit(50);
     rightSparkConfig.encoder
+          .inverted(true)
           .positionConversionFactor(kPositionConversionFactor) 
           .velocityConversionFactor(kVelocityConversionFactor);
 }
@@ -105,13 +109,13 @@ public class IntakeArm extends SubsystemBase {
   public IntakeArm() {
 
     m_armLeftSparkMax = new SparkMax(Constants.CanIds.intakeArmLeftMotorID, MotorType.kBrushed);
-    m_armLeftSparkMax.configure(leftSparkConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    m_armLeftSparkMax.configure(leftSparkConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
     m_armRightSparkMax = new SparkMax(Constants.CanIds.intakeArmRightMotorID, MotorType.kBrushed);
-    m_armRightSparkMax.configure(rightSparkConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    m_armRightSparkMax.configure(rightSparkConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     
-    m_ArmEncoderRight = m_armRightSparkMax.getAbsoluteEncoder();
-    m_ArmEncoderLeft  = m_armLeftSparkMax.getAbsoluteEncoder();
+    m_ArmEncoderRight = m_armRightSparkMax.getEncoder();
+    m_ArmEncoderLeft  = m_armLeftSparkMax.getEncoder();
     m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
                                                 new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
     m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
@@ -120,8 +124,8 @@ public class IntakeArm extends SubsystemBase {
     m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
     m_lastArmAngle = getArmAngleRightDegrees();
 
-    m_ArmEncoderRightSim = new SparkAbsoluteEncoderSim(m_armRightSparkMax);
-    m_ArmEncoderLeftSim  = new SparkAbsoluteEncoderSim(m_armLeftSparkMax);
+    m_ArmEncoderRightSim = new SparkRelativeEncoderSim(m_armRightSparkMax);
+    m_ArmEncoderLeftSim  = new SparkRelativeEncoderSim(m_armLeftSparkMax);
     DCMotor plant = DCMotor.getAndymark9015(2);
     m_armSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
 
@@ -186,11 +190,11 @@ public class IntakeArm extends SubsystemBase {
   }
 
   public double getArmAngleRightDegrees() {
-    return (m_ArmEncoderRight.getPosition() * 360.0) + m_armAngleOffset;
+    return m_ArmEncoderRight.getPosition() + m_armAngleOffsetRight;
   }
 
   public double getArmAngleLeftDegrees() {
-    return (m_ArmEncoderLeft.getPosition() * 360.0) + m_armAngleOffset;
+    return m_ArmEncoderLeft.getPosition() + m_armAngleOffsetLeft;
   }
 
   public double getArmAngleVelocity() {
@@ -204,7 +208,7 @@ public class IntakeArm extends SubsystemBase {
   public Command testCommand(double speed){
     return new FunctionalCommand(
                           ()->{m_armLeftSparkMax.set(speed);
-                               m_armRightSparkMax.set(speed);},
+                               m_armRightSparkMax.set(-speed);},
                           ()->{},
                           (x)->{m_armLeftSparkMax.set(0.0);
                                 m_armRightSparkMax.set(0.0);},
@@ -218,8 +222,11 @@ public class IntakeArm extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty("ArmAngleR", this::getArmAngleRightDegrees, null);
     builder.addDoubleProperty("ArmAngleL", this::getArmAngleLeftDegrees, null);
-    builder.addDoubleProperty("ArmAngleOffset", () -> m_armAngleOffset, (x) -> {
-      m_armAngleOffset = x;
+    builder.addDoubleProperty("ArmAnglOffstL", () -> m_armAngleOffsetLeft, (x) -> {
+      m_armAngleOffsetLeft = x;
+    });
+    builder.addDoubleProperty("ArmAnglOffstR", () -> m_armAngleOffsetRight, (x) -> {
+      m_armAngleOffsetRight = x;
     });
     builder.addDoubleProperty("kS", () -> kS, (x) -> {
       kS = x;
@@ -245,7 +252,8 @@ public class IntakeArm extends SubsystemBase {
     });
     builder.addStringProperty("pid", ()->String.format("%.2f", pidLeft), null);
     builder.addStringProperty("ff", ()->String.format("%.2f", ff), null);
-    builder.addDoubleProperty("motorVoltage", ()->m_armLeftSparkMax.getAppliedOutput()*12, null);
+    builder.addDoubleProperty("LmotorOutput", ()->m_armLeftSparkMax.getAppliedOutput(), null);
+    builder.addDoubleProperty("RmotorOutput", ()->m_armRightSparkMax.getAppliedOutput(), null);
   }
 
   @Override

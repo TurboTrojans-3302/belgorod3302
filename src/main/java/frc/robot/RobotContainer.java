@@ -281,8 +281,8 @@ public class RobotContainer {
 
     if (INTAKE_ARM_ENABLE) {
       JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
-      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.1));
-      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.1));    
+      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.2));
+      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.2));    
     }
 
     if (INTAKE_ENABLE) {
