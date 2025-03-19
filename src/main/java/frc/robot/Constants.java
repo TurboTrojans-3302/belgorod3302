@@ -153,9 +153,14 @@ public final class Constants {
     public static final String name = "limelight";
 
     public static final class Offset {
-      public static final double forward = 0.2985;
-      public static final double side = 0.0;
-      public static final double up = 0.5;
+
+      //measured to the center of the lens
+
+      //inches
+      public static final double forward = 4; 
+      public static final double side = -7.5; //right is negative
+      public static final double up = 37.25; 
+
       public static final double roll = 0.0;
       public static final double pitch = 0.0;
       public static final double yaw = 0.0;
