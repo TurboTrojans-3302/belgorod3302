@@ -70,13 +70,15 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     //DataLogManager.start();
     //CanBridge.runTCP();
-    LimelightHelpers.setCameraPose_RobotSpace(Constants.LimelightConstants.name,
-                                              Constants.LimelightConstants.Offset.forward,
-                                              Constants.LimelightConstants.Offset.side,
-                                              Constants.LimelightConstants.Offset.up,
-                                              Constants.LimelightConstants.Offset.roll,
-                                              Constants.LimelightConstants.Offset.pitch,
-                                              Constants.LimelightConstants.Offset.yaw
+    
+    //Uses the main camera by default
+    LimelightHelpers.setCameraPose_RobotSpace(Constants.LimelightConstants.mainName,
+                                              Constants.LimelightConstants.OffsetsMain.forward,
+                                              Constants.LimelightConstants.OffsetsMain.side,
+                                              Constants.LimelightConstants.OffsetsMain.up,
+                                              Constants.LimelightConstants.OffsetsMain.roll,
+                                              Constants.LimelightConstants.OffsetsMain.pitch,
+                                              Constants.LimelightConstants.OffsetsMain.yaw
                                             );
   }
 

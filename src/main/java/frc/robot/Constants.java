@@ -150,9 +150,19 @@ public final class Constants {
   }
 
   public static final class LimelightConstants {
-    public static final String name = "limelight";
+    public static final String mainName = "limelight";
+    
+    public static final class OffsetsMain {
+      public static final double forward = 0.2985;
+      public static final double side = 0.0;
+      public static final double up = 0.5;
+      public static final double roll = 0.0;
+      public static final double pitch = 0.0;
+      public static final double yaw = 0.0;
+    }
 
-    public static final class Offset {
+    public static final class OffsetsAlternate {
+      //TODO need to figure out these values for both since the camera is no longer in the center?
       public static final double forward = 0.2985;
       public static final double side = 0.0;
       public static final double up = 0.5;

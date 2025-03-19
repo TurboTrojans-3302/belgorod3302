@@ -146,7 +146,7 @@ public class RobotContainer {
      */
     new Trigger(() -> m_driverController.getPOV() == 0)
         .onTrue(new RunCommand(() -> {
-          targetTagId = (int) LimelightHelpers.getFiducialID("limelight");
+          targetTagId = (int) LimelightHelpers.getFiducialID(m_nav.getPriorityCameraName());
         }));
     new Trigger(() -> m_driverController.getPOV() == 180)
         .whileTrue(Commands.defer(() -> new NavigateToTag(m_robotDrive, m_nav, () -> targetTagId),
@@ -156,6 +156,8 @@ public class RobotContainer {
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
+
+        //what does this do
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .onTrue(new InstantCommand(() -> {
           double stream = LimelightHelpers.getLimelightNTDouble("limelight", "stream");
