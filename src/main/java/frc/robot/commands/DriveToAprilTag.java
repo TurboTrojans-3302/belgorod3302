@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
+import frc.robot.RobotContainer;
 import frc.robot.LimelightHelpers.RawFiducial;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Navigation;
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToAprilTag extends Command {
-  public static final String cameraName = "limelight";
+  public static final String cameraName = RobotContainer.getInstance().m_nav.getPriorityCameraName();
 
   DriveSubsystem m_drive;
   int m_targetTag;
