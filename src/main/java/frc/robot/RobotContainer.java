@@ -50,7 +50,7 @@ public class RobotContainer {
 
   private static boolean ELEVATOR_ENABLE = true;
   private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = false;
+  private static boolean INTAKE_ARM_ENABLE = true;
   private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = false;
 

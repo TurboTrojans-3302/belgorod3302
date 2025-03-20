@@ -214,7 +214,7 @@ public final class Constants {
     public static final double kD = 0.002;
     public static final double intakeSpeedMin = -0.75;
     public static final double armAngleOffsetLeft = -18.1;
-    public static final double armAngleOffsetRight = 113.4;
+    public static final double armAngleOffsetRight = -18.230000;
     public static final double MaxArmAngle = 115.0;
     public static final double MinArmAngle = -17.0;
     public static final double inSpeed = 0;

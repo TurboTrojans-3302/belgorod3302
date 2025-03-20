@@ -98,7 +98,8 @@ public class IntakeArm extends SubsystemBase {
   private double m_armVelocity = 0.0;
   private double pidLeft = 0;
   private double pidRight = 0;
-  private double ff = 0;
+  private double ffLeft = 0;
+  private double ffRight = 0;
 
   private SingleJointedArmSim m_sim;
   private double kPositionTolerance = IntakeConstants.kPositionTolerance;
@@ -153,19 +154,20 @@ public class IntakeArm extends SubsystemBase {
       m_armVelocity = m_velocityFilter.calculate(vel);
       m_lastArmAngle = newAngle;
   
-      pidLeft = m_PidControllerRight.calculate(newAngle);
-      State intermediateLeft = m_PidControllerRight.getSetpoint();
-      ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
+      pidLeft = m_PidControllerLeft.calculate(newAngle);
+      State intermediateLeft = m_PidControllerLeft.getSetpoint();
+      ffLeft = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
                                           Math.toRadians(intermediateLeft.velocity));
   
       pidRight = m_PidControllerRight.calculate(newAngle);
+      //TODO is this the right value to feed into feedforward?
       State intermediateRight = m_PidControllerRight.getSetpoint();
-      ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
+      ffRight = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
                                           Math.toRadians(intermediateRight.velocity));
   
       if(!DriverStation.isTest()){
-        m_armLeftSparkMax.set( (pidLeft + ff));
-        m_armRightSparkMax.set( (pidRight + ff));
+        m_armLeftSparkMax.set( (pidLeft + ffLeft));
+        m_armRightSparkMax.set( -(pidRight + ffRight));
       }
     }
   
@@ -262,7 +264,8 @@ public class IntakeArm extends SubsystemBase {
       kMaxArmAngle = x;
     });
     builder.addStringProperty("pid", ()->String.format("%.2f", pidLeft), null);
-    builder.addStringProperty("ff", ()->String.format("%.2f", ff), null);
+    builder.addStringProperty("ffL", ()->String.format("%.2f", ffLeft), null);
+    builder.addStringProperty("ffR", ()->String.format("%.2f", ffRight), null);
     builder.addDoubleProperty("LmotorOutput", ()->m_armLeftSparkMax.getAppliedOutput(), null);
     builder.addDoubleProperty("RmotorOutput", ()->m_armRightSparkMax.getAppliedOutput(), null);
     builder.addStringProperty("ArmAngleLabel", this::getPositionLabel, null);
