@@ -43,6 +43,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  private AutonBuilder m_builder;
+
   Robot(){}
 
   Robot(double period) {
@@ -126,6 +128,26 @@ public class Robot extends TimedRobot {
           m_robotContainer.targetTagId = m_robotContainer.m_reefController.getAprilTagId();
       }
     }
+
+    if (RobotContainer.getActionCount() != null && m_builder.isInitialized == false){
+      m_builder = new AutonBuilder();
+      m_builder.isInitialized = true;
+      m_builder.getBuilder(m_robotContainer, RobotContainer.getActionCount(), DriverStation.getAlliance().toString());
+
+      for (int i = 0; i < m_builder.choosers.length; i++){
+        SmartDashboard.putData("Action: " + i, m_builder.choosers[i]);
+
+      }
+
+      
+    }
+    
+    //TODO so close?
+
+    for (int i = 0; i < m_builder.choosers.length; i++){
+      m_builder.choosers[i].onChange(m_builder.setActionStep(i, m_choosers[i].getSelected()));
+    }
+    
   }
 
 
