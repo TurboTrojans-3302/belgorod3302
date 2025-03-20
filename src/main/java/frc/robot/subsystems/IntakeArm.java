@@ -46,7 +46,8 @@ public class IntakeArm extends SubsystemBase {
 
   private SparkMax m_armLeftSparkMax;
   private SparkMax m_armRightSparkMax;
-  private SparkMaxSim m_armSparkMaxSim;
+  private SparkMaxSim m_armLeftSparkMaxSim;
+  private SparkMaxSim m_armRightSparkMaxSim;
   private RelativeEncoder m_ArmEncoderRight;
   private SparkRelativeEncoderSim m_ArmEncoderRightSim;
   private RelativeEncoder m_ArmEncoderLeft;
@@ -124,8 +125,9 @@ public class IntakeArm extends SubsystemBase {
   
       m_ArmEncoderRightSim = new SparkRelativeEncoderSim(m_armRightSparkMax);
       m_ArmEncoderLeftSim  = new SparkRelativeEncoderSim(m_armLeftSparkMax);
-      DCMotor plant = DCMotor.getAndymark9015(2);
-      m_armSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
+      DCMotor plant = DCMotor.getAndymark9015(1);
+      m_armLeftSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
+      m_armRightSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
   
       m_sim = new SingleJointedArmSim(plant,
                                       kGearRatio,
@@ -138,7 +140,7 @@ public class IntakeArm extends SubsystemBase {
                                       );
       m_sim.setState( 0, 0);
   
-  
+      stop();
     }
   
     private void resetFeedForward() {
@@ -163,7 +165,7 @@ public class IntakeArm extends SubsystemBase {
       ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
                                           Math.toRadians(intermediateRight.velocity));
   
-      if(!DriverStation.isTest()){
+      if(!DriverStation.isTest() && DriverStation.isEnabled()){
         m_armLeftSparkMax.set( (pidLeft + ff));
         m_armRightSparkMax.set( (pidRight + ff));
       }
@@ -270,10 +272,17 @@ public class IntakeArm extends SubsystemBase {
 
   @Override
   public void simulationPeriodic(){
-    m_sim.setInputVoltage(m_armSparkMaxSim.getAppliedOutput() * 12.0);
+    m_sim.setInputVoltage(m_armLeftSparkMaxSim.getAppliedOutput() * 12.0);
     m_sim.update(Robot.kDefaultPeriod);
-    m_armSparkMaxSim.iterate(Math.toDegrees(m_sim.getVelocityRadPerSec()), 12.0, Robot.kDefaultPeriod);
+    m_armLeftSparkMaxSim.iterate(Math.toDegrees(m_sim.getVelocityRadPerSec()), 12.0, Robot.kDefaultPeriod);
     m_ArmEncoderRightSim.setPosition(m_sim.getAngleRads()/6.28318);
     m_ArmEncoderLeftSim.setPosition(m_sim.getAngleRads()/6.28318);
+  }
+
+  public void stop() {
+    m_PidControllerLeft.setGoal(getArmAngleLeftDegrees());
+    m_PidControllerRight.setGoal(getArmAngleRightDegrees());
+    m_armLeftSparkMax.set(0.0);  
+    m_armRightSparkMax.set(0.0);
   }
 }
