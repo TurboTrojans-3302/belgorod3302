@@ -130,7 +130,7 @@ public class RobotContainer {
   public void setDefaultCommands(){
     // Configure default commands
     Command teleopCommand = new TeleopDrive(m_robotDrive, m_driverController);
-    m_robotDrive.setDefaultCommand(teleopCommand);
+    //m_robotDrive.setDefaultCommand(teleopCommand);
     SmartDashboard.putData("TeleopCommand", teleopCommand);
 
   }
@@ -177,6 +177,9 @@ public class RobotContainer {
      *
      */
     if (ELEVATOR_ENABLE) {
+
+      new JoystickButton(m_buttonBoard, ButtonBox.Right2)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kPickupLevel));
 
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));

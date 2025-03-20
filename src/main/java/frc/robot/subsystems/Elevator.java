@@ -181,6 +181,7 @@ public class Elevator extends SubsystemBase {
     builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
     builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );
     builder.addDoubleProperty("motor output", elevatorMotor::getAppliedOutput, null);
+    builder.addDoubleProperty("setpoint", ()->this.PID.getGoal().position, null);
   }
 
   public void stop() {

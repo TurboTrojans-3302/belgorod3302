@@ -182,12 +182,13 @@ public final class Constants {
     // position in motor rotations for different levels of the reef, all random
     // numbers that need to be tested of course
     public static final double kLimitLow = 0;
-    public static final double kSoftLimitLow = 10;
-    public static final double kPickupLevel = 100;
-    public static final double kLevel2 = 300;
-    public static final double kLevel3 = 400;
-    public static final double kLevel4 = 500;
-    public static final double kSoftLimitHigh = 550;
+    public static final double kSoftLimitLow = 5;
+    public static final double kLoadPosition = 5;
+    public static final double kPickupLevel = 5;
+    public static final double kLevel2 = 5;
+    public static final double kLevel3 = 198;
+    public static final double kLevel4 = 550;
+    public static final double kSoftLimitHigh = 580;
     public static final double kLimitHigh = 563.9;
     // honestly the processor probably wouldn't require the elevator to move at all
     // from the start position, but if it is already up it could be useful to have a
@@ -195,14 +196,13 @@ public final class Constants {
     public static final double kProcessor = 15;
 
     public static final double kElevatorAutoSpeedToLevel = 1.0;
-    public static final double kElevatorMaxSpeed = 100000;
-    public static final double kElevatorMaxAccel = 100000;
-    public static final double kManualRate = 1.0;
+    public static final double kElevatorMaxSpeed = 225;
+    public static final double kElevatorMaxAccel = 180;
+    public static final double kManualRate = 10.097;
 
-    public static final double kP = 0.0;
+    public static final double kP = 0.04;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-    public static final double kLoadPosition = 0;
     public static final double kTolerance = 3; //position tolerance
   }
 
