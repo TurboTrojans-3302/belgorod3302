@@ -18,8 +18,6 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
 
     public static final Pose2d defaultStartPosition = new Pose2d(Translation2d.kZero, Rotation2d.kZero);
 
-    private double m_maxSpeed = 0.0;
-
     //todo upload the field map to the camera?
 
 
@@ -68,17 +66,6 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     public abstract SwerveModulePosition[] getSwerveModulePositions();
 
     public abstract SwerveDriveKinematics getKinematics();
-
-    public double getMaxSpeed() {
-        return m_maxSpeed;
-    }
-
-    public void setMaxSpeed() {
-        double speed = getSpeed();
-        if (speed >= m_maxSpeed) {
-            m_maxSpeed = (speed + m_maxSpeed) / 2.0;
-        }
-    }
 
     public abstract double turnToHeadingDegrees(double heading);
 
@@ -142,6 +129,6 @@ public abstract class DriveSubsystemBase extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder){
         super.initSendable(builder);
-        builder.addDoubleProperty("maxSpeed", this::getMaxSpeed, null);
+        builder.addDoubleProperty("speed", this::getSpeed, null);
     }
 }

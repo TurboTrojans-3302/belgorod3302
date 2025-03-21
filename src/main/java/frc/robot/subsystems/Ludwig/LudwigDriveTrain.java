@@ -94,7 +94,6 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
 
   @Override
   public void periodic() {
-    setMaxSpeed();
 
   }
 

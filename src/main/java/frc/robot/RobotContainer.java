@@ -48,9 +48,9 @@ import frc.robot.subsystems.Navigation;
  */
 public class RobotContainer {
 
-  private static boolean ELEVATOR_ENABLE = true;
+  private static boolean ELEVATOR_ENABLE = false;
   private static boolean INTAKE_ENABLE = false;
-  private static boolean INTAKE_ARM_ENABLE = true;
+  private static boolean INTAKE_ARM_ENABLE = false;
   private static boolean GRIPPER_ENABLE = false;
   private static boolean CLIMBERS_ENABLE = true;
 
@@ -247,11 +247,11 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
           .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
 
-      new Trigger(() -> {
-        return m_intake.lowerObjectDetected();
+      // new Trigger(() -> {
+      //   return m_intake.lowerObjectDetected();
 
-      })
-      .onTrue(new Coral(m_intakeArm, m_intake));    
+      // })
+      // .onTrue(new Coral(m_intakeArm, m_intake));    
     }
 
     m_reefController.getChangeTrigger()
