@@ -139,7 +139,6 @@ public class EddieDriveTrain extends DriveSubsystemBase {
 
     @Override
     public void periodic() {
-        setMaxSpeed();
 
         if (Math.abs(getSpeed()) > 1e-6 || Math.abs(getTurnRate()) > 1e-6) {
             stillTime.restart();

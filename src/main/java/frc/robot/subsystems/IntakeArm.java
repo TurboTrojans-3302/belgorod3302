@@ -115,6 +115,9 @@ public class IntakeArm extends SubsystemBase {
       
       m_ArmEncoderRight = m_armRightSparkMax.getEncoder();
       m_ArmEncoderLeft  = m_armLeftSparkMax.getEncoder();
+      m_ArmEncoderLeft.setPosition(kMaxArmAngle);
+      m_ArmEncoderRight.setPosition(kMaxArmAngle);
+
       m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
       m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
