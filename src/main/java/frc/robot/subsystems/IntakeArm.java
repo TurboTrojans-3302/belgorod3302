@@ -125,6 +125,8 @@ public class IntakeArm extends SubsystemBase {
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
       m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kPleft, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
+      m_PidControllerRight.setGoal(new State(kMaxArmAngle, 0.0));
+      m_PidControllerLeft.setGoal(new State(kMaxArmAngle, 0.0));
       resetFeedForward();
       m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
       m_lastArmAngle = getArmAngleRightDegrees();

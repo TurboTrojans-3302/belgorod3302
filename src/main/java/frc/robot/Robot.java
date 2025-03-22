@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DoNothing;
 import frc.robot.commands.GoToCommand;
 import frc.robot.commands.NavRoute;
 import frc.robot.commands.NavigateToTag;
@@ -134,6 +135,7 @@ public class Robot extends TimedRobot {
     setLED(LEDmode.Auton);
     System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_nav.getPose());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = new DoNothing();
     System.out.println("Starting command: " + m_autonomousCommand.getName());
 
     // schedule the autonomous command (example)
