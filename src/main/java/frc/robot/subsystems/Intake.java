@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -38,7 +40,7 @@ public class Intake extends SubsystemBase {
   //private DigitalInput m_upperObjectDetectSwitch;
 
   public Intake(int lowerSparkId, int upperSparkId, int lowerLimitSwitchId, int upperLimitSwitchId) {
-    m_lowerIntakeMotor = new SparkMax(lowerSparkId, MotorType.kBrushed);
+    m_lowerIntakeMotor = new SparkMax(lowerSparkId, MotorType.kBrushless);
     //m_upperIntakeMotor = new SparkMax(upperSparkId, MotorType.kBrushless);
 
     m_lowerObjectDetectSwitch = new DigitalInput(lowerLimitSwitchId);
@@ -118,4 +120,6 @@ public class Intake extends SubsystemBase {
     setLowerSpeed(outSpeed);
     //setUpperSpeed(upperLoadSpeed);
   }
+
+  
 }

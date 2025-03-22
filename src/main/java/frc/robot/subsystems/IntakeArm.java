@@ -119,9 +119,9 @@ public class IntakeArm extends SubsystemBase {
       m_ArmEncoderLeft.setPosition(kMaxArmAngle);
       m_ArmEncoderRight.setPosition(kMaxArmAngle);
 
-      m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
+      m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kPright, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
-      m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
+      m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kPleft, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
       resetFeedForward();
       m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
@@ -144,6 +144,7 @@ public class IntakeArm extends SubsystemBase {
                                       );
       m_sim.setState( 0, 0);
   
+      
       stop();
     }
   
@@ -224,7 +225,7 @@ public class IntakeArm extends SubsystemBase {
                             this
                             );
     }
-  
+
     public String getPositionLabel(){
       double pos = getArmAngleRightDegrees();
       if(MathUtil.isNear(kFloorPosition, pos, kPositionTolerance)){

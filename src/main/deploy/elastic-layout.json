@@ -90,19 +90,6 @@
         ],
         "containers": [
           {
-            "title": "limelight",
-            "x": 512.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 384.0,
-            "type": "Camera Stream",
-            "properties": {
-              "topic": "/CameraPublisher/limelight",
-              "period": 0.06,
-              "rotation_turns": 0
-            }
-          },
-          {
             "title": "Field",
             "x": 0.0,
             "y": 0.0,
@@ -222,6 +209,19 @@
               "data_type": "string",
               "show_submit_button": false
             }
+          },
+          {
+            "title": "USB Camera 0",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/USB Camera 0",
+              "period": 0.06,
+              "rotation_turns": 0
+            }
           }
         ]
       }
@@ -241,7 +241,7 @@
             "properties": {
               "topic": "/SmartDashboard/Field",
               "period": 0.06,
-              "field_game": "Crescendo",
+              "field_game": "Reefscape",
               "robot_width": 0.85,
               "robot_length": 0.85,
               "show_other_objects": true,
