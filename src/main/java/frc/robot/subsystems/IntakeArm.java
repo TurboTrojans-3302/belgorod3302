@@ -56,7 +56,8 @@ public class IntakeArm extends SubsystemBase {
   private double m_armAngleOffsetRight = IntakeConstants.armAngleOffsetRight;
   public ProfiledPIDController m_PidControllerRight;
   public ProfiledPIDController m_PidControllerLeft;
-  private ArmFeedforward m_Feedforward;
+  private ArmFeedforward m_FeedforwardLeft;
+  private ArmFeedforward m_FeedforwardRight;
   private double kS = IntakeConstants.kS;
   private double kGLeft = IntakeConstants.kGLeft;
   private double kGRight = IntakeConstants.kGRight;
@@ -150,7 +151,8 @@ public class IntakeArm extends SubsystemBase {
     }
   
     private void resetFeedForward() {
-      m_Feedforward = new ArmFeedforward(kS, kG, kV, kA);
+      m_FeedforwardLeft = new ArmFeedforward(kS, kGLeft, kV, kA);
+      m_FeedforwardRight = new ArmFeedforward(kS, kGRight, kV, kA);
     }
   
     @Override
@@ -165,14 +167,14 @@ public class IntakeArm extends SubsystemBase {
       //State intermediateLeft = m_PidControllerRight.getSetpoint();
       //ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
       //                                    Math.toRadians(intermediateLeft.velocity));
-      ffLeft = m_Feedforward.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
+      ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
 
 
       pidRight = m_PidControllerRight.calculate(newAngle);
       // State intermediateRight = m_PidControllerRight.getSetpoint();
       // ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
       //                                     Math.toRadians(intermediateRight.velocity));
-      ffRight = m_Feedforward.calculate(Math.toRadians(getArmAngleRightDegrees()), 0.0);
+      ffRight = m_FeedforwardRight.calculate(Math.toRadians(getArmAngleRightDegrees()), 0.0);
 
       if(!DriverStation.isTest() && DriverStation.isEnabled()){
         m_armLeftSparkMax.set( (pidLeft + ffLeft));
@@ -255,10 +257,14 @@ public class IntakeArm extends SubsystemBase {
       kS = x;
       resetFeedForward();
     });
-    builder.addDoubleProperty("kG", () -> kG, (x) -> {
-      kG = x;
+    builder.addDoubleProperty("kGLeft", () -> kGLeft, (x) -> {
+      kGLeft = x;
       resetFeedForward();
     });
+    builder.addDoubleProperty("kGRight", () -> kGRight, (x) -> {
+      kGRight = x;
+        resetFeedForward();
+   });
     builder.addDoubleProperty("kV", () -> kV, (x) -> {
       kV = x;
       resetFeedForward();
