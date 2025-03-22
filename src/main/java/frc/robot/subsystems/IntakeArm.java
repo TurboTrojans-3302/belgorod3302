@@ -99,7 +99,8 @@ public class IntakeArm extends SubsystemBase {
   private double m_armVelocity = 0.0;
   private double pidLeft = 0;
   private double pidRight = 0;
-  private double ff = 0;
+  private double ffLeft = 0;
+  private double ffRight = 0;
 
   private SingleJointedArmSim m_sim;
   private double kPositionTolerance = IntakeConstants.kPositionTolerance;
@@ -158,24 +159,28 @@ public class IntakeArm extends SubsystemBase {
       m_armVelocity = m_velocityFilter.calculate(vel);
       m_lastArmAngle = newAngle;
   
-      pidLeft = m_PidControllerRight.calculate(newAngle);
-      State intermediateLeft = m_PidControllerRight.getSetpoint();
-      ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
-                                          Math.toRadians(intermediateLeft.velocity));
-  
+      pidLeft = m_PidControllerLeft.calculate(newAngle);
+      //State intermediateLeft = m_PidControllerRight.getSetpoint();
+      //ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
+      //                                    Math.toRadians(intermediateLeft.velocity));
+      ffLeft = m_Feedforward.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
+
+
       pidRight = m_PidControllerRight.calculate(newAngle);
-      State intermediateRight = m_PidControllerRight.getSetpoint();
-      ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
-                                          Math.toRadians(intermediateRight.velocity));
-  
+      // State intermediateRight = m_PidControllerRight.getSetpoint();
+      // ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
+      //                                     Math.toRadians(intermediateRight.velocity));
+      ffRight = m_Feedforward.calculate(Math.toRadians(getArmAngleRightDegrees()), 0.0);
+
       if(!DriverStation.isTest() && DriverStation.isEnabled()){
-        m_armLeftSparkMax.set( (pidLeft + ff));
-        m_armRightSparkMax.set( (pidRight + ff));
+        m_armLeftSparkMax.set( (pidLeft + ffLeft));
+        m_armRightSparkMax.set( -(pidRight + ffRight));
       }
     }
   
     public void setPositionAngleSetpoint(double angle) {
       double setpoint = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
+      m_PidControllerLeft.setGoal(setpoint);
       m_PidControllerRight.setGoal(setpoint);
     }
   
@@ -267,7 +272,7 @@ public class IntakeArm extends SubsystemBase {
       kMaxArmAngle = x;
     });
     builder.addStringProperty("pid", ()->String.format("%.2f", pidLeft), null);
-    builder.addStringProperty("ff", ()->String.format("%.2f", ff), null);
+    builder.addStringProperty("ffLeft", ()->String.format("%.2f", ffLeft), null);
     builder.addDoubleProperty("LmotorOutput", ()->m_armLeftSparkMax.getAppliedOutput(), null);
     builder.addDoubleProperty("RmotorOutput", ()->m_armRightSparkMax.getAppliedOutput(), null);
     builder.addStringProperty("ArmAngleLabel", this::getPositionLabel, null);

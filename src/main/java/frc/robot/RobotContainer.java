@@ -294,13 +294,13 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_intake.in()))
           .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
 
-      JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
-      testUpperConveyor.and(testPlus)
-          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
-          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
-      testUpperConveyor.and(testMinus)
-          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
-          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      // JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
+      // testUpperConveyor.and(testPlus)
+      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
+      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      // testUpperConveyor.and(testMinus)
+      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
+      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
     }
 
     if (ELEVATOR_ENABLE) {
