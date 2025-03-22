@@ -33,22 +33,22 @@ public class Intake extends SubsystemBase {
 
   /** Creates a new Intake. */
   private SparkMax m_lowerIntakeMotor;
-  private SparkMax m_upperIntakeMotor;
+  //private SparkMax m_upperIntakeMotor;
   private DigitalInput m_lowerObjectDetectSwitch;
-  private DigitalInput m_upperObjectDetectSwitch;
+  //private DigitalInput m_upperObjectDetectSwitch;
 
   public Intake(int lowerSparkId, int upperSparkId, int lowerLimitSwitchId, int upperLimitSwitchId) {
-    m_lowerIntakeMotor = new SparkMax(lowerSparkId, MotorType.kBrushless);
-    m_upperIntakeMotor = new SparkMax(upperSparkId, MotorType.kBrushless);
+    m_lowerIntakeMotor = new SparkMax(lowerSparkId, MotorType.kBrushed);
+    //m_upperIntakeMotor = new SparkMax(upperSparkId, MotorType.kBrushless);
 
     m_lowerObjectDetectSwitch = new DigitalInput(lowerLimitSwitchId);
-    m_upperObjectDetectSwitch = new DigitalInput(upperLimitSwitchId);
+    //m_upperObjectDetectSwitch = new DigitalInput(upperLimitSwitchId);
     stop();
   }
 
   public void stop(){
     m_lowerIntakeMotor.set(0.0);
-    m_upperIntakeMotor.set(0.0);
+    //m_upperIntakeMotor.set(0.0);
   }
   
   public double getLowerSpeed(){
@@ -66,23 +66,23 @@ public class Intake extends SubsystemBase {
     return !m_lowerObjectDetectSwitch.get();
   }
 
-  public double getUpperSpeed(){
-    return m_upperIntakeMotor.get();
-  }
+  // public double getUpperSpeed(){
+  //   return m_upperIntakeMotor.get();
+  // }
 
-  /*
-   * negative speed moves down, positive speed moves up into gripper
-   */
-  public void setUpperSpeed(double speed){
-    m_upperIntakeMotor.set(MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax));
-  }
+  // /*
+  //  * negative speed moves down, positive speed moves up into gripper
+  //  */
+  // public void setUpperSpeed(double speed){
+  //   m_upperIntakeMotor.set(MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax));
+  // }
 
-  /*
-   *  Object detected in the upper conveyor
-   */
-  public boolean upperObjectDetected(){
-    return !m_upperObjectDetectSwitch.get();
-  }
+  // /*
+  //  *  Object detected in the upper conveyor
+  //  */
+  // public boolean upperObjectDetected(){
+  //   return !m_upperObjectDetectSwitch.get();
+  // }
 
 
   @Override
@@ -106,15 +106,16 @@ public class Intake extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty("LowerSpeed", this::getLowerSpeed, this::setLowerSpeed);
-    builder.addDoubleProperty("UpperSpeed", this::getUpperSpeed, this::setUpperSpeed);
+    //builder.addDoubleProperty("UpperSpeed", this::getUpperSpeed, this::setUpperSpeed);
     builder.addBooleanProperty("Lower Object Detected", this::lowerObjectDetected, null);
-    builder.addBooleanProperty("Upper Object Detected", this::upperObjectDetected, null);
+    //builder.addBooleanProperty("Upper Object Detected", this::upperObjectDetected, null);
     builder.addDoubleProperty("inSpeed", ()->inSpeed, (x)->inSpeed = x);
     builder.addDoubleProperty("outSpeed", ()->outSpeed, (x)->outSpeed = x);
+    builder.addDoubleProperty("motor output", ()->m_lowerIntakeMotor.getAppliedOutput(), null);
   }
 
   public void loadGripper() {
     setLowerSpeed(outSpeed);
-    setUpperSpeed(upperLoadSpeed);
+    //setUpperSpeed(upperLoadSpeed);
   }
 }

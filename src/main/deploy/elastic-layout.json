@@ -375,30 +375,9 @@
         "layouts": [],
         "containers": [
           {
-            "title": "ArmAngle",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
-            "properties": {
-              "topic": "/SmartDashboard/IntakeArm/ArmAngle",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": -120.0,
-              "end_angle": 30.0,
-              "min_value": -30.0,
-              "max_value": 120.0,
-              "number_of_labels": 5,
-              "wrap_value": false,
-              "show_pointer": true,
-              "show_ticks": false
-            }
-          },
-          {
             "title": "ArmAngleOffset",
-            "x": 256.0,
-            "y": 256.0,
+            "x": 0.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -411,8 +390,8 @@
           },
           {
             "title": "kG",
-            "x": 256.0,
-            "y": 0.0,
+            "x": 128.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
@@ -446,32 +425,6 @@
             "type": "Text Display",
             "properties": {
               "topic": "/SmartDashboard/IntakeArm/kMinArmAngle",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "IntakeArmPID",
-            "x": 384.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "ProfiledPIDController",
-            "properties": {
-              "topic": "/SmartDashboard/IntakeArmPID",
-              "period": 0.06
-            }
-          },
-          {
-            "title": "kV",
-            "x": 256.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/IntakeArm/kV",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
@@ -582,6 +535,100 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "ArmAngleL",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/ArmAngleL",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "ArmAngleR",
+            "x": 128.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/ArmAngleR",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "LmotorOutput",
+            "x": 896.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/LmotorOutput",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "RmotorOutput",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/RmotorOutput",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "ff",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/ff",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "ArmPIDleft",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "ProfiledPIDController",
+            "properties": {
+              "topic": "/SmartDashboard/ArmPIDleft",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "ArmPIDright",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "ProfiledPIDController",
+            "properties": {
+              "topic": "/SmartDashboard/ArmPIDright",
+              "period": 0.06
             }
           }
         ]
