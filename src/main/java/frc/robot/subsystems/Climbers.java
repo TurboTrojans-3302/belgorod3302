@@ -62,9 +62,9 @@ public class Climbers extends SubsystemBase {
     m_rightEncoder = m_rightClimber.getEncoder();
    
 
-    m_leftEncoder.setPosition(kUpperLimitLeft);
-    m_rightEncoder.setPosition(kUpperLimitRight);
-    positionSetPoint = getPositionRight();
+    m_leftEncoder.setPosition(ClimberConstants.kUpperLimitLeft);
+    m_rightEncoder.setPosition(ClimberConstants.kUpperLimitRight);
+    positionSetPoint = 0.0;
   }
 
   public static SparkMaxConfig leftConfig = new SparkMaxConfig();

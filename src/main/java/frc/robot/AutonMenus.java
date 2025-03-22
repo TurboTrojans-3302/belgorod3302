@@ -21,6 +21,7 @@ public class AutonMenus {
     
         SendableChooser<Command> blueCommands = new SendableChooser<Command>();
         blueCommands.setDefaultOption("Do Nothing (blue)", new DoNothing());
+        blueCommands.addOption("fwd one meter", Got);
         blueCommands.addOption("TroughScore 17", new AutonCoralTrough(bot, 17));
         blueCommands.addOption("TroughScore 18", new AutonCoralTrough(bot, 18));
         blueCommands.addOption("TroughScore 19", new AutonCoralTrough(bot, 19));
@@ -28,7 +29,7 @@ public class AutonMenus {
         blueCommands.addOption("TroughScore 21", new AutonCoralTrough(bot, 21));
         blueCommands.addOption("TroughScore 22", new AutonCoralTrough(bot, 22));
         blueCommands.addOption("Drive to april tag 1", new DriveToAprilTag(bot.m_robotDrive, bot.m_nav, 1));
-        blueCommands.addOption("GoTo 1, 0, 0", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 1.0, 0, 0));
+        blueCommands.addOption("Go", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 1.0, 0, 0));
         blueCommands.addOption("GoTo 2, 0, 0", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 2.0, 0, 0));
         blueCommands.addOption("GoTo -2, 0, 0", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, -2.0, 0, 0));
         blueCommands.addOption("GoTo 1, -1, 0", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 1.0, -1.0, 0));

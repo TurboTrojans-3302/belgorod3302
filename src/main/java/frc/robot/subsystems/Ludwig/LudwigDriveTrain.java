@@ -174,7 +174,7 @@ public class LudwigDriveTrain extends DriveSubsystemBase {
   }
 
   public void setGyroAngleDeg(double angle) {
-    m_gyroOffsetDeg = angle - m_gyro.getAngle();
+    m_gyroOffsetDeg = angle + m_gyro.getAngle();
   }
 
   public double getGyroAngleRadians() {

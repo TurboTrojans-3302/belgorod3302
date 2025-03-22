@@ -166,6 +166,13 @@ public class RobotContainer {
               (stream == 0.0 ? 2.0 : 0.0));
         }));
 
+    new JoystickButton(m_driverController, XboxController.Button.kA.value)
+      .onTrue(new InstantCommand(()->{
+        double newheading = m_robotDrive.getGyroAngleDegrees() + 180.0;
+        if(newheading > 180.0){ newheading -= 180.0;}
+        m_robotDrive.setGyroAngleDeg((newheading) );
+      }));    
+
     if (INTAKE_ENABLE) {
       new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
           .onTrue(new RunCommand(() -> m_intake.in(), m_intake))
@@ -373,6 +380,7 @@ public class RobotContainer {
    * called once when is set to Red by the DriverStation
    */
   public void initRed() {
+    m_robotDrive.setGyroAngleDeg(0.0);
     m_autonomousChooser = AutonMenus.getRed();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
@@ -385,6 +393,7 @@ public class RobotContainer {
    * called once when is set to Blue by the DriverStation
    */
   public void initBlue() {
+    m_robotDrive.setGyroAngleDeg(180.0);
     m_autonomousChooser = AutonMenus.getBlue();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 

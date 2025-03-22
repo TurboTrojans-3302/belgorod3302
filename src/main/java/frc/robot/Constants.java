@@ -191,9 +191,9 @@ public final class Constants {
     public static final double intakeSpeedMax = 1.0;
     public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.00;
-    public static final double kPleft = 0.002;
-    public static final double kPright = 0.065;
-    public static final double kD = 0.00;
+    public static final double kPleft = 0.03;
+    public static final double kPright = 0.03;
+    public static final double kD = 0.001;
     public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
     // public static final double armAngleOffsetRight = 113.4;
@@ -204,7 +204,7 @@ public final class Constants {
     public static final double inSpeed = -0.4;
     public static final double outSpeed = 1.0;
     public static final double kS = 0.0;
-    public static final double kGLeft = 0.25;
+    public static final double kGLeft = 0.15;
     public static final double kGRight = 0.25;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
@@ -224,10 +224,10 @@ public final class Constants {
     public static final double kD = 0.5;
     public static final double kMaxVelocity = 100000; //RPM
     public static final double kMaxAcceleration = 100000; //RPM/s
-    public static double kLowerLimit = 75;
-    public static double kLockedPosition = 70;
-    public static double kUpperLimitRight = 100;
-    public static double kUpperLimitLeft = 119;
+    public static double kLowerLimit = -1.5;
+    public static double kLockedPosition = 7;
+    public static double kUpperLimitRight = 16;
+    public static double kUpperLimitLeft = 22;
     public static double increment = 1.0;
   }
 

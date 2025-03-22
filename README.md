@@ -9,7 +9,7 @@ Left stick press: toggle slow drive, press
 
 Right stick press: toggle field oriented, press
 
-A button: 
+A button: flip drivetrain gyro value
 
 B button: hold to orbit CCW around reef (planned)
 
