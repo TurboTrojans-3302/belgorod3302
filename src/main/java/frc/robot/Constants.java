@@ -191,8 +191,8 @@ public final class Constants {
     public static final double intakeSpeedMax = 1.0;
     public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.00;
-    public static final double kPleft = 0.01;
-    public static final double kPright = 0.02;
+    public static final double kPleft = 0.01; //0.002
+    public static final double kPright = 0.02; //0.065
     public static final double kD = 0.00;
     public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
@@ -204,7 +204,8 @@ public final class Constants {
     public static final double inSpeed = -0.4;
     public static final double outSpeed = 1.0;
     public static final double kS = 0.0;
-    public static final double kG = 0.25;
+    public static final double kGLeft = 0.25;
+    public static final double kGRight = 0.25;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double kMaxVelocity = 720;

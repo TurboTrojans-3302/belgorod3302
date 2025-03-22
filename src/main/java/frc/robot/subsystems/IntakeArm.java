@@ -58,7 +58,8 @@ public class IntakeArm extends SubsystemBase {
   public ProfiledPIDController m_PidControllerLeft;
   private ArmFeedforward m_Feedforward;
   private double kS = IntakeConstants.kS;
-  private double kG = IntakeConstants.kG;
+  private double kGLeft = IntakeConstants.kGLeft;
+  private double kGRight = IntakeConstants.kGRight;
   private double kV = IntakeConstants.kV;
   private double kA = IntakeConstants.kA;
   private double kMaxArmAngle = IntakeConstants.MaxArmAngle;
