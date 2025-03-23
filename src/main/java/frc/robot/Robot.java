@@ -135,7 +135,7 @@ public class Robot extends TimedRobot {
     setLED(LEDmode.Auton);
     System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_nav.getPose());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_autonomousCommand = new DoNothing();
+    m_autonomousCommand = GoToCommand.relative(m_robotContainer.m_robotDrive, m_robotContainer.m_nav, 1.0, 0.0, 0.0);
     System.out.println("Starting command: " + m_autonomousCommand.getName());
 
     // schedule the autonomous command (example)
