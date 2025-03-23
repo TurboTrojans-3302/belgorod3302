@@ -47,12 +47,8 @@ public class IntakeArm extends SubsystemBase {
 
   private SparkMax m_armLeftSparkMax;
   private SparkMax m_armRightSparkMax;
-  private SparkMaxSim m_armLeftSparkMaxSim;
-  private SparkMaxSim m_armRightSparkMaxSim;
   private RelativeEncoder m_ArmEncoderRight;
-  private SparkRelativeEncoderSim m_ArmEncoderRightSim;
   private RelativeEncoder m_ArmEncoderLeft;
-  private SparkRelativeEncoderSim m_ArmEncoderLeftSim;
   private double m_armAngleOffsetLeft = IntakeConstants.armAngleOffsetLeft;
   private double m_armAngleOffsetRight = IntakeConstants.armAngleOffsetRight;
   public ProfiledPIDController m_PidControllerRight;
@@ -130,24 +126,6 @@ public class IntakeArm extends SubsystemBase {
       resetFeedForward();
       m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
       m_lastArmAngle = getArmAngleRightDegrees();
-  
-      m_ArmEncoderRightSim = new SparkRelativeEncoderSim(m_armRightSparkMax);
-      m_ArmEncoderLeftSim  = new SparkRelativeEncoderSim(m_armLeftSparkMax);
-      DCMotor plant = DCMotor.getAndymark9015(1);
-      m_armLeftSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
-      m_armRightSparkMaxSim = new SparkMaxSim(m_armLeftSparkMax, plant);
-  
-      m_sim = new SingleJointedArmSim(plant,
-                                      kGearRatio,
-                                      kMoment,
-                                      kArmLength,
-                                      Math.toRadians(kMinArmAngle),
-                                      Math.toRadians(kMaxArmAngle),
-                                      true,
-                                      0
-                                      );
-      m_sim.setState( 0, 0);
-  
       
       stop();
     }
@@ -296,14 +274,6 @@ public class IntakeArm extends SubsystemBase {
     builder.addStringProperty("ArmAngleLabel", this::getPositionLabel, null);
   }
 
-  @Override
-  public void simulationPeriodic(){
-    m_sim.setInputVoltage(m_armLeftSparkMaxSim.getAppliedOutput() * 12.0);
-    m_sim.update(Robot.kDefaultPeriod);
-    m_armLeftSparkMaxSim.iterate(Math.toDegrees(m_sim.getVelocityRadPerSec()), 12.0, Robot.kDefaultPeriod);
-    m_ArmEncoderRightSim.setPosition(m_sim.getAngleRads()/6.28318);
-    m_ArmEncoderLeftSim.setPosition(m_sim.getAngleRads()/6.28318);
-  }
 
   public void stop() {
     m_PidControllerLeft.setSetpoint(getArmAngleLeftDegrees());
