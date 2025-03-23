@@ -56,9 +56,11 @@ public class IntakeArm extends SubsystemBase {
   private double m_armAngleOffsetRight = IntakeConstants.armAngleOffsetRight;
   public ProfiledPIDController m_PidControllerRight;
   public ProfiledPIDController m_PidControllerLeft;
-  private ArmFeedforward m_Feedforward;
+  private ArmFeedforward m_FeedforwardLeft;
+  private ArmFeedforward m_FeedforwardRight;
   private double kS = IntakeConstants.kS;
-  private double kG = IntakeConstants.kG;
+  private double kGLeft = IntakeConstants.kGLeft;
+  private double kGRight = IntakeConstants.kGRight;
   private double kV = IntakeConstants.kV;
   private double kA = IntakeConstants.kA;
   private double kMaxArmAngle = IntakeConstants.MaxArmAngle;
@@ -99,7 +101,8 @@ public class IntakeArm extends SubsystemBase {
   private double m_armVelocity = 0.0;
   private double pidLeft = 0;
   private double pidRight = 0;
-  private double ff = 0;
+  private double ffLeft = 0;
+  private double ffRight = 0;
 
   private SingleJointedArmSim m_sim;
   private double kPositionTolerance = IntakeConstants.kPositionTolerance;
@@ -118,10 +121,12 @@ public class IntakeArm extends SubsystemBase {
       m_ArmEncoderLeft.setPosition(kMaxArmAngle);
       m_ArmEncoderRight.setPosition(kMaxArmAngle);
 
-      m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
+      m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kPright, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
-      m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD, 
+      m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kPleft, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
+      m_PidControllerRight.setGoal(new State(kMaxArmAngle, 0.0));
+      m_PidControllerLeft.setGoal(new State(kMaxArmAngle, 0.0));
       resetFeedForward();
       m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
       m_lastArmAngle = getArmAngleRightDegrees();
@@ -143,11 +148,13 @@ public class IntakeArm extends SubsystemBase {
                                       );
       m_sim.setState( 0, 0);
   
+      
       stop();
     }
   
     private void resetFeedForward() {
-      m_Feedforward = new ArmFeedforward(kS, kG, kV, kA);
+      m_FeedforwardLeft = new ArmFeedforward(kS, kGLeft, kV, kA);
+      m_FeedforwardRight = new ArmFeedforward(kS, kGRight, kV, kA);
     }
   
     @Override
@@ -158,24 +165,28 @@ public class IntakeArm extends SubsystemBase {
       m_armVelocity = m_velocityFilter.calculate(vel);
       m_lastArmAngle = newAngle;
   
-      pidLeft = m_PidControllerRight.calculate(newAngle);
-      State intermediateLeft = m_PidControllerRight.getSetpoint();
-      ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
-                                          Math.toRadians(intermediateLeft.velocity));
-  
+      pidLeft = m_PidControllerLeft.calculate(newAngle);
+      //State intermediateLeft = m_PidControllerRight.getSetpoint();
+      //ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
+      //                                    Math.toRadians(intermediateLeft.velocity));
+      ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
+
+
       pidRight = m_PidControllerRight.calculate(newAngle);
-      State intermediateRight = m_PidControllerRight.getSetpoint();
-      ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
-                                          Math.toRadians(intermediateRight.velocity));
-  
+      // State intermediateRight = m_PidControllerRight.getSetpoint();
+      // ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
+      //                                     Math.toRadians(intermediateRight.velocity));
+      ffRight = m_FeedforwardRight.calculate(Math.toRadians(getArmAngleRightDegrees()), 0.0);
+
       if(!DriverStation.isTest() && DriverStation.isEnabled()){
-        m_armLeftSparkMax.set( (pidLeft + ff));
-        m_armRightSparkMax.set( (pidRight + ff));
+        m_armLeftSparkMax.set( (pidLeft + ffLeft));
+        m_armRightSparkMax.set( -(pidRight + ffRight));
       }
     }
   
     public void setPositionAngleSetpoint(double angle) {
       double setpoint = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
+      m_PidControllerLeft.setGoal(setpoint);
       m_PidControllerRight.setGoal(setpoint);
     }
   
@@ -219,7 +230,7 @@ public class IntakeArm extends SubsystemBase {
                             this
                             );
     }
-  
+
     public String getPositionLabel(){
       double pos = getArmAngleRightDegrees();
       if(MathUtil.isNear(kFloorPosition, pos, kPositionTolerance)){
@@ -248,10 +259,14 @@ public class IntakeArm extends SubsystemBase {
       kS = x;
       resetFeedForward();
     });
-    builder.addDoubleProperty("kG", () -> kG, (x) -> {
-      kG = x;
+    builder.addDoubleProperty("kGLeft", () -> kGLeft, (x) -> {
+      kGLeft = x;
       resetFeedForward();
     });
+    builder.addDoubleProperty("kGRight", () -> kGRight, (x) -> {
+      kGRight = x;
+        resetFeedForward();
+   });
     builder.addDoubleProperty("kV", () -> kV, (x) -> {
       kV = x;
       resetFeedForward();
@@ -267,7 +282,7 @@ public class IntakeArm extends SubsystemBase {
       kMaxArmAngle = x;
     });
     builder.addStringProperty("pid", ()->String.format("%.2f", pidLeft), null);
-    builder.addStringProperty("ff", ()->String.format("%.2f", ff), null);
+    builder.addStringProperty("ffLeft", ()->String.format("%.2f", ffLeft), null);
     builder.addDoubleProperty("LmotorOutput", ()->m_armLeftSparkMax.getAppliedOutput(), null);
     builder.addDoubleProperty("RmotorOutput", ()->m_armRightSparkMax.getAppliedOutput(), null);
     builder.addStringProperty("ArmAngleLabel", this::getPositionLabel, null);

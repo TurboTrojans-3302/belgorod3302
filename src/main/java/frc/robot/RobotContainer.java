@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -74,7 +75,7 @@ public class RobotContainer {
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
   GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
-  ReefController m_reefController = new ReefController(OIConstants.kReefControllerPort);
+  //ReefController m_reefController = new ReefController(OIConstants.kReefControllerPort);
 
   public int targetTagId = 0;
 
@@ -84,6 +85,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
     instance = this;
+    
+    CameraServer.startAutomaticCapture();
     
     // The robot's subsystems
     m_robotDrive = new DriveSubsystem();
@@ -163,12 +166,21 @@ public class RobotContainer {
               (stream == 0.0 ? 2.0 : 0.0));
         }));
 
+    new JoystickButton(m_driverController, XboxController.Button.kA.value)
+      .onTrue(new InstantCommand(()->{
+        double newheading = m_robotDrive.getGyroAngleDegrees() + 180.0;
+        if(newheading > 180.0){ newheading -= 180.0;}
+        m_robotDrive.setGyroAngleDeg((newheading) );
+      }));    
+
     if (INTAKE_ENABLE) {
       new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-          .whileTrue(new RunCommand(() -> m_intake.in(), m_intake));
+          .onTrue(new RunCommand(() -> m_intake.in(), m_intake))
+          .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
       new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-          .whileTrue(new RunCommand(() -> m_intake.out(), m_intake));
-    }
+      .onTrue(new RunCommand(() -> m_intake.out(), m_intake))
+      .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+}
 
     /**
      * Copilot's Controller
@@ -252,22 +264,31 @@ public class RobotContainer {
 
       })
       .onTrue(new Coral(m_intakeArm, m_intake));    
+
+      BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
+      BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+
+      // convert booleansupplier into triggers so the whileTrue() method can be called
+      // upon them
+      Trigger armup = new Trigger(dpadUp);
+      Trigger armdown = new Trigger(dpadDown);
+
     }
 
-    m_reefController.getChangeTrigger()
-      .onChange(new InstantCommand(()->{
-            targetTagId = m_reefController.getAprilTagId();
-            Pose2d tgt = m_reefController.getTargetPose2d();
-            m_nav.m_dashboardField.getObject("dest").setPose(tgt);
-            SmartDashboard.putString("ReefController", m_reefController.label());
-          }
-      ));
+    // m_reefController.getChangeTrigger()
+    //   .onChange(new InstantCommand(()->{
+    //         targetTagId = m_reefController.getAprilTagId();
+    //         Pose2d tgt = m_reefController.getTargetPose2d();
+    //         m_nav.m_dashboardField.getObject("dest").setPose(tgt);
+    //         SmartDashboard.putString("ReefController", m_reefController.label());
+    //       }
+    //  ));
 
       
 
-      if (INTAKE_ENABLE && INTAKE_ARM_ENABLE && ELEVATOR_ENABLE && GRIPPER_ENABLE){
-        new JoystickButton(m_copilotController, XboxController.Button.kY.value)
-          .onTrue(new LoadGripper(instance));
+      if (INTAKE_ENABLE && INTAKE_ARM_ENABLE){
+        // new JoystickButton(m_copilotController, XboxController.Button.kY.value)
+        //   .onTrue(new LoadGripper(instance));
 
         new JoystickButton(m_copilotController, XboxController.Button.kA.value)
           .onTrue(new TroughScore(m_intakeArm, m_intake));
@@ -294,13 +315,13 @@ public class RobotContainer {
           .onTrue(new InstantCommand(() -> m_intake.in()))
           .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
 
-      JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
-      testUpperConveyor.and(testPlus)
-          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
-          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
-      testUpperConveyor.and(testMinus)
-          .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
-          .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      // JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
+      // testUpperConveyor.and(testPlus)
+      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
+      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      // testUpperConveyor.and(testMinus)
+      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
+      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
     }
 
     if (ELEVATOR_ENABLE) {
@@ -359,6 +380,7 @@ public class RobotContainer {
    * called once when is set to Red by the DriverStation
    */
   public void initRed() {
+    m_robotDrive.setGyroAngleDeg(0.0);
     m_autonomousChooser = AutonMenus.getRed();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
@@ -371,6 +393,7 @@ public class RobotContainer {
    * called once when is set to Blue by the DriverStation
    */
   public void initBlue() {
+    m_robotDrive.setGyroAngleDeg(180.0);
     m_autonomousChooser = AutonMenus.getBlue();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
 
@@ -381,6 +404,8 @@ public class RobotContainer {
 
   private void setStartPosition(Pose2d pose) {
     if (DriverStation.isDisabled()) {
+      System.out.println("setStartPosition()" + pose.toString());
+      m_robotDrive.setGyroAngleDeg(pose.getRotation().getDegrees());
       m_nav.resetOdometry(pose);
     }
   }

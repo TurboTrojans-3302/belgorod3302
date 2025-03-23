@@ -41,7 +41,7 @@ public class AutoIntake extends Command {
   @Override
   public void end(boolean interrupted) {
     m_intake.setLowerSpeed(0);
-    m_intake.setUpperSpeed(0);
+    //m_intake.setUpperSpeed(0);
   }
 
   // Returns true when the command should end.

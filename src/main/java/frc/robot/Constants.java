@@ -25,20 +25,6 @@ public final class Constants {
   public final class CanIds {
     public static final int DX_SENSOR_CAN_ID = 0;
 
-    // Eddie DriveTrain
-    public static final int DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR = 1;
-    public static final int DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR = 2;
-    public static final int DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR = 3;
-    public static final int DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR = 4;
-    public static final int DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR = 5;
-    public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR = 6;
-    public static final int DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR = 7;
-    public static final int DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR = 8;
-    public static final int DRIVETRAIN_FRONT_LEFT_ANGLE_ENCODER = 9;
-    public static final int DRIVETRAIN_BACK_LEFT_ANGLE_ENCODER = 10;
-    public static final int DRIVETRAIN_BACK_RIGHT_ANGLE_ENCODER = 11;
-    public static final int DRIVETRAIN_FRONT_RIGHT_ANGLE_ENCODER = 12;
-
     // Ludwig DriveTrain
     public static final int kFrontRightTurningCanId = 1;
     public static final int kFrontRightDrivingCanId = 2;
@@ -202,22 +188,24 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final double intakeSpeedMax = 0.75;
+    public static final double intakeSpeedMax = 1.0;
     public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.00;
-    public static final double kP = 0.0;
-    public static final double kD = 0.00;
-    public static final double intakeSpeedMin = -0.75;
+    public static final double kPleft = 0.03;
+    public static final double kPright = 0.03;
+    public static final double kD = 0.001;
+    public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
     // public static final double armAngleOffsetRight = 113.4;
     public static final double armAngleOffsetLeft = 0;
     public static final double armAngleOffsetRight = 0;
     public static final double MaxArmAngle = 115.0;
     public static final double MinArmAngle = -17.0;
-    public static final double inSpeed = 0;
-    public static final double outSpeed = 0;
+    public static final double inSpeed = -0.4;
+    public static final double outSpeed = 1.0;
     public static final double kS = 0.0;
-    public static final double kG = 0.0;
+    public static final double kGLeft = 0.15;
+    public static final double kGRight = 0.25;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double kMaxVelocity = 720;
@@ -236,10 +224,10 @@ public final class Constants {
     public static final double kD = 0.5;
     public static final double kMaxVelocity = 100000; //RPM
     public static final double kMaxAcceleration = 100000; //RPM/s
-    public static double kLowerLimit = 75;
-    public static double kLockedPosition = 70;
-    public static double kUpperLimitRight = 100;
-    public static double kUpperLimitLeft = 119;
+    public static double kLowerLimit = -1.5;
+    public static double kLockedPosition = 7;
+    public static double kUpperLimitRight = 16;
+    public static double kUpperLimitLeft = 22;
     public static double increment = 1.0;
   }
 

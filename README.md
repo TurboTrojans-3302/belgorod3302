@@ -9,7 +9,7 @@ Left stick press: toggle slow drive, press
 
 Right stick press: toggle field oriented, press
 
-A button: 
+A button: flip drivetrain gyro value
 
 B button: hold to orbit CCW around reef (planned)
 
@@ -47,7 +47,7 @@ B button
 
 X button 
 
-Y button - Load coral from intake to gripper
+Y button - 
  
 Left Bumper - Load elevator routine (planned)
 
@@ -57,9 +57,9 @@ Right Trigger - retract gripper
 
 Left Trigger - extend gripper
  
-hold DPad up - Elevator precision control up
+hold DPad up - intake arm precision control up
 
-hold Dpad down - Elevator precision control down
+hold Dpad down - intake arm precision control down
 
 ## ButtonBox
 
