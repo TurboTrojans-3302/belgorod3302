@@ -15,6 +15,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.sim.SparkRelativeEncoderSim;
@@ -49,9 +50,9 @@ public class IntakeArm extends SubsystemBase {
   private SparkMax m_armRightSparkMax;
   private SparkMaxSim m_armLeftSparkMaxSim;
   private SparkMaxSim m_armRightSparkMaxSim;
-  private RelativeEncoder m_ArmEncoderRight;
+  private AbsoluteEncoder m_ArmEncoderRight;
   private SparkRelativeEncoderSim m_ArmEncoderRightSim;
-  private RelativeEncoder m_ArmEncoderLeft;
+  private AbsoluteEncoder m_ArmEncoderLeft;
   private SparkRelativeEncoderSim m_ArmEncoderLeftSim;
   private double m_armAngleOffsetLeft = IntakeConstants.armAngleOffsetLeft;
   private double m_armAngleOffsetRight = IntakeConstants.armAngleOffsetRight;
@@ -97,8 +98,6 @@ public class IntakeArm extends SubsystemBase {
   private final double kMoment = SingleJointedArmSim.estimateMOI(0.355, 9.1);
   private final double kArmLength = .355;
 
-  private LinearFilter m_velocityFilter;
-  private double m_lastArmAngle;
   private double m_armVelocity = 0.0;
   private double pidLeft = 0;
   private double pidRight = 0;
@@ -117,10 +116,8 @@ public class IntakeArm extends SubsystemBase {
       m_armRightSparkMax = new SparkMax(Constants.CanIds.intakeArmRightMotorID, MotorType.kBrushed);
       m_armRightSparkMax.configure(rightSparkConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
       
-      m_ArmEncoderRight = m_armRightSparkMax.getEncoder();
-      m_ArmEncoderLeft  = m_armLeftSparkMax.getEncoder();
-      m_ArmEncoderLeft.setPosition(kMaxArmAngle);
-      m_ArmEncoderRight.setPosition(kMaxArmAngle);
+      m_ArmEncoderRight = m_armRightSparkMax.getAbsoluteEncoder();
+      m_ArmEncoderLeft  = m_armLeftSparkMax.getAbsoluteEncoder();
 
       m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kPright, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
@@ -128,8 +125,6 @@ public class IntakeArm extends SubsystemBase {
       m_PidControllerRight.reset(kMaxArmAngle);
       m_PidControllerLeft.reset();
       resetFeedForward();
-      m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
-      m_lastArmAngle = getArmAngleRightDegrees();
   
       m_ArmEncoderRightSim = new SparkRelativeEncoderSim(m_armRightSparkMax);
       m_ArmEncoderLeftSim  = new SparkRelativeEncoderSim(m_armLeftSparkMax);
@@ -161,9 +156,6 @@ public class IntakeArm extends SubsystemBase {
     public void periodic() {
       // This method will be called once per scheduler run
       double newAngle = getArmAngleRightDegrees();
-      double vel = (newAngle - m_lastArmAngle) / Robot.kDefaultPeriod;
-      m_armVelocity = m_velocityFilter.calculate(vel);
-      m_lastArmAngle = newAngle;
   
       pidLeft = m_PidControllerLeft.calculate(newAngle);
       ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
