@@ -27,16 +27,17 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -55,7 +56,7 @@ public class IntakeArm extends SubsystemBase {
   private double m_armAngleOffsetLeft = IntakeConstants.armAngleOffsetLeft;
   private double m_armAngleOffsetRight = IntakeConstants.armAngleOffsetRight;
   public ProfiledPIDController m_PidControllerRight;
-  public ProfiledPIDController m_PidControllerLeft;
+  public PIDController m_PidControllerLeft;
   private ArmFeedforward m_FeedforwardLeft;
   private ArmFeedforward m_FeedforwardRight;
   private double kS = IntakeConstants.kS;
@@ -123,10 +124,9 @@ public class IntakeArm extends SubsystemBase {
 
       m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kPright, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
-      m_PidControllerLeft = new ProfiledPIDController(IntakeConstants.kPleft, IntakeConstants.kI, IntakeConstants.kD, 
-                                                  new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
-      m_PidControllerRight.setGoal(new State(kMaxArmAngle, 0.0));
-      m_PidControllerLeft.setGoal(new State(kMaxArmAngle, 0.0));
+      m_PidControllerLeft = new PIDController(IntakeConstants.kPleft, IntakeConstants.kI, IntakeConstants.kD);
+      m_PidControllerRight.reset(kMaxArmAngle);
+      m_PidControllerLeft.reset();
       resetFeedForward();
       m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
       m_lastArmAngle = getArmAngleRightDegrees();
@@ -166,16 +166,10 @@ public class IntakeArm extends SubsystemBase {
       m_lastArmAngle = newAngle;
   
       pidLeft = m_PidControllerLeft.calculate(newAngle);
-      //State intermediateLeft = m_PidControllerRight.getSetpoint();
-      //ff = m_Feedforward.calculate(Math.toRadians(intermediateLeft.position),
-      //                                    Math.toRadians(intermediateLeft.velocity));
       ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
 
 
       pidRight = m_PidControllerRight.calculate(newAngle);
-      // State intermediateRight = m_PidControllerRight.getSetpoint();
-      // ff = m_Feedforward.calculate(Math.toRadians(intermediateRight.position),
-      //                                     Math.toRadians(intermediateRight.velocity));
       ffRight = m_FeedforwardRight.calculate(Math.toRadians(getArmAngleRightDegrees()), 0.0);
 
       if(!DriverStation.isTest() && DriverStation.isEnabled()){
@@ -186,8 +180,8 @@ public class IntakeArm extends SubsystemBase {
   
     public void setPositionAngleSetpoint(double angle) {
       double setpoint = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
-      m_PidControllerLeft.setGoal(setpoint);
       m_PidControllerRight.setGoal(setpoint);
+      m_PidControllerLeft.setSetpoint(getArmAngleRightDegrees());
     }
   
     public boolean atSetpoint(){
@@ -218,6 +212,20 @@ public class IntakeArm extends SubsystemBase {
     public void floorPosition(){ setPositionAngleSetpoint(kFloorPosition); }
     public void troughPosition(){ setPositionAngleSetpoint(kTroughPosition); }
     public void elevatorPosition(){ setPositionAngleSetpoint(kElevatorPosition); }
+
+    public Command setPositionCommand(double position){
+      return new FunctionalCommand(
+                            ()->setPositionAngleSetpoint(position),
+                            ()->{},
+                            (x)->{},
+                            ()->atSetpoint(),
+                            this
+                            );
+    }
+
+    public Command changePositionCommand(double delta){
+      return new InstantCommand(()->changeSetPoint(delta));
+    }
   
     public Command testCommand(double speed){
       return new FunctionalCommand(
@@ -298,7 +306,7 @@ public class IntakeArm extends SubsystemBase {
   }
 
   public void stop() {
-    m_PidControllerLeft.setGoal(getArmAngleLeftDegrees());
+    m_PidControllerLeft.setSetpoint(getArmAngleLeftDegrees());
     m_PidControllerRight.setGoal(getArmAngleRightDegrees());
     m_armLeftSparkMax.set(0.0);  
     m_armRightSparkMax.set(0.0);

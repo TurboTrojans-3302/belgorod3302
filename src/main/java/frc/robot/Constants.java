@@ -216,6 +216,7 @@ public final class Constants {
     public static final double upperLoadSpeed = 0;
     public static final double ejectTime = 1.0;
     public static final double kPositionTolerance = 2.0;
+    public static final double kPositionIncrement = 1.0;
   }
 
   public static final class ClimberConstants {

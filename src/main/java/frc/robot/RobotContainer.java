@@ -22,12 +22,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.ButtonBox;
 import frc.robot.commands.Coral;
 import frc.robot.commands.ElevatorManualMove;
-import frc.robot.commands.IntakeCycle;
-import frc.robot.commands.LoadGripper;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
@@ -224,10 +223,8 @@ public class RobotContainer {
 
       extensionOut.onTrue(m_gripper.extendCommand());
       extensionIn.onTrue(m_gripper.retractCommand());
-
-
-
     }
+
     if (CLIMBERS_ENABLE) {
       new Trigger(() -> m_buttonBoard
           .getPOV() == Constants.OIConstants.ButtonBox.StickUp)
@@ -248,31 +245,22 @@ public class RobotContainer {
     }
 
     if (INTAKE_ARM_ENABLE) {
-      new Trigger(() -> {
-        return m_copilotController.getRightY() < -0.9;
-      })
-          .onTrue(new InstantCommand(() -> m_intakeArm.floorPosition()));
-      new Trigger(() -> {
-        return m_copilotController.getRightY() > 0.9;
-      })
-          .onTrue(new InstantCommand(() -> m_intakeArm.elevatorPosition()));
+      new Trigger(() -> m_copilotController.getRightY() < -0.9 )
+          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
+      
+      new Trigger(() -> m_copilotController.getRightY() > 0.9)
+          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
+
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
-          .onTrue(new InstantCommand(() -> m_intakeArm.troughPosition()));
+          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
 
-      new Trigger(() -> {
-        return m_intake.lowerObjectDetected();
+      new Trigger(() -> m_intake.lowerObjectDetected())
+          .onTrue(new Coral(m_intakeArm, m_intake));    
 
-      })
-      .onTrue(new Coral(m_intakeArm, m_intake));    
-
-      BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
-      BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
-
-      // convert booleansupplier into triggers so the whileTrue() method can be called
-      // upon them
-      Trigger armup = new Trigger(dpadUp);
-      Trigger armdown = new Trigger(dpadDown);
-
+      new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCW))
+        .onTrue(m_intakeArm.changePositionCommand(IntakeConstants.kPositionIncrement));
+      new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCCW))
+        .onTrue(m_intakeArm.changePositionCommand(-IntakeConstants.kPositionIncrement));
     }
 
     // m_reefController.getChangeTrigger()
@@ -409,7 +397,5 @@ public class RobotContainer {
       m_nav.resetOdometry(pose);
     }
   }
-
-
 
 }
