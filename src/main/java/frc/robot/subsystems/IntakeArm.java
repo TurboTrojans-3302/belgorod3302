@@ -94,8 +94,10 @@ public class IntakeArm extends SubsystemBase {
   private final double kArmLength = .355;
 
   private LinearFilter m_velocityFilter;
-  private double m_lastArmAngle;
-  private double m_armVelocity = 0.0;
+  private double m_lastArmAngleLeft;
+  private double m_lastArmAngleRight;
+  private double m_armVelocityLeft = 0.0;
+  private double m_armVelocityRight = 0.0;
   private double pidLeft = 0;
   private double pidRight = 0;
   private double ffLeft = 0;
@@ -106,7 +108,7 @@ public class IntakeArm extends SubsystemBase {
   
     /** Creates a new IntakeArm. */
     public IntakeArm() {
-  
+      //are the two configs different in any way?
       m_armLeftSparkMax = new SparkMax(Constants.CanIds.intakeArmLeftMotorID, MotorType.kBrushed);
       m_armLeftSparkMax.configure(leftSparkConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
   
@@ -118,6 +120,7 @@ public class IntakeArm extends SubsystemBase {
       m_ArmEncoderLeft.setPosition(kMaxArmAngle);
       m_ArmEncoderRight.setPosition(kMaxArmAngle);
 
+      //are constraints causing a problem?
       m_PidControllerRight = new ProfiledPIDController(IntakeConstants.kPright, IntakeConstants.kI, IntakeConstants.kD, 
                                                   new Constraints(IntakeConstants.kMaxVelocity, IntakeConstants.kMaxAcceleration));
       m_PidControllerLeft = new PIDController(IntakeConstants.kPleft, IntakeConstants.kI, IntakeConstants.kD);
@@ -125,7 +128,8 @@ public class IntakeArm extends SubsystemBase {
       m_PidControllerLeft.reset();
       resetFeedForward();
       m_velocityFilter = LinearFilter.singlePoleIIR(0.1, Robot.kDefaultPeriod);
-      m_lastArmAngle = getArmAngleRightDegrees();
+      m_lastArmAngleRight = getArmAngleRightDegrees();
+      m_lastArmAngleLeft = getArmAngleLeftDegrees();
       
       stop();
     }
@@ -138,16 +142,20 @@ public class IntakeArm extends SubsystemBase {
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
-      double newAngle = getArmAngleRightDegrees();
-      double vel = (newAngle - m_lastArmAngle) / Robot.kDefaultPeriod;
-      m_armVelocity = m_velocityFilter.calculate(vel);
-      m_lastArmAngle = newAngle;
+      double newAngleLeft = getArmAngleLeftDegrees();
+      double newAngleRight = getArmAngleRightDegrees();
+      double velLeft = (newAngleLeft - m_lastArmAngleLeft) / Robot.kDefaultPeriod;
+      double velRight = (newAngleRight - m_lastArmAngleRight) / Robot.kDefaultPeriod;
+      m_armVelocityLeft = m_velocityFilter.calculate(velLeft);
+      m_armVelocityRight = m_velocityFilter.calculate(velRight);
+      m_lastArmAngleLeft = newAngleLeft;
+      m_lastArmAngleRight = newAngleRight;
   
-      pidLeft = m_PidControllerLeft.calculate(newAngle);
+      pidLeft = m_PidControllerLeft.calculate(newAngleLeft);
       ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleLeftDegrees()), 0.0);
 
 
-      pidRight = m_PidControllerRight.calculate(newAngle);
+      pidRight = m_PidControllerRight.calculate(newAngleRight);
       ffRight = m_FeedforwardRight.calculate(Math.toRadians(getArmAngleRightDegrees()), 0.0);
 
       if(!DriverStation.isTest() && DriverStation.isEnabled()){
@@ -158,8 +166,9 @@ public class IntakeArm extends SubsystemBase {
   
     public void setPositionAngleSetpoint(double angle) {
       double setpoint = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
+      //needs to change?
       m_PidControllerRight.setGoal(setpoint);
-      m_PidControllerLeft.setSetpoint(getArmAngleRightDegrees());
+      m_PidControllerLeft.setSetpoint(getArmAngleRightDegrees()); //why not just setpoint??
     }
   
     public boolean atSetpoint(){
@@ -183,8 +192,12 @@ public class IntakeArm extends SubsystemBase {
       return m_ArmEncoderLeft.getPosition() + m_armAngleOffsetLeft;
     }
   
-    public double getArmAngleVelocity() {
-      return m_armVelocity;
+    public double getArmAngleVelocityLeft() {
+      return m_armVelocityLeft;
+    }
+
+    public double getArmAngleVelocityRight() {
+      return m_armVelocityRight;
     }
   
     public void floorPosition(){ setPositionAngleSetpoint(kFloorPosition); }
