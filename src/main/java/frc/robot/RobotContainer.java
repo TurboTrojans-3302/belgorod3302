@@ -101,14 +101,12 @@ public class RobotContainer {
       SmartDashboard.putData("Elevator PID", m_elevator.PID);
     }
     if (INTAKE_ENABLE) {
-      m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,
-          DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kUpperIntakeLimitSwitchId);
+      m_intake = new Intake(CanIds.kUpperIntakeMotorCanId, DigitalIO.kUpperIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
-      SmartDashboard.putData("ArmPIDright", m_intakeArm.m_PidControllerRight);
       SmartDashboard.putData("ArmPIDleft", m_intakeArm.m_PidControllerLeft);
     }
     if (GRIPPER_ENABLE) {
@@ -254,7 +252,7 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
           .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
 
-      new Trigger(() -> m_intake.lowerObjectDetected())
+      new Trigger(() -> m_intake.objectDetected())
           .onTrue(new Coral(m_intakeArm, m_intake));    
 
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCW))
@@ -298,10 +296,10 @@ public class RobotContainer {
       JoystickButton testLowerConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
       testLowerConveyor.and(testPlus)    
           .onTrue(new InstantCommand(() -> m_intake.out()))
-          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+          .onFalse(new InstantCommand(() -> m_intake.setIntakeSpeed(0.0)));
       testLowerConveyor.and(testMinus) 
           .onTrue(new InstantCommand(() -> m_intake.in()))
-          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
+          .onFalse(new InstantCommand(() -> m_intake.setIntakeSpeed(0.0)));
 
       // JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
       // testUpperConveyor.and(testPlus)

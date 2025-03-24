@@ -11,8 +11,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -22,102 +20,77 @@ public class Intake extends SubsystemBase {
   private double outSpeed = Constants.IntakeConstants.outSpeed;
   private double upperLoadSpeed = Constants.IntakeConstants.upperLoadSpeed;
 
-  private static final SparkMaxConfig lowerSparkConfig = new SparkMaxConfig();
-  private static final SparkMaxConfig upperSparkConfig = new SparkMaxConfig();
+  private static final SparkMaxConfig sparkConfig = new SparkMaxConfig();
   static {
-    lowerSparkConfig
-          .idleMode(IdleMode.kBrake)
-          .smartCurrentLimit(40);
-    upperSparkConfig
+    sparkConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(40);
   }
 
   /** Creates a new Intake. */
-  private SparkMax m_lowerIntakeMotor;
-  //private SparkMax m_upperIntakeMotor;
-  private DigitalInput m_lowerObjectDetectSwitch;
+  private SparkMax m_intakeMotor;
+  private DigitalInput m_objectDetectSwitch;
   //private DigitalInput m_upperObjectDetectSwitch;
 
-  public Intake(int lowerSparkId, int upperSparkId, int lowerLimitSwitchId, int upperLimitSwitchId) {
-    m_lowerIntakeMotor = new SparkMax(lowerSparkId, MotorType.kBrushless);
-    //m_upperIntakeMotor = new SparkMax(upperSparkId, MotorType.kBrushless);
+  public Intake(int sparkId, int limitSwitchId) {
+    m_intakeMotor = new SparkMax(sparkId, MotorType.kBrushed);
 
-    m_lowerObjectDetectSwitch = new DigitalInput(lowerLimitSwitchId);
+    m_objectDetectSwitch = new DigitalInput(limitSwitchId);
     //m_upperObjectDetectSwitch = new DigitalInput(upperLimitSwitchId);
     stop();
   }
 
   public void stop(){
-    m_lowerIntakeMotor.set(0.0);
+    m_intakeMotor.set(0.0);
     //m_upperIntakeMotor.set(0.0);
   }
   
-  public double getLowerSpeed(){
-    return m_lowerIntakeMotor.get();
+  public double getIntakeSpeed(){
+    return m_intakeMotor.get();
   }
 
   /*
    * negative speed pulls in, positive speed pushes out
    */
-  public void setLowerSpeed(double speed){
-    m_lowerIntakeMotor.set(MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax));
+  public void setIntakeSpeed(double speed){
+    m_intakeMotor.set(MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax));
   }
 
-  public boolean lowerObjectDetected(){
-    return !m_lowerObjectDetectSwitch.get();
+  public boolean objectDetected(){
+    return !m_objectDetectSwitch.get();
   }
-
-  // public double getUpperSpeed(){
-  //   return m_upperIntakeMotor.get();
-  // }
-
-  // /*
-  //  * negative speed moves down, positive speed moves up into gripper
-  //  */
-  // public void setUpperSpeed(double speed){
-  //   m_upperIntakeMotor.set(MathUtil.clamp(speed, Constants.IntakeConstants.intakeSpeedMin, Constants.IntakeConstants.intakeSpeedMax));
-  // }
-
-  // /*
-  //  *  Object detected in the upper conveyor
-  //  */
-  // public boolean upperObjectDetected(){
-  //   return !m_upperObjectDetectSwitch.get();
-  // }
-
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (lowerObjectDetected()){
-      setLowerSpeed(Math.max(getLowerSpeed(), 0.0));
+    if (objectDetected()){
+      setIntakeSpeed(Math.max(getIntakeSpeed(), 0.0));
     }
 
   }
 
   public void in(){
-    setLowerSpeed(inSpeed);
+    setIntakeSpeed(inSpeed);
   }
 
   public void out(){
-    setLowerSpeed(outSpeed);
+    setIntakeSpeed(outSpeed);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("LowerSpeed", this::getLowerSpeed, this::setLowerSpeed);
+    builder.addDoubleProperty("Intake Speed", this::getIntakeSpeed, this::setIntakeSpeed);
     //builder.addDoubleProperty("UpperSpeed", this::getUpperSpeed, this::setUpperSpeed);
-    builder.addBooleanProperty("Lower Object Detected", this::lowerObjectDetected, null);
+    builder.addBooleanProperty("Coral Detected", this::objectDetected, null);
     //builder.addBooleanProperty("Upper Object Detected", this::upperObjectDetected, null);
     builder.addDoubleProperty("inSpeed", ()->inSpeed, (x)->inSpeed = x);
     builder.addDoubleProperty("outSpeed", ()->outSpeed, (x)->outSpeed = x);
-    builder.addDoubleProperty("motor output", ()->m_lowerIntakeMotor.getAppliedOutput(), null);
+    builder.addDoubleProperty("motor output", ()->m_intakeMotor.getAppliedOutput(), null);
   }
 
   public void loadGripper() {
-    setLowerSpeed(outSpeed);
+    setIntakeSpeed(outSpeed);
     //setUpperSpeed(upperLoadSpeed);
   }
 
