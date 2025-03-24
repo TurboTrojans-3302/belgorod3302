@@ -67,6 +67,7 @@ public class RobotContainer {
 
   private SendableChooser<Command> m_autonomousChooser = new SendableChooser<Command>();
   private SendableChooser<Pose2d> m_startPosChooser = new SendableChooser<Pose2d>();
+  private Command m_autonCommand;
 
   private final REVBlinkinLED m_BlinkinLED;
 
@@ -351,7 +352,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_autonomousChooser.getSelected();
+    System.out.println("getAutonomousCommand()");
+    return m_autonCommand;
+  }
+
+  public void setAutonCommand(Command cmd){
+    m_autonCommand = cmd;
+    System.out.println("setAutonCommand" + m_autonCommand);
   }
 
   public Pose2d getStartPosition() {
@@ -369,6 +376,7 @@ public class RobotContainer {
     m_robotDrive.setGyroAngleDeg(0.0);
     m_autonomousChooser = AutonMenus.getRed();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
+    m_autonomousChooser.onChange(this::setAutonCommand);
 
     m_startPosChooser = StartPositions.getRed();
     SmartDashboard.putData("Start Position", m_startPosChooser);
@@ -382,6 +390,7 @@ public class RobotContainer {
     m_robotDrive.setGyroAngleDeg(180.0);
     m_autonomousChooser = AutonMenus.getBlue();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
+    m_autonomousChooser.onChange((this::setAutonCommand));
 
     m_startPosChooser = StartPositions.getBlue();
     SmartDashboard.putData("Start Position", m_startPosChooser);

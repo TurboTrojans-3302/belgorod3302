@@ -125,6 +125,11 @@ public class Robot extends TimedRobot {
     }
   }
 
+  @Override
+  public void disabledExit(){
+    System.out.println("disabledExit() m_autonomousCommand == " + 
+                       (m_autonomousCommand == null ? "null" : m_autonomousCommand.toString()));
+  }
 
   /**
    * This autonomous runs the autonomous command selected by your
