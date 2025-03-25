@@ -19,65 +19,27 @@ import frc.robot.Constants.GripperConstants;
 
 public class Gripper extends SubsystemBase {
   /** Creates a new Gripper. */
-  SparkMax gripperMotor;
   SparkMax gripperExtension;
   DigitalInput gripperClosedSwitch;
   DigitalInput gripperFullyRetracted;
-  DigitalInput gripperObjectDetected;
   RelativeEncoder extensionMotorEncoder;
-  RelativeEncoder gripperEncoder;
   double extensionSpeed = GripperConstants.gripperExtensionSpeed;
   final double extensionToleranceMedium = 4.0;
   final double extensionToleranceSmall = 2.0;
   final double stopTolerance = 0.5;
-  public PIDController gripperPID;
-  double kClosed = GripperConstants.closedPosition;
-  double kOpen = GripperConstants.openPosition;
   double kExtendedPos = GripperConstants.gripperExtendedPosition;
   double kRetractedPos = GripperConstants.gripperRetractedPosition;
 
   public Gripper(int gripperMotorID, int gripperExtensionID, int closedSwitchID, int retractedSwitchID,
       int objectDetectionID) {
-    gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
     gripperExtension = new SparkMax(gripperExtensionID, MotorType.kBrushless);
     extensionMotorEncoder = gripperExtension.getEncoder();
-    gripperEncoder = gripperMotor.getEncoder();
     gripperClosedSwitch = new DigitalInput(closedSwitchID);
     gripperFullyRetracted = new DigitalInput(retractedSwitchID);
-    gripperObjectDetected = new DigitalInput(objectDetectionID);
-    gripperPID = new PIDController(GripperConstants.kP, GripperConstants.kI, GripperConstants.kD);
-  }
-
-  public double getGripperPosition() {
-    return gripperEncoder.getPosition();
-  }
-
-  public boolean isGripperClosed() {
-    return getGripperPosition() <= kClosed;
-  }
-
-  public boolean isGripperOpen() {
-    return getGripperPosition() >= kOpen;
   }
 
   public boolean isExtensionRetracted() {
     return !gripperFullyRetracted.get();
-  }
-
-  public void closeGripper() {
-    gripperPID.setSetpoint(kClosed);
-  }
-
-  public void openGripper() {
-    gripperPID.setSetpoint(kOpen);
-  }
-
-  public void toggleGripper() {
-    if (isGripperOpen()) {
-      closeGripper();
-    } else {
-      openGripper();
-    }
   }
 
   public void extendGripper() {
@@ -107,26 +69,8 @@ public class Gripper extends SubsystemBase {
     return (getExtensionPosition() > kExtendedPos - stopTolerance);
   }
 
-  public void setGripperPosition(double setpoint) {
-    gripperPID.setSetpoint(setpoint);
-  }
-
   public double getExtensionPosition() {
     return extensionMotorEncoder.getPosition();
-  }
-
-  public boolean objectInGripper() {
-    return (!gripperObjectDetected.get());
-  }
-
-  @Override
-  public void periodic() {
-    if(!DriverStation.isTest()){
-      // This method will be called once per scheduler run
-      double position = gripperEncoder.getPosition();
-      double speed = gripperPID.calculate(position);
-      gripperMotor.set(speed);
-    }
   }
 
   public Command extendCommand() {
@@ -149,37 +93,6 @@ public class Gripper extends SubsystemBase {
     );
   }
 
-  public Command openCommand() {
-    return new FunctionalCommand(() -> openGripper(),
-        () -> {
-        },
-        (x) -> {
-        },
-        () -> isGripperOpen(),
-        this
-    );
-  }
-
-  public Command closeCommand() {
-    return new FunctionalCommand(() -> closeGripper(),
-        () -> {
-        },
-        (x) -> {
-        },
-        () -> isGripperClosed(),
-        this
-    );
-  }
-
-  public Command testGripperCommand(double speed) {
-    return new FunctionalCommand(
-        () -> gripperMotor.set(speed),
-        () -> {},
-        (x) -> gripperMotor.set(0.0),
-        () -> false,
-        this
-    );
-  }
 
   public Command testExtensionCommand(double speed) {
     return new FunctionalCommand(
@@ -194,17 +107,6 @@ public class Gripper extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("kClosed", () -> kClosed, (x) -> {
-      kClosed = x;
-    });
-    builder.addDoubleProperty("kOpen", () -> kOpen, (x) -> {
-      kOpen = x;
-    });
-    builder.addDoubleProperty("Gripper Pos.", this::getGripperPosition, null);
-    builder.addBooleanProperty("Obj In Gripper", this::objectInGripper, null);
-    builder.addBooleanProperty("Open", this::isGripperOpen, null);
-    builder.addBooleanProperty("Closed", this::isGripperClosed, null);
-
     
     builder.addDoubleProperty("Extension Pos.", this::getExtensionPosition, null);
     builder.addBooleanProperty("Extended", this::isGripperFullyExtended, null);

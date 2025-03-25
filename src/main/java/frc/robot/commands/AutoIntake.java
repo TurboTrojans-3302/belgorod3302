@@ -30,7 +30,6 @@ public class AutoIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_gripper.openGripper();
     m_gripper.retractGripper();
     m_Elevator.setPosition(Constants.ElevatorConstants.kLoadPosition);
     m_intake.stop();

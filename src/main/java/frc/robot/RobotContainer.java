@@ -116,7 +116,6 @@ public class RobotContainer {
           DigitalIO.kGripperFullyRetractedSwitchId,
           DigitalIO.kGripperObjectDetectedSwitchId);
       SmartDashboard.putData("Gripper", m_gripper);
-      SmartDashboard.putData("GripperPID", m_gripper.gripperPID);
     }
     if (CLIMBERS_ENABLE) {
       m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
@@ -214,8 +213,6 @@ public class RobotContainer {
     }
 
     if (GRIPPER_ENABLE) {
-      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
-          .onTrue(new InstantCommand(() -> m_gripper.toggleGripper()));
       Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
       Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
 
@@ -331,12 +328,6 @@ public class RobotContainer {
     }
 
     if (GRIPPER_ENABLE) {
-      JoystickButton testGripper = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up);
-      testGripper.and(testPlus)
-          .whileTrue(m_gripper.testGripperCommand(0.1));
-      testGripper.and(testMinus)
-          .whileTrue(m_gripper.testGripperCommand(-0.1));
-
       JoystickButton testExtension = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down);
       testExtension.and(testPlus)
           .whileTrue(m_gripper.testExtensionCommand(0.1));
