@@ -80,19 +80,16 @@ public class TeleopDrive extends Command {
 
     } else {
 
-      if(m_fieldOrientedEnable) {
+      if(m_driverController.getBButton()){
+        m_robotDrive.setX();
+      }
+      else if(m_fieldOrientedEnable) {
         double reverse = (Robot.alliance == Alliance.Red) ? -1.0 : 1.0;
         m_robotDrive.driveFieldOriented(reverse * forward, reverse * leftward, rotate);
       }else{
         m_robotDrive.driveRobotOriented(forward, leftward, rotate);
       }
 
-      if(m_driverController.getBButton()){
-        m_robotDrive.setX();
-      }
-      else{
-        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
-      }
     }
   }
 
