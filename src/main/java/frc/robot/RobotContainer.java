@@ -184,6 +184,16 @@ public class RobotContainer {
      */
     if (ELEVATOR_ENABLE) {
 
+
+      JoystickButton elevatorEnable;
+    elevatorEnable = new JoystickButton(m_buttonBoard, ButtonBox.Left4);
+
+    elevatorEnable.and(new Trigger(() -> m_buttonBoard
+    .getPOV() == Constants.OIConstants.ButtonBox.StickUp)).whileTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
+
+    elevatorEnable.and(new Trigger(() -> m_buttonBoard
+    .getPOV() == Constants.OIConstants.ButtonBox.StickDown)).whileTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+
       //TODO find elevator position for algae
       new JoystickButton(m_buttonBoard, ButtonBox.Left3)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLoadPosition));
@@ -200,17 +210,11 @@ public class RobotContainer {
 
       // get dpad position as a boolean (they are automatically returned by getPOV()
       // as an exact value)
-      BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
-      BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
+    
 
       // convert booleansupplier into triggers so the whileTrue() method can be called
       // upon them
-      Trigger elevatorUp = new Trigger(dpadUp);
-      Trigger elevatorDown = new Trigger(dpadDown);
-
-      // dpad causes the elevator to go up/down slowly during teleop
-      elevatorUp.whileTrue(new ElevatorManualMove(m_elevator, Constants.ElevatorConstants.kManualRate));
-      elevatorDown.whileTrue(new ElevatorManualMove(m_elevator, -Constants.ElevatorConstants.kManualRate));
+      
 
     }
 
@@ -224,12 +228,18 @@ public class RobotContainer {
     }
 
     if (CLIMBERS_ENABLE) {
-      new Trigger(() -> m_buttonBoard
-          .getPOV() == Constants.OIConstants.ButtonBox.StickUp)
-          .whileTrue(m_climbers.climbersUpCommand());
-      new Trigger(() -> m_buttonBoard
-          .getPOV() == Constants.OIConstants.ButtonBox.StickDown)
-          .whileTrue(m_climbers.climbersDownCommand());
+    JoystickButton climbersEnable;
+    climbersEnable = new JoystickButton(m_buttonBoard, ButtonBox.Left4);
+
+    climbersEnable.and(new Trigger(() -> m_buttonBoard
+    .getPOV() == Constants.OIConstants.ButtonBox.StickUp)).whileTrue(m_climbers.climbersUpCommand());
+
+    climbersEnable.and(new Trigger(() -> m_buttonBoard
+    .getPOV() == Constants.OIConstants.ButtonBox.StickDown)).whileTrue(m_climbers.climbersDownCommand());
+
+
+
+    
 
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
