@@ -87,8 +87,11 @@ public class TeleopDrive extends Command {
         m_robotDrive.driveRobotOriented(forward, leftward, rotate);
       }
 
-      while(m_driverController.getBButton() && forward == 0.0 && leftward == 0.0 && rotate == 0.0){
+      if(m_driverController.getBButton()){
         m_robotDrive.setX();
+      }
+      else{
+        m_robotDrive.driveRobotOriented(forward, leftward, rotate);
       }
     }
   }
