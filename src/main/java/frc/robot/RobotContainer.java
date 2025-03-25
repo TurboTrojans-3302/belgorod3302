@@ -185,11 +185,11 @@ public class RobotContainer {
     if (ELEVATOR_ENABLE) {
 
       //TODO find elevator position for algae
-      new JoystickButton(m_buttonBoard, ButtonBox.Left2)
+      new JoystickButton(m_buttonBoard, ButtonBox.Left3)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLoadPosition));
       
 
-      new JoystickButton(m_buttonBoard, ButtonBox.Right1)
+      new JoystickButton(m_buttonBoard, ButtonBox.Left2)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.Algae));
       
 
@@ -216,11 +216,11 @@ public class RobotContainer {
 
     if (GRIPPER_ENABLE) {
       //TODO test extension controls
-      Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
-      Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
+      new JoystickButton(m_buttonBoard, ButtonBox.Right1)
+          .onTrue(m_gripper.extendCommand());
 
-      extensionOut.onTrue(m_gripper.extendCommand());
-      extensionIn.onTrue(m_gripper.retractCommand());
+      new JoystickButton(m_buttonBoard, ButtonBox.Right3)
+          .onTrue(m_gripper.retractCommand());
     }
 
     if (CLIMBERS_ENABLE) {
