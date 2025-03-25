@@ -39,8 +39,8 @@ Safety switch - enable climber lock
 
 Engine Start - put climber in locked position 
 
-    *Buttons
-        (From top to bottom)
+### Buttons (From top to bottom)
+
 Left 1 - Elevator to top position (formerly level 4)
 Left 2 - Elevator to algae position
 Left 3 - Elevator to bottom position
@@ -51,7 +51,7 @@ Right 2 - Trough score command
 Right 3 - Retract extension
 Right 4 - When toggled you can operate climbers from stick
 
-    *Other
+### Other
 
 Switch 2 up - arm out (to floor)
 Switch 2 neutral - trough position
