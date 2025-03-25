@@ -229,7 +229,7 @@ public class RobotContainer {
 
     if (CLIMBERS_ENABLE) {
     JoystickButton climbersEnable;
-    climbersEnable = new JoystickButton(m_buttonBoard, ButtonBox.Left4);
+    climbersEnable = new JoystickButton(m_buttonBoard, ButtonBox.Right4);
 
     climbersEnable.and(new Trigger(() -> m_buttonBoard
     .getPOV() == Constants.OIConstants.ButtonBox.StickUp)).whileTrue(m_climbers.climbersUpCommand());
@@ -253,22 +253,20 @@ public class RobotContainer {
     }
 
     if (INTAKE_ARM_ENABLE) {
-      new Trigger(() -> m_copilotController.getRightY() < -0.9 )
-          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
-      
-      new Trigger(() -> m_copilotController.getRightY() > 0.9)
-          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
-
-      new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
-          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
-
+    
       new Trigger(() -> m_intake.objectDetected())
           .onTrue(new Coral(m_intakeArm, m_intake));    
 
+     
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCW))
         .onTrue(m_intakeArm.changePositionCommand(IntakeConstants.kPositionIncrement));
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCCW))
         .onTrue(m_intakeArm.changePositionCommand(-IntakeConstants.kPositionIncrement));
+
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Up)
+      .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Down)
+      .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
     }
 
     // m_reefController.getChangeTrigger()
@@ -286,7 +284,7 @@ public class RobotContainer {
         // new JoystickButton(m_copilotController, XboxController.Button.kY.value)
         //   .onTrue(new LoadGripper(instance));
 
-        new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+          new JoystickButton(m_buttonBoard, ButtonBox.Right2)
           .onTrue(new TroughScore(m_intakeArm, m_intake));
       }
   };
