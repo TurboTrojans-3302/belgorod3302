@@ -262,9 +262,9 @@ public class RobotContainer {
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCCW))
         .onTrue(m_intakeArm.changePositionCommand(-IntakeConstants.kPositionIncrement));
 
-      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Up)
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch2Up)
       .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
-      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Down)
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch2Down)
       .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
     }
 
