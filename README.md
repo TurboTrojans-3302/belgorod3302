@@ -9,13 +9,13 @@ Left stick press: toggle slow drive, press
 
 Right stick press: toggle field oriented, press
 
-A button: flip drivetrain gyro value
+A button: hold to orbit CCW around reef (yet to be done)
 
-B button: hold to orbit CCW around reef (planned)
+B button: break (yet to be done)
 
-X button: hold to orbit CW around reef (planned)
+X button: flip drivetrain gyro value (yet to be done)
 
-Y button: Switch camera view
+Y button: hold to orbit CW around reef (yet to be done)
 
 Up Arrow: Target April tag that is currently being looked at and sent to dashboard, press (planned)
 

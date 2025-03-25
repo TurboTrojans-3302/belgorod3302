@@ -162,7 +162,7 @@ public class RobotContainer {
               (stream == 0.0 ? 2.0 : 0.0));
         }));
 
-    new JoystickButton(m_driverController, XboxController.Button.kA.value)
+    new JoystickButton(m_driverController, XboxController.Button.kX.value)
       .onTrue(new InstantCommand(()->{
         double newheading = m_robotDrive.getGyroAngleDegrees() + 180.0;
         if(newheading > 180.0){ newheading -= 180.0;}
