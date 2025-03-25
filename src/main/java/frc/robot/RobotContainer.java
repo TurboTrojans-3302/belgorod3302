@@ -330,9 +330,9 @@ public class RobotContainer {
     if (GRIPPER_ENABLE) {
       JoystickButton testExtension = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down);
       testExtension.and(testPlus)
-          .whileTrue(m_gripper.testExtensionCommand(0.1));
+          .whileTrue(m_gripper.testExtensionCommand(1.0));
       testExtension.and(testMinus)
-          .whileTrue(m_gripper.testExtensionCommand(-0.1));
+          .whileTrue(m_gripper.testExtensionCommand(-1.0));
     }
   }
 
