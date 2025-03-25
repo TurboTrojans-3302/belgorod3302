@@ -184,13 +184,13 @@ public class RobotContainer {
      */
     if (ELEVATOR_ENABLE) {
 
-      //TODO find heights of algae
+      //TODO find elevator position for algae
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2Algae));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLoadPosition));
       
 
       new JoystickButton(m_buttonBoard, ButtonBox.Right1)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3Algae));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.Algae));
       
 
           //just move elevator up to top position (for knocking off algae faster?)
