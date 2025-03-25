@@ -184,14 +184,16 @@ public class RobotContainer {
      */
     if (ELEVATOR_ENABLE) {
 
+      //TODO find heights of algae
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2Algae));
       
 
       new JoystickButton(m_buttonBoard, ButtonBox.Right1)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3Algae));
       
 
+          //just move elevator up to top position (for knocking off algae faster?)
       new JoystickButton(m_buttonBoard, ButtonBox.Left1)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
       
@@ -213,6 +215,7 @@ public class RobotContainer {
     }
 
     if (GRIPPER_ENABLE) {
+      //TODO test extension controls
       Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
       Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
 

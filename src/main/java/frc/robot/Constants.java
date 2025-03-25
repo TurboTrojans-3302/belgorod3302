@@ -165,7 +165,9 @@ public final class Constants {
     public static final double kLimitLow = 0;
     public static final double kSoftLimitLow = 10;
     public static final double kPickupLevel = 100;
+    public static final double kLevel2Algae = 250; //TODO find value
     public static final double kLevel2 = 300;
+    public static final double kLevel3Algae = 350; //TODO find value
     public static final double kLevel3 = 400;
     public static final double kLevel4 = 500;
     public static final double kSoftLimitHigh = 550;
