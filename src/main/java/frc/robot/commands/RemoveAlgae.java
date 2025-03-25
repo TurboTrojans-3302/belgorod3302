@@ -40,9 +40,9 @@ public class RemoveAlgae extends Command {
       //TODO does there need to be time in between starting the elevator and moving backwards
 
     for (int i = 0; i > 100; i++){
-      timeSeconds = timeSeconds + 0.020;
+      timeSeconds = timeSeconds + 0.020; //time it takes to run execute method
     if (timeSeconds == 1.0){
-      GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 1.0, 0.0, 0.0);
+      GoToCommand.relative(bot.m_robotDrive, bot.m_nav, -1.0, 0.0, 0.0);
     }
 
    }
@@ -54,12 +54,12 @@ public class RemoveAlgae extends Command {
   public void end(boolean interrupted) {
     bot.m_elevator.stop();
     bot.m_gripper.retractGripper();
-    //probably shouldnt move the eevator down automatically just in case.
+    //probably shouldnt move the elevator down automatically just in case.
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (finished && bot.m_elevator.atSetpoint() && (timeSeconds > 2.0));
+    return (finished && bot.m_elevator.atSetpoint() && (timeSeconds == 2.0));
   }
 }
