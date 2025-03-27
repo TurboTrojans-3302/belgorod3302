@@ -30,7 +30,6 @@ public class AutoIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_gripper.openGripper();
     m_gripper.retractGripper();
     m_Elevator.setPosition(Constants.ElevatorConstants.kLoadPosition);
     m_intake.stop();
@@ -40,13 +39,13 @@ public class AutoIntake extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setLowerSpeed(0);
+    m_intake.setIntakeSpeed(0);
     //m_intake.setUpperSpeed(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_arm.atSetpoint() && m_Elevator.atSetpoint();
+    return m_arm.atGoal() && m_Elevator.atSetpoint();
   }
 }

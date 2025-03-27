@@ -10,6 +10,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.IntakeArm;
 
+//TODO this whole thing need to be reconsidered
+
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TroughScore extends Command {
   /** Creates a new TroughScore. */
@@ -36,8 +38,8 @@ public class TroughScore extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_arm.atSetpoint()){
-      m_intake.out();
+    if (m_arm.atGoal()){
+      m_intake.up();
       m_timer.restart();
     }
 

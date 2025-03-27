@@ -48,10 +48,10 @@ import frc.robot.subsystems.Navigation;
  */
 public class RobotContainer {
 
-  private static boolean ELEVATOR_ENABLE = false;
+  private static boolean ELEVATOR_ENABLE = true;
   private static boolean INTAKE_ENABLE = true;
   private static boolean INTAKE_ARM_ENABLE = true;
-  private static boolean GRIPPER_ENABLE = false;
+  private static boolean GRIPPER_ENABLE = true;
   private static boolean CLIMBERS_ENABLE = true;
 
   private static RobotContainer instance;
@@ -101,15 +101,13 @@ public class RobotContainer {
       SmartDashboard.putData("Elevator PID", m_elevator.PID);
     }
     if (INTAKE_ENABLE) {
-      m_intake = new Intake(CanIds.kLowerIntakeMotorCanId, CanIds.kUpperIntakeMotorCanId,
-          DigitalIO.kLowerIntakeLimitSwitchId, DigitalIO.kUpperIntakeLimitSwitchId);
+      m_intake = new Intake(CanIds.kIntakeConveyorCanId, DigitalIO.kUpperIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
-      SmartDashboard.putData("ArmPIDright", m_intakeArm.m_PidControllerRight);
-      SmartDashboard.putData("ArmPIDleft", m_intakeArm.m_PidControllerLeft);
+      SmartDashboard.putData("ArmPID", m_intakeArm.m_PidController);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -118,7 +116,6 @@ public class RobotContainer {
           DigitalIO.kGripperFullyRetractedSwitchId,
           DigitalIO.kGripperObjectDetectedSwitchId);
       SmartDashboard.putData("Gripper", m_gripper);
-      SmartDashboard.putData("GripperPID", m_gripper.gripperPID);
     }
     if (CLIMBERS_ENABLE) {
       m_climbers = new Climbers(CanIds.kClimberLeftMotorCanId,
@@ -174,10 +171,10 @@ public class RobotContainer {
 
     if (INTAKE_ENABLE) {
       new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-          .onTrue(new RunCommand(() -> m_intake.in(), m_intake))
+          .onTrue(new RunCommand(() -> m_intake.down(), m_intake))
           .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
       new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-      .onTrue(new RunCommand(() -> m_intake.out(), m_intake))
+      .onTrue(new RunCommand(() -> m_intake.up(), m_intake))
       .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
 }
 
@@ -216,8 +213,6 @@ public class RobotContainer {
     }
 
     if (GRIPPER_ENABLE) {
-      new JoystickButton(m_copilotController, XboxController.Button.kRightBumper.value)
-          .onTrue(new InstantCommand(() -> m_gripper.toggleGripper()));
       Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
       Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
 
@@ -254,7 +249,7 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
           .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
 
-      new Trigger(() -> m_intake.lowerObjectDetected())
+      new Trigger(() -> m_intake.objectDetected())
           .onTrue(new Coral(m_intakeArm, m_intake));    
 
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCW))
@@ -290,26 +285,18 @@ public class RobotContainer {
 
     if (INTAKE_ARM_ENABLE) {
       JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
-      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.2));
-      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.2));    
+      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.4));
+      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.4));    
     }
 
     if (INTAKE_ENABLE) {
-      JoystickButton testLowerConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
-      testLowerConveyor.and(testPlus)    
-          .onTrue(new InstantCommand(() -> m_intake.out()))
-          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
-      testLowerConveyor.and(testMinus) 
-          .onTrue(new InstantCommand(() -> m_intake.in()))
-          .onFalse(new InstantCommand(() -> m_intake.setLowerSpeed(0.0)));
-
-      // JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
-      // testUpperConveyor.and(testPlus)
-      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
-      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
-      // testUpperConveyor.and(testMinus)
-      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
-      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
+      JoystickButton testConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
+      testConveyor.and(testPlus)    
+          .onTrue(new InstantCommand(() -> m_intake.up()))
+          .onFalse(new InstantCommand(() -> m_intake.setIntakeSpeed(0.0)));
+      testConveyor.and(testMinus) 
+          .onTrue(new InstantCommand(() -> m_intake.down()))
+          .onFalse(new InstantCommand(() -> m_intake.setIntakeSpeed(0.0)));
     }
 
     if (ELEVATOR_ENABLE) {
@@ -333,17 +320,11 @@ public class RobotContainer {
     }
 
     if (GRIPPER_ENABLE) {
-      JoystickButton testGripper = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Up);
-      testGripper.and(testPlus)
-          .whileTrue(m_gripper.testGripperCommand(0.1));
-      testGripper.and(testMinus)
-          .whileTrue(m_gripper.testGripperCommand(-0.1));
-
       JoystickButton testExtension = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch4Down);
       testExtension.and(testPlus)
-          .whileTrue(m_gripper.testExtensionCommand(0.1));
+          .whileTrue(m_gripper.testExtensionCommand(1.0));
       testExtension.and(testMinus)
-          .whileTrue(m_gripper.testExtensionCommand(-0.1));
+          .whileTrue(m_gripper.testExtensionCommand(-1.0));
     }
   }
 
