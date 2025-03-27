@@ -37,6 +37,7 @@ public class Gripper extends SubsystemBase {
     gripperExtension = new SparkMax(gripperExtensionID, MotorType.kBrushless);
     gripperExtension.configure(new SparkMaxConfig().idleMode(IdleMode.kBrake), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     extensionMotorEncoder = gripperExtension.getEncoder();
+    extensionMotorEncoder.setPosition(0.0);
     gripperClosedSwitch = new DigitalInput(closedSwitchID);
     gripperFullyRetracted = new DigitalInput(retractedSwitchID);
   }
@@ -47,9 +48,9 @@ public class Gripper extends SubsystemBase {
 
   public void extendGripper() {
     if (getExtensionPosition() > kExtendedPos - extensionToleranceMedium) {
-      gripperExtension.set(extensionSpeed * 0.75);
+      gripperExtension.set((extensionSpeed * 0.75));
     } else if (getExtensionPosition() > kExtendedPos - extensionToleranceSmall) {
-      gripperExtension.set(extensionSpeed * 0.25);
+      gripperExtension.set((extensionSpeed * 0.25));
     } else if (getExtensionPosition() > kExtendedPos - stopTolerance) {
       gripperExtension.set(0);
 
@@ -73,7 +74,7 @@ public class Gripper extends SubsystemBase {
   }
 
   public double getExtensionPosition() {
-    return extensionMotorEncoder.getPosition();
+    return (extensionMotorEncoder.getPosition());
   }
 
   public Command extendCommand() {

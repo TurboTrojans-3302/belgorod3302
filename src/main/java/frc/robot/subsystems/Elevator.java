@@ -148,6 +148,10 @@ public class Elevator extends SubsystemBase {
     public boolean atSetpoint(){
       return PID.atGoal();
     }
+
+    public double getSetpoint(){
+      return PID.getSetpoint().position;
+    }
     
     
       @Override
@@ -163,6 +167,7 @@ public class Elevator extends SubsystemBase {
       public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         builder.addDoubleProperty("Position", this::getElevatorPosition, this::resetElevatorPositionEncoder);
+        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setPosition);
         builder.addDoubleProperty("Tolerance", () -> PID.getPositionTolerance(),
                                                    (x) -> PID.setTolerance(x));
       builder.addDoubleProperty("PickupLevel", ()-> kPickupLevel, (x)-> {

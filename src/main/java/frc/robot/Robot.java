@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
 
     m_robotContainer.configureButtonBindings();
     m_robotContainer.setDefaultCommands();
-    m_robotContainer.m_intakeArm.stop();
+    //m_robotContainer.m_intakeArm.stop();
     
     setLED(LEDmode.Teleop);
     // This makes sure that the autonomous stops running when
@@ -178,7 +178,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().cancelAll();
 
     m_robotContainer.m_robotDrive.stop();
-    //m_robotContainer.m_elevator.stop();
+    m_robotContainer.m_elevator.stop();
     m_robotContainer.m_intake.stop();
     m_robotContainer.m_intakeArm.stop();
 

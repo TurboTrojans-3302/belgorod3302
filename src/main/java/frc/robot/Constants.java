@@ -141,9 +141,9 @@ public final class Constants {
       //measured to the center of the lens
 
       //inches
-      public static final double forward = 4; 
-      public static final double side = -7.5; //right is negative
-      public static final double up = 37.25; 
+      public static final double forward = 12; 
+      public static final double side = -4.5; //right is negative
+      public static final double up = 10.25; 
 
       public static final double roll = 0.0;
       public static final double pitch = 0.0;
@@ -179,9 +179,9 @@ public final class Constants {
     public static final double kElevatorMaxAccel = 100000;
     public static final double kManualRate = 1.0;
 
-    public static final double kP = 0.0;
+    public static final double kP = 0.1;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final double kD = 0.001;
     public static final double kLoadPosition = 0;
     public static final double kTolerance = 3; //position tolerance
     public static final double kPositionIncrement = 15.0;
@@ -231,7 +231,7 @@ public final class Constants {
   }
 
   public static final class GripperConstants {
-    public static final double gripperExtendedPosition = 65.0;
+    public static final double gripperExtendedPosition = 100.0;
     public static final double gripperRetractedPosition = 0.0;
     // only one speed necessary
     public static final double gripperExtensionSpeed = 0.5;

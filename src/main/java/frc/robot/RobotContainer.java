@@ -264,9 +264,10 @@ public class RobotContainer {
       armIn.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
 
       JoystickButton armOut = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Down);
-      armOut.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
+      armOut.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
 
-      armIn.or(armOut).onFalse(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
+      //removed floor position
+      armIn.or(armOut).onFalse(new InstantCommand(() -> m_intakeArm.stop()));
     }
 
     // m_reefController.getChangeTrigger()
