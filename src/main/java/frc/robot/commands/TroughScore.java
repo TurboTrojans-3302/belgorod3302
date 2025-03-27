@@ -36,7 +36,7 @@ public class TroughScore extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_arm.atSetpoint()){
+    if (m_arm.atGoal()){
       m_intake.up();
       m_timer.restart();
     }
