@@ -9,18 +9,18 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj.Timer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RemoveAlgae extends Command {
   /** Creates a new RemoveAlgae. */
   RobotContainer bot;
-  boolean readyToRemove = false;
-  boolean finished = false;
-  double timeSeconds = 0.0;
+  Timer m_timer;
   public RemoveAlgae(RobotContainer robot) {
     // Use addRequirements() here to declare subsystem dependencies.
     bot = robot; 
     addRequirements(bot.m_elevator, bot.m_gripper, bot.m_nav, bot.m_robotDrive);
+    m_timer = new Timer();
   }
 
   // Called when the command is initially scheduled.
@@ -36,16 +36,16 @@ public class RemoveAlgae extends Command {
   @Override
   public void execute() {
     if (bot.m_elevator.atSetpoint() && bot.m_gripper.isGripperFullyExtended()){
+      m_timer.restart();
       bot.m_elevator.setPosition(Constants.ElevatorConstants.kLevel4); //TODO does the elevator have to be raised this high?
       //TODO does there need to be time in between starting the elevator and moving backwards
 
-    for (int i = 0; i > 100; i++){
-      timeSeconds = timeSeconds + 0.020; //time it takes to run execute method
-    if (timeSeconds == 1.0){
+    
+    if (m_timer.hasElapsed(1.0)){
       GoToCommand.relative(bot.m_robotDrive, bot.m_nav, -1.0, 0.0, 0.0);
     }
 
-   }
+   
   }
  }
 
@@ -60,6 +60,6 @@ public class RemoveAlgae extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (finished && bot.m_elevator.atSetpoint() && (timeSeconds == 2.0));
+    return (bot.m_elevator.atSetpoint() && (m_timer.hasElapsed(2.0)));
   }
 }
