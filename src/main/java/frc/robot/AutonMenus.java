@@ -20,7 +20,7 @@ public class AutonMenus {
         RobotContainer bot = RobotContainer.getInstance();
     
         SendableChooser<Command> blueCommands = new SendableChooser<Command>();
-        blueCommands.setDefaultOption("Do Nothing (blue)", new DoNothing());
+        blueCommands.setDefaultOption("DoNothing (blue)", new DoNothing());
         blueCommands.addOption("TroughScore 17", new AutonCoralTrough(bot, 17));
         blueCommands.addOption("TroughScore 18", new AutonCoralTrough(bot, 18));
         blueCommands.addOption("TroughScore 19", new AutonCoralTrough(bot, 19));
