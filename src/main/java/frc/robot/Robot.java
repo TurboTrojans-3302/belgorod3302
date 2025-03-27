@@ -170,14 +170,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if (30.0 > DriverStation.getMatchTime() && DriverStation.getMatchTime() > 29.0) {
-      m_robotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 1.0);
-      m_robotContainer.m_copilotController.setRumble(RumbleType.kBothRumble, 1.0);
-    } else {
-      m_robotContainer.m_driverController.setRumble(RumbleType.kBothRumble, 0.0);
-      m_robotContainer.m_copilotController.setRumble(RumbleType.kBothRumble, 0.0);
-    }
-
   }
 
   @Override

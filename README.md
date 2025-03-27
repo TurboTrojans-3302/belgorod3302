@@ -33,43 +33,34 @@ Right Bumper - intake in
 
 Left Bumper -  intake out
 
-
-## Copilot Controller
-
-Left Stick 
-
-Right Stick -- Push stick forward to Extend arm down to floor and begin lower conveyor intake
-                Pull stick back to bring intake arm to top position and stop lower conveyor if needed
-
-A Button - Move intake arm forward and then eject coral into trough  
-
-B button
-
-X button 
-
-Y button - 
- 
-Left Bumper - Load elevator routine (planned)
-
-Right Bumper - toggle open/close gripper
-
-Right Trigger - retract gripper
-
-Left Trigger - extend gripper
- 
-hold DPad up - intake arm precision control up
-
-hold Dpad down - intake arm precision control down
-
 ## ButtonBox
 
 Safety switch - enable climber lock
 
 Engine Start - put climber in locked position 
 
-Enter Button - move climber up
+### Buttons (From top to bottom)
 
-Esc Button - move climber down
+Left 1 - Elevator to top position (formerly level 4)
+Left 2 - Elevator to algae position
+Left 3 - Elevator to bottom position
+Left 4 - When toggled you can operate the elevator with the stick
+
+Right 1 - Extend out
+Right 2 - Trough score command
+Right 3 - Retract extension
+Right 4 - When toggled you can operate climbers from stick
+
+### Other
+
+Switch 2 up - arm out (to floor)
+Switch 2 neutral - trough position
+Switch 2 down - arm in (to elevator position)
+
+Stick - precision control for elevator or climbers (left 4/right 4 toggled)
+
+
+## Button Box (Testing)
 
 Switch 1 (momentary) - Test-nove the enabled mechainsim (see below) 
 

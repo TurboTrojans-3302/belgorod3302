@@ -22,11 +22,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanIds;
 import frc.robot.Constants.DigitalIO;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.ButtonBox;
 import frc.robot.commands.Coral;
-import frc.robot.commands.ElevatorManualMove;
 import frc.robot.commands.MoveElevator;
 import frc.robot.commands.NavigateToTag;
 import frc.robot.commands.OrbitAroundReef;
@@ -73,7 +73,6 @@ public class RobotContainer {
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  XboxController m_copilotController = new XboxController(OIConstants.kCopilotControllerPort);
   GenericHID m_buttonBoard = new GenericHID(OIConstants.kButtonBoardPort);
   //ReefController m_reefController = new ReefController(OIConstants.kReefControllerPort);
 
@@ -183,51 +182,61 @@ public class RobotContainer {
      * Copilot's Controller
      *
      */
+
+     Trigger stickUp = new Trigger(() -> m_buttonBoard.getPOV() == Constants.OIConstants.ButtonBox.StickUp); 
+     Trigger stickDown = new Trigger(() -> m_buttonBoard.getPOV() == Constants.OIConstants.ButtonBox.StickDown); 
+
+
     if (ELEVATOR_ENABLE) {
 
+
+      JoystickButton elevatorEnable;
+    elevatorEnable = new JoystickButton(m_buttonBoard, ButtonBox.Left4);
+
+    elevatorEnable.and(stickUp).whileTrue(new InstantCommand(() -> m_elevator.changeSetPoint(1.0)));
+
+    elevatorEnable.and(stickDown).whileTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
+
+      //TODO find elevator position for algae
+      new JoystickButton(m_buttonBoard, ButtonBox.Left3)
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLoadPosition));
+      
+
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel2));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.Algae));
       
 
-      new JoystickButton(m_buttonBoard, ButtonBox.Right1)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
-      
-
+          //just move elevator up to top position (for knocking off algae faster?)
       new JoystickButton(m_buttonBoard, ButtonBox.Left1)
           .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
       
 
-      // get dpad position as a boolean (they are automatically returned by getPOV()
-      // as an exact value)
-      BooleanSupplier dpadUp = () -> m_copilotController.getPOV() == 0;
-      BooleanSupplier dpadDown = () -> m_copilotController.getPOV() == 180;
-
-      // convert booleansupplier into triggers so the whileTrue() method can be called
-      // upon them
-      Trigger elevatorUp = new Trigger(dpadUp);
-      Trigger elevatorDown = new Trigger(dpadDown);
-
-      // dpad causes the elevator to go up/down slowly during teleop
-      elevatorUp.whileTrue(new ElevatorManualMove(m_elevator, Constants.ElevatorConstants.kManualRate));
-      elevatorDown.whileTrue(new ElevatorManualMove(m_elevator, -Constants.ElevatorConstants.kManualRate));
-
+      new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.LeftKnobCW))
+          .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(ElevatorConstants.kPositionIncrement)));
+      new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.LeftKnobCCW))
+      .onTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-ElevatorConstants.kPositionIncrement)));
     }
 
     if (GRIPPER_ENABLE) {
-      Trigger extensionOut = new Trigger(() -> (m_copilotController.getLeftTriggerAxis() > 0.8));
-      Trigger extensionIn = new Trigger(() -> (m_copilotController.getRightTriggerAxis() > 0.8));
+      //TODO test extension controls
+      new JoystickButton(m_buttonBoard, ButtonBox.Right1)
+          .onTrue(m_gripper.extendCommand());
 
-      extensionOut.onTrue(m_gripper.extendCommand());
-      extensionIn.onTrue(m_gripper.retractCommand());
+      new JoystickButton(m_buttonBoard, ButtonBox.Right3)
+          .onTrue(m_gripper.retractCommand());
     }
 
     if (CLIMBERS_ENABLE) {
-      new Trigger(() -> m_buttonBoard
-          .getPOV() == Constants.OIConstants.ButtonBox.StickUp)
-          .whileTrue(m_climbers.climbersUpCommand());
-      new Trigger(() -> m_buttonBoard
-          .getPOV() == Constants.OIConstants.ButtonBox.StickDown)
-          .whileTrue(m_climbers.climbersDownCommand());
+    JoystickButton climbersEnable;
+    climbersEnable = new JoystickButton(m_buttonBoard, ButtonBox.Right4);
+
+    climbersEnable.and(stickUp).whileTrue(m_climbers.climbersUpCommand());
+
+    climbersEnable.and(stickDown).whileTrue(m_climbers.climbersDownCommand());
+
+
+
+    
 
       Trigger safetySwitch = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.SafetySwitch));
       Trigger lockClimbers = new Trigger(() -> m_buttonBoard.getRawButton(OIConstants.ButtonBox.EngineStart));
@@ -241,22 +250,23 @@ public class RobotContainer {
     }
 
     if (INTAKE_ARM_ENABLE) {
-      new Trigger(() -> m_copilotController.getRightY() < -0.9 )
-          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
-      
-      new Trigger(() -> m_copilotController.getRightY() > 0.9)
-          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
-
-      new JoystickButton(m_copilotController, XboxController.Button.kRightStick.value)
-          .onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
-
+    
       new Trigger(() -> m_intake.objectDetected())
           .onTrue(new Coral(m_intakeArm, m_intake));    
 
+     
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCW))
         .onTrue(m_intakeArm.changePositionCommand(IntakeConstants.kPositionIncrement));
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCCW))
         .onTrue(m_intakeArm.changePositionCommand(-IntakeConstants.kPositionIncrement));
+
+      JoystickButton armIn = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Up);
+      armIn.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
+
+      JoystickButton armOut = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Down);
+      armOut.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
+
+      armIn.or(armOut).onFalse(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
     }
 
     // m_reefController.getChangeTrigger()
@@ -274,7 +284,7 @@ public class RobotContainer {
         // new JoystickButton(m_copilotController, XboxController.Button.kY.value)
         //   .onTrue(new LoadGripper(instance));
 
-        new JoystickButton(m_copilotController, XboxController.Button.kA.value)
+          new JoystickButton(m_buttonBoard, ButtonBox.Right2)
           .onTrue(new TroughScore(m_intakeArm, m_intake));
       }
   };
