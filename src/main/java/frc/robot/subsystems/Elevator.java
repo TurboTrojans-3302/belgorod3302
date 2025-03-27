@@ -49,141 +49,147 @@ public class Elevator extends SubsystemBase {
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;
   public double kLevel4 = ElevatorConstants.kLevel4;
+    public double kAlgaeLevel = ElevatorConstants.kAlgaeLevel;
+    
+      public Elevator(int MotorID, int highSwitchId, int lowSwitchId) {
+        elevatorMotor = new SparkMax(MotorID, MotorType.kBrushless);
+        elevatorMotor.configure(new SparkMaxConfig().inverted(true)
+                                                    .idleMode(IdleMode.kBrake),
+                                ResetMode.kResetSafeParameters,
+                                PersistMode.kNoPersistParameters
+                               );
+        elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
+        elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
+        encoder = elevatorMotor.getEncoder();
+        encoder.setPosition(kLimitLow);
   
-    public Elevator(int MotorID, int highSwitchId, int lowSwitchId) {
-      elevatorMotor = new SparkMax(MotorID, MotorType.kBrushless);
-      elevatorMotor.configure(new SparkMaxConfig().inverted(true)
-                                                  .idleMode(IdleMode.kBrake),
-                              ResetMode.kResetSafeParameters,
-                              PersistMode.kNoPersistParameters
-                             );
-      elevatorHighLimitSwitch = new DigitalInput(highSwitchId);
-      elevatorLowLimitSwitch = new DigitalInput(lowSwitchId);
-      encoder = elevatorMotor.getEncoder();
-      encoder.setPosition(kLimitLow);
-
-      PID = new ProfiledPIDController(ElevatorConstants.kP, 
-                                      ElevatorConstants.kI, 
-                                      ElevatorConstants.kD,
-                                      new Constraints(ElevatorConstants.kElevatorMaxSpeed,
-                                                      ElevatorConstants.kElevatorMaxAccel));
-      PID.setTolerance(ElevatorConstants.kTolerance);
-      PID.reset(getElevatorPosition());
-
-      stop();
-    }
+        PID = new ProfiledPIDController(ElevatorConstants.kP, 
+                                        ElevatorConstants.kI, 
+                                        ElevatorConstants.kD,
+                                        new Constraints(ElevatorConstants.kElevatorMaxSpeed,
+                                                        ElevatorConstants.kElevatorMaxAccel));
+        PID.setTolerance(ElevatorConstants.kTolerance);
+        PID.reset(getElevatorPosition());
   
-    public double getElevatorSpeed() {
-      return encoder.getVelocity();
-    }
+        stop();
+      }
+    
+      public double getElevatorSpeed() {
+        return encoder.getVelocity();
+      }
+    
+      public double getElevatorPosition() {
+        // returns relative encoder position from one of the motors in full rotations
+        return encoder.getPosition();
+      }
+    
+      public void changeSetPoint(double delta){
+        double p = getElevatorPosition();
+        setPosition(p + delta);
+      }
   
-    public double getElevatorPosition() {
-      // returns relative encoder position from one of the motors in full rotations
-      return encoder.getPosition();
-    }
+      public Command testMoveCommand(double speed){
+        return new FunctionalCommand(()->{elevatorMotor.set(speed);
+                                          System.out.println("Speed: " + speed);},
+                                     ()->{},
+                                     (x)->{elevatorMotor.set(0.0);
+                                           System.out.println("stop");},
+                                     ()->false,
+                                     this 
+                                     );
+      }
   
-    public void changeSetPoint(double delta){
-      double p = getElevatorPosition();
-      setPosition(p + delta);
-    }
-
-    public Command testMoveCommand(double speed){
-      return new FunctionalCommand(()->{elevatorMotor.set(speed);
-                                        System.out.println("Speed: " + speed);},
+  
+      public void resetElevatorPositionEncoder(double position) {
+        encoder.setPosition(position);
+        PID.reset(position);
+      }
+    
+      // stopping elevator with limit switches
+      public void checkLimits() {
+        /*
+         * Checking the hard limits
+         */
+        if (!elevatorHighLimitSwitch.get()) {
+          if (getElevatorPosition() < kLimitHigh) {
+            resetElevatorPositionEncoder(kLimitHigh);
+          }
+        }
+        if (!elevatorLowLimitSwitch.get()) {
+          if (getElevatorPosition() > kLimitLow) {
+            resetElevatorPositionEncoder(kLimitLow);
+          }
+        }
+      }
+      
+      public void setPosition(double setpoint) {
+        setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
+        PID.setGoal(setpoint);
+      }
+    
+      public boolean isNear(double position) {
+        return MathUtil.isNear(position, getElevatorPosition(), PID.getPositionTolerance());
+      }
+    
+      public Command setPostionCommand(double setpoint){
+        return new FunctionalCommand(()->setPosition(setpoint),
                                    ()->{},
-                                   (x)->{elevatorMotor.set(0.0);
-                                         System.out.println("stop");},
-                                   ()->false,
-                                   this 
-                                   );
-    }
-
-
-    public void resetElevatorPositionEncoder(double position) {
-      encoder.setPosition(position);
-      PID.reset(position);
-    }
+                                   (x)->{},
+                                   ()->isNear(setpoint),
+                                   this
+                                  );
+      }
   
-    // stopping elevator with limit switches
-    public void checkLimits() {
-      /*
-       * Checking the hard limits
-       */
-      if (!elevatorHighLimitSwitch.get()) {
-        if (getElevatorPosition() < kLimitHigh) {
-          resetElevatorPositionEncoder(kLimitHigh);
-        }
-      }
-      if (!elevatorLowLimitSwitch.get()) {
-        if (getElevatorPosition() > kLimitLow) {
-          resetElevatorPositionEncoder(kLimitLow);
-        }
-      }
+    public Command loadPosCommand() { return setPostionCommand(kLoadPosition); }
+    public Command level2Command() { return setPostionCommand(kLevel2); }
+    public Command level3Command() { return setPostionCommand(kLevel3); }
+    public Command level4Command() { return setPostionCommand(kLevel4); }
+  
+    public boolean atSetpoint(){
+      return PID.atGoal();
     }
     
-    public void setPosition(double setpoint) {
-      setpoint = MathUtil.clamp(setpoint, kSoftLimitLow, kSoftLimitHigh);
-      PID.setGoal(setpoint);
+    
+      @Override
+      public void periodic() {
+        if (!DriverStation.isTest()){// todo I bet we need some feedforward here
+        double speed = PID.calculate(encoder.getPosition());
+        elevatorMotor.set(speed);
+        // important to check the limits after setting the speed
+        checkLimits();}
+      }
+    
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
+        builder.addDoubleProperty("Position", this::getElevatorPosition, this::resetElevatorPositionEncoder);
+        builder.addDoubleProperty("Tolerance", () -> PID.getPositionTolerance(),
+                                                   (x) -> PID.setTolerance(x));
+      builder.addDoubleProperty("PickupLevel", ()-> kPickupLevel, (x)-> {
+        kPickupLevel = x;
+      });
+      builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> {
+        kLevel2 = x;
+      });
+      builder.addDoubleProperty("Level3", () -> kLevel3, (x) -> {
+        kLevel3 = x;
+      });
+      builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> {
+        kLevel4 = x;
+      });
+      builder.addBooleanProperty("AtPickup", ()->isNear(kLoadPosition), null);
+      builder.addBooleanProperty("AtLevel2", ()->isNear(kLevel2), null );
+      builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
+      builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );
+      builder.addDoubleProperty("motor output", elevatorMotor::getAppliedOutput, null);
     }
   
-    public boolean isNear(double position) {
-      return MathUtil.isNear(position, getElevatorPosition(), PID.getPositionTolerance());
+    public void stop() {
+      setPosition(getElevatorPosition());
     }
   
-    public Command setPostionCommand(double setpoint){
-      return new FunctionalCommand(()->setPosition(setpoint),
-                                 ()->{},
-                                 (x)->{},
-                                 ()->isNear(setpoint),
-                                 this
-                                );
-    }
-
-  public Command loadPosCommand() { return setPostionCommand(kLoadPosition); }
-  public Command level2Command() { return setPostionCommand(kLevel2); }
-  public Command level3Command() { return setPostionCommand(kLevel3); }
-  public Command level4Command() { return setPostionCommand(kLevel4); }
-
-  public boolean atSetpoint(){
-    return PID.atGoal();
-  }
-  
-  
-    @Override
-    public void periodic() {
-      if (!DriverStation.isTest()){// todo I bet we need some feedforward here
-      double speed = PID.calculate(encoder.getPosition());
-      elevatorMotor.set(speed);
-      // important to check the limits after setting the speed
-      checkLimits();}
-    }
-  
-    @Override
-    public void initSendable(SendableBuilder builder) {
-      super.initSendable(builder);
-      builder.addDoubleProperty("Position", this::getElevatorPosition, this::resetElevatorPositionEncoder);
-      builder.addDoubleProperty("Tolerance", () -> PID.getPositionTolerance(),
-                                                 (x) -> PID.setTolerance(x));
-    builder.addDoubleProperty("PickupLevel", ()-> kPickupLevel, (x)-> {
-      kPickupLevel = x;
-    });
-    builder.addDoubleProperty("Level2", () -> kLevel2, (x) -> {
-      kLevel2 = x;
-    });
-    builder.addDoubleProperty("Level3", () -> kLevel3, (x) -> {
-      kLevel3 = x;
-    });
-    builder.addDoubleProperty("Level4", () -> kLevel4, (x) -> {
-      kLevel4 = x;
-    });
-    builder.addBooleanProperty("AtPickup", ()->isNear(kLoadPosition), null);
-    builder.addBooleanProperty("AtLevel2", ()->isNear(kLevel2), null );
-    builder.addBooleanProperty("AtLevel3", ()->isNear(kLevel3), null );
-    builder.addBooleanProperty("AtLevel4", ()->isNear(kLevel4), null );
-    builder.addDoubleProperty("motor output", elevatorMotor::getAppliedOutput, null);
-  }
-
-  public void stop() {
-    setPosition(getElevatorPosition());
-  }
+  public Command algaeLevelCommand() {
+      // TODO Auto-generated method stub
+      return setPostionCommand(kAlgaeLevel);
+}
 }

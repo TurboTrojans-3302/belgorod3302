@@ -203,7 +203,7 @@ public class RobotContainer {
       
 
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.Algae));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kAlgaeLevel));
       
 
           //just move elevator up to top position (for knocking off algae faster?)
