@@ -149,7 +149,7 @@ public class IntakeArm extends SubsystemBase {
   
     public void floorPosition(){ setGoal(kFloorPosition); }
     public void troughPosition(){ setGoal(kTroughPosition); }
-    public void elevatorPosition(){ setGoal(kElevatorPosition); }
+    public void upPosition(){ setGoal(kElevatorPosition); }
 
     public Command setPositionCommand(double position){
       return new FunctionalCommand(

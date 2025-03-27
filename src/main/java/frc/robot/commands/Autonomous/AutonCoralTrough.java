@@ -21,7 +21,8 @@ public class AutonCoralTrough extends SequentialCommandGroup {
 
                        new OrbitReefToTag(bot.m_robotDrive, bot.m_nav, tagid),
                                        
-                       new GoToCommand(bot.m_robotDrive, bot.m_nav, Navigation.getPose2dInFrontOfTag(tagid, 0.05)),
+                       new GoToCommand(bot.m_robotDrive, bot.m_nav, Navigation.getPose2dInFrontOfTag(tagid, 0.457))
+                                      .withTimeout(8.0),
                        new TroughScore(bot.m_intakeArm, bot.m_intake),
                        GoToCommand.relative(bot.m_robotDrive, bot.m_nav, -1.0, 0, 0)
                       );

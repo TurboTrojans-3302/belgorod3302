@@ -25,7 +25,7 @@ public class Coral extends Command {
   @Override
   public void initialize() {
     m_intake.stop();
-    m_arm.elevatorPosition();
+    m_arm.upPosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

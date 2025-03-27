@@ -39,7 +39,7 @@ public class TroughScore extends Command {
   @Override
   public void execute() {
     if (m_arm.atGoal()){
-      m_intake.up();
+      m_intake.down();
       m_timer.restart();
     }
 
@@ -50,7 +50,7 @@ public class TroughScore extends Command {
   @Override
   public void end(boolean interrupted) {
     m_intake.stop();
-    m_arm.elevatorPosition();
+    m_arm.upPosition();
   }
 
   // Returns true when the command should end.

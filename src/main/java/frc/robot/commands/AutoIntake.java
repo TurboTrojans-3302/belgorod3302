@@ -33,7 +33,7 @@ public class AutoIntake extends Command {
     m_gripper.retractGripper();
     m_Elevator.setPosition(Constants.ElevatorConstants.kLoadPosition);
     m_intake.stop();
-    m_arm.elevatorPosition();
+    m_arm.upPosition();
   }
 
   // Called once the command ends or is interrupted.
