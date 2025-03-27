@@ -64,6 +64,8 @@ public class IntakeArm extends SubsystemBase {
   private static final double kGearRatio = 100.0;
   private static final double kPositionConversionFactor = 360.0; // converts to degrees
   private static final double kVelocityConversionFactor = kPositionConversionFactor/ 60.0; // converts RPM to deg/sec
+  private static final double kMaxVelocity = 40;
+  private static final double kMaxAcceleration = 80;
 
   private static final SparkMaxConfig leftSparkConfig = new SparkMaxConfig();
   static {
@@ -116,7 +118,7 @@ public class IntakeArm extends SubsystemBase {
       ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleDegrees()), 0.0);
 
       if(!DriverStation.isTest() && DriverStation.isEnabled()){
-        m_armSparkMax.set( (pidLeft + ffLeft));
+        m_armSparkMax.set((pidLeft + ffLeft));
       }
     }
   

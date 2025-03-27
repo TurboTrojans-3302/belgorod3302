@@ -101,7 +101,7 @@ public class RobotContainer {
       SmartDashboard.putData("Elevator PID", m_elevator.PID);
     }
     if (INTAKE_ENABLE) {
-      m_intake = new Intake(CanIds.kUpperIntakeMotorCanId, DigitalIO.kUpperIntakeLimitSwitchId);
+      m_intake = new Intake(CanIds.kIntakeConveyorCanId, DigitalIO.kUpperIntakeLimitSwitchId);
       SmartDashboard.putData("Intake", m_intake);
     }
     if (INTAKE_ARM_ENABLE) {
@@ -285,8 +285,8 @@ public class RobotContainer {
 
     if (INTAKE_ARM_ENABLE) {
       JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
-      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.2));
-      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.2));    
+      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.4));
+      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.4));    
     }
 
     if (INTAKE_ENABLE) {

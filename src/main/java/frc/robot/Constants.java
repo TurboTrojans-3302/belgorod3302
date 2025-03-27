@@ -38,8 +38,8 @@ public final class Constants {
     // 10
     // 11
     // 12
-    public static final int kLowerIntakeMotorCanId = 13;    
-    public static final int kUpperIntakeMotorCanId = 14;    
+    public static final int kIntakeConveyorCanId = 13;    
+    // 14    
     public static final int kElevatorCanId = 15;
     public static final int kGripperMotorCanId = 16;
     public static final int kGripperExtensionMotorCanId = 17;
@@ -191,12 +191,12 @@ public final class Constants {
     public static final double intakeSpeedMax = 1.0;
     public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.00;
-    public static final double kP = 0.05;
-    public static final double kD = 0.0;
+    public static final double kP = 0.03;
+    public static final double kD = 0.001;
     public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
     // public static final double armAngleOffsetRight = 113.4;
-    public static final double armAngleOffset = 112;
+    public static final double armAngleOffset = 144;
     public static final double MaxArmAngle = 115.0;
     public static final double MinArmAngle = -6.0;
     public static final double upSpeed = -0.4;
@@ -213,7 +213,7 @@ public final class Constants {
     public static final double upperLoadSpeed = 0;
     public static final double ejectTime = 1.0;
     public static final double kPositionTolerance = 2.0;
-    public static final double kPositionIncrement = 0.1;
+    public static final double kPositionIncrement = 1.0;
   }
 
   public static final class ClimberConstants {
