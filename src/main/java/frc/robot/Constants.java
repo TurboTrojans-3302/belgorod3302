@@ -45,8 +45,8 @@ public final class Constants {
     public static final int kGripperExtensionMotorCanId = 17;
     public static final int kClimberLeftMotorCanId = 18;
     public static final int kClimberRightMotorCanId = 19;
-    public static final int intakeArmLeftMotorID = 20;
-    public static final int intakeArmRightMotorID = 21;
+    public static final int intakeArmMotorID = 20;
+    
 
   }
 
@@ -191,21 +191,18 @@ public final class Constants {
     public static final double intakeSpeedMax = 1.0;
     public static final double intakeSpeedAuto = 0.4;
     public static final double kI = 0.00;
-    public static final double kPleft = 0.03;
-    public static final double kPright = 0.03;
-    public static final double kD = 0.001;
+    public static final double kP = 0.05;
+    public static final double kD = 0.0;
     public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
     // public static final double armAngleOffsetRight = 113.4;
-    public static final double armAngleOffsetLeft = 0;
-    public static final double armAngleOffsetRight = 0;
+    public static final double armAngleOffset = 112;
     public static final double MaxArmAngle = 115.0;
-    public static final double MinArmAngle = -17.0;
-    public static final double inSpeed = -0.4;
-    public static final double outSpeed = 1.0;
+    public static final double MinArmAngle = -6.0;
+    public static final double upSpeed = -0.4;
+    public static final double downSpeed = 1.0;
     public static final double kS = 0.0;
-    public static final double kGLeft = 0.15;
-    public static final double kGRight = 0.25;
+    public static final double kG = 0.15;
     public static final double kV = 0.0;
     public static final double kA = 0.0;
     public static final double kMaxVelocity = 720;
@@ -216,7 +213,7 @@ public final class Constants {
     public static final double upperLoadSpeed = 0;
     public static final double ejectTime = 1.0;
     public static final double kPositionTolerance = 2.0;
-    public static final double kPositionIncrement = 1.0;
+    public static final double kPositionIncrement = 0.1;
   }
 
   public static final class ClimberConstants {

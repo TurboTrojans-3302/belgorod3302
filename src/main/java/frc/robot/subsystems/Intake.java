@@ -16,8 +16,8 @@ import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
 
-  private double inSpeed = Constants.IntakeConstants.inSpeed;
-  private double outSpeed = Constants.IntakeConstants.outSpeed;
+  private double upSpeed = Constants.IntakeConstants.upSpeed;
+  private double downSpeed = Constants.IntakeConstants.downSpeed;
   private double upperLoadSpeed = Constants.IntakeConstants.upperLoadSpeed;
 
   private static final SparkMaxConfig sparkConfig = new SparkMaxConfig();
@@ -69,30 +69,25 @@ public class Intake extends SubsystemBase {
 
   }
 
-  public void in(){
-    setIntakeSpeed(inSpeed);
+  public void down(){
+    setIntakeSpeed(downSpeed);
   }
 
-  public void out(){
-    setIntakeSpeed(outSpeed);
+  public void up(){
+    setIntakeSpeed(upSpeed);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty("Intake Speed", this::getIntakeSpeed, this::setIntakeSpeed);
-    //builder.addDoubleProperty("UpperSpeed", this::getUpperSpeed, this::setUpperSpeed);
     builder.addBooleanProperty("Coral Detected", this::objectDetected, null);
-    //builder.addBooleanProperty("Upper Object Detected", this::upperObjectDetected, null);
-    builder.addDoubleProperty("inSpeed", ()->inSpeed, (x)->inSpeed = x);
-    builder.addDoubleProperty("outSpeed", ()->outSpeed, (x)->outSpeed = x);
+    builder.addDoubleProperty("downSpeed", ()->downSpeed, (x)->downSpeed = x);
+    builder.addDoubleProperty("upSpeed", ()->upSpeed, (x)->upSpeed = x);
     builder.addDoubleProperty("motor output", ()->m_intakeMotor.getAppliedOutput(), null);
   }
 
-  public void loadGripper() {
-    setIntakeSpeed(outSpeed);
-    //setUpperSpeed(upperLoadSpeed);
-  }
+  
 
   
 }

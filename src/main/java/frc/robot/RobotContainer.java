@@ -107,7 +107,7 @@ public class RobotContainer {
     if (INTAKE_ARM_ENABLE) {
       m_intakeArm = new IntakeArm();
       SmartDashboard.putData("IntakeArm", m_intakeArm);
-      SmartDashboard.putData("ArmPIDleft", m_intakeArm.m_PidControllerLeft);
+      SmartDashboard.putData("ArmPID", m_intakeArm.m_PidController);
     }
     if (GRIPPER_ENABLE) {
       m_gripper = new Gripper(CanIds.kGripperMotorCanId,
@@ -171,10 +171,10 @@ public class RobotContainer {
 
     if (INTAKE_ENABLE) {
       new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-          .onTrue(new RunCommand(() -> m_intake.in(), m_intake))
+          .onTrue(new RunCommand(() -> m_intake.down(), m_intake))
           .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
       new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-      .onTrue(new RunCommand(() -> m_intake.out(), m_intake))
+      .onTrue(new RunCommand(() -> m_intake.up(), m_intake))
       .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
 }
 
@@ -290,21 +290,13 @@ public class RobotContainer {
     }
 
     if (INTAKE_ENABLE) {
-      JoystickButton testLowerConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
-      testLowerConveyor.and(testPlus)    
-          .onTrue(new InstantCommand(() -> m_intake.out()))
+      JoystickButton testConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
+      testConveyor.and(testPlus)    
+          .onTrue(new InstantCommand(() -> m_intake.up()))
           .onFalse(new InstantCommand(() -> m_intake.setIntakeSpeed(0.0)));
-      testLowerConveyor.and(testMinus) 
-          .onTrue(new InstantCommand(() -> m_intake.in()))
+      testConveyor.and(testMinus) 
+          .onTrue(new InstantCommand(() -> m_intake.down()))
           .onFalse(new InstantCommand(() -> m_intake.setIntakeSpeed(0.0)));
-
-      // JoystickButton testUpperConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Up);
-      // testUpperConveyor.and(testPlus)
-      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(Constants.IntakeConstants.upperLoadSpeed)))
-      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
-      // testUpperConveyor.and(testMinus)
-      //     .onTrue(new InstantCommand(() -> m_intake.setUpperSpeed(-Constants.IntakeConstants.upperLoadSpeed)))
-      //     .onFalse(new InstantCommand(() -> m_intake.setUpperSpeed(0.0)));
     }
 
     if (ELEVATOR_ENABLE) {

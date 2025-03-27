@@ -21,7 +21,7 @@ public class AutoCoralPickupGround extends ParallelCommandGroup {
   
     addCommands(new InstantCommand(()->{
                         arm.floorPosition();
-                        intake.in();
+                        intake.down();
                     }),
                 GoToCommand.relative(drive, nav, distanceForward, 0, 0));
   }

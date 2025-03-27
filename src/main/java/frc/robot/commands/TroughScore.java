@@ -37,7 +37,7 @@ public class TroughScore extends Command {
   @Override
   public void execute() {
     if (m_arm.atSetpoint()){
-      m_intake.out();
+      m_intake.up();
       m_timer.restart();
     }
 
