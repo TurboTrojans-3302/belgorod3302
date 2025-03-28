@@ -176,6 +176,14 @@ public class RobotContainer {
       new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
       .onTrue(new RunCommand(() -> m_intake.up(), m_intake))
       .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch3Up)
+      .onTrue(new RunCommand(() -> m_intake.up()))
+      .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch3Down)
+      .onTrue(new RunCommand(() -> m_intake.down()))
+      .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+
 }
 
     /**
