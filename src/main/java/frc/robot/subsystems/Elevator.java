@@ -44,7 +44,7 @@ public class Elevator extends SubsystemBase {
   public double kLimitHigh = ElevatorConstants.kLimitHigh;
   public double kSoftLimitLow = ElevatorConstants.kSoftLimitLow;
   public double kSoftLimitHigh = ElevatorConstants.kSoftLimitHigh;
-  public double kLoadPosition = ElevatorConstants.kLoadPosition;
+  public double kLoadPosition = ElevatorConstants.kLoadAndAlgaePosition;
   public double kPickupLevel = ElevatorConstants.kPickupLevel;
   public double kLevel2 = ElevatorConstants.kLevel2;
   public double kLevel3 = ElevatorConstants.kLevel3;

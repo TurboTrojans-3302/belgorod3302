@@ -33,7 +33,7 @@ public class Intake extends SubsystemBase {
   //private DigitalInput m_upperObjectDetectSwitch;
 
   public Intake(int sparkId, int limitSwitchId) {
-    m_intakeMotor = new SparkMax(sparkId, MotorType.kBrushed);
+    m_intakeMotor = new SparkMax(sparkId, MotorType.kBrushless);
 
     m_objectDetectSwitch = new DigitalInput(limitSwitchId);
     //m_upperObjectDetectSwitch = new DigitalInput(upperLimitSwitchId);

@@ -105,18 +105,12 @@ public class Climbers extends SubsystemBase {
   }
 
  
-
   
-
   public void setPosition(double position){
-    setPosition(position, false);
-  }
-  
-  public void setPosition(double position, boolean override){
     //TODO don't move if we're in the lock position)
 
     double Lposition, Rposition;
-    if (override == false){
+    if (climberLockActive == false){
       Rposition = MathUtil.clamp(position, kLowerLimit, kUpperLimitRight);
       Lposition = MathUtil.clamp(position, kLowerLimit, kUpperLimitLeft);
       
@@ -153,7 +147,7 @@ public class Climbers extends SubsystemBase {
 
   public void climbersFullDown(){
     if (climberLockActive){
-      setPosition(lockedPosition, true);
+      setPosition(lockedPosition);
     }
   }
 

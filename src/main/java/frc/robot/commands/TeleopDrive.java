@@ -58,16 +58,6 @@ public class TeleopDrive extends Command {
 
     if(forward == 0.0 && leftward == 0.0 && rotate == 0.0){
 
-      if(m_driverController.getXButton()){
-        new OrbitAroundReef(drive, nav, -orbitSpeed * speedScale);
-      }
-      else if(m_driverController.getBButton()){
-        new OrbitAroundReef(drive, nav, orbitSpeed * speedScale);
-      }
-      else{
-        m_robotDrive.stop();
-      }
-
       final Translation2d orbitCenter = new Translation2d(1.0, 0.0);
       if(m_driverController.getPOV() == 90 && m_driverController.getXButton() == false && m_driverController.getBButton() == false){
         m_robotDrive.orbitRobotFrame(orbitSpeed * -speedScale, orbitCenter);
@@ -87,6 +77,9 @@ public class TeleopDrive extends Command {
         m_robotDrive.driveRobotOriented(forward, leftward, rotate);
       }
 
+      if(m_driverController.getYButton()){
+        m_robotDrive.setX();
+      }
     }
   }
 

@@ -182,7 +182,7 @@ public final class Constants {
     public static final double kP = 0.1;
     public static final double kI = 0.0;
     public static final double kD = 0.001;
-    public static final double kLoadPosition = 0;
+    public static final double kLoadAndAlgaePosition = 0;
     public static final double kTolerance = 3; //position tolerance
     public static final double kPositionIncrement = 15.0;
     public static final double kAlgaeLevel = 350;
@@ -200,8 +200,8 @@ public final class Constants {
     public static final double armAngleOffset = 144;
     public static final double MaxArmAngle = 115.0;
     public static final double MinArmAngle = -6.0;
-    public static final double upSpeed = -0.4;
-    public static final double downSpeed = 1.0;
+    public static final double upSpeed = 0.5;
+    public static final double downSpeed = -0.5;
     public static final double kS = 0.0;
     public static final double kG = 0.15;
     public static final double kV = 0.0;
@@ -223,8 +223,8 @@ public final class Constants {
     public static final double kD = 0.5;
     public static final double kMaxVelocity = 100000; //RPM
     public static final double kMaxAcceleration = 100000; //RPM/s
-    public static double kLowerLimit = -1.5;
-    public static double kLockedPosition = 7;
+    public static double kLowerLimit = -20;
+    public static double kLockedPosition = -14;
     public static double kUpperLimitRight = 16;
     public static double kUpperLimitLeft = 22;
     public static double increment = 1.0;

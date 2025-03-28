@@ -155,12 +155,6 @@ public class RobotContainer {
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, 1.0));
     new JoystickButton(m_driverController, XboxController.Button.kX.value)
         .whileTrue(new OrbitAroundReef(m_robotDrive, m_nav, -1.0));
-    new JoystickButton(m_driverController, XboxController.Button.kY.value)
-        .onTrue(new InstantCommand(() -> {
-          double stream = LimelightHelpers.getLimelightNTDouble("limelight", "stream");
-          LimelightHelpers.setLimelightNTDouble("limelight", "stream",
-              (stream == 0.0 ? 2.0 : 0.0));
-        }));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
       .onTrue(new InstantCommand(()->{
@@ -171,18 +165,18 @@ public class RobotContainer {
 
     if (INTAKE_ENABLE) {
       new JoystickButton(m_driverController, XboxController.Button.kRightBumper.value)
-          .onTrue(new RunCommand(() -> m_intake.down(), m_intake))
-          .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+          .onTrue(new InstantCommand(() -> m_intake.down()))
+          .onFalse(new InstantCommand(() -> m_intake.stop()));
       new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
-      .onTrue(new RunCommand(() -> m_intake.up(), m_intake))
-      .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
-
+      .onTrue(new InstantCommand(() -> m_intake.up()))
+      .onFalse(new InstantCommand(() -> m_intake.stop()));
+      
       new JoystickButton(m_buttonBoard, ButtonBox.Switch3Up)
-      .onTrue(new RunCommand(() -> m_intake.up()))
-      .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+      .onTrue(new InstantCommand(() -> m_intake.up()))
+      .onFalse(new InstantCommand(() -> m_intake.stop()));
       new JoystickButton(m_buttonBoard, ButtonBox.Switch3Down)
-      .onTrue(new RunCommand(() -> m_intake.down()))
-      .onFalse(new RunCommand(() -> m_intake.stop(), m_intake));
+      .onTrue(new InstantCommand(() -> m_intake.down()))
+      .onFalse(new InstantCommand(() -> m_intake.stop()));
 
 }
 
@@ -205,9 +199,9 @@ public class RobotContainer {
 
     elevatorEnable.and(stickDown).whileTrue(new InstantCommand(() -> m_elevator.changeSetPoint(-1.0)));
 
-      //TODO find elevator position for algae
+      
       new JoystickButton(m_buttonBoard, ButtonBox.Left3)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLoadPosition));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLoadAndAlgaePosition));
       
 
       new JoystickButton(m_buttonBoard, ButtonBox.Left2)
@@ -232,6 +226,12 @@ public class RobotContainer {
 
       new JoystickButton(m_buttonBoard, ButtonBox.Right3)
           .onTrue(m_gripper.retractCommand());
+
+
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Up)
+        .whileTrue(m_gripper.testExtensionCommand(Constants.GripperConstants.gripperExtensionSpeed));
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Down)
+        .whileTrue(m_gripper.testExtensionCommand(-Constants.GripperConstants.gripperExtensionSpeed));
     }
 
     if (CLIMBERS_ENABLE) {
@@ -275,7 +275,6 @@ public class RobotContainer {
       armIn.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
 
       //removed floor position
-      armIn.or(armTrough).onFalse(new InstantCommand(() -> m_intakeArm.stop()));
     }
 
     // m_reefController.getChangeTrigger()
@@ -305,8 +304,8 @@ public class RobotContainer {
 
     if (INTAKE_ARM_ENABLE) {
       JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
-      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.4));
-      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.4));    
+      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.7));
+      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.7));    
     }
 
     if (INTAKE_ENABLE) {

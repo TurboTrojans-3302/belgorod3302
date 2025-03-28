@@ -31,7 +31,7 @@ public class AutoIntake extends Command {
   @Override
   public void initialize() {
     m_gripper.retractGripper();
-    m_Elevator.setPosition(Constants.ElevatorConstants.kLoadPosition);
+    m_Elevator.setPosition(Constants.ElevatorConstants.kLoadAndAlgaePosition);
     m_intake.stop();
     m_arm.upPosition();
   }

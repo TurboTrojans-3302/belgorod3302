@@ -111,7 +111,7 @@ public class Gripper extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    
+    builder.addDoubleProperty("speed", ()->extensionSpeed, (x)->{extensionSpeed=x;});    
     builder.addDoubleProperty("Extension Pos.", this::getExtensionPosition, null);
     builder.addBooleanProperty("Extended", this::isGripperFullyExtended, null);
     builder.addBooleanProperty("Retracted", this::isExtensionRetracted, null);
