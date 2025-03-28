@@ -163,7 +163,7 @@ public final class Constants {
     public static final double kLimitLow = 0;
     public static final double kSoftLimitLow = 10;
     public static final double kPickupLevel = 100;
-    public static final double kLevel2Algae = 250; //TODO find value
+    public static final double kLevel2Algae = 150; //TODO find value
     public static final double kLevel2 = 300;
     public static final double kLevel3 = 400;
     public static final double kLevel4 = 500;
@@ -185,7 +185,7 @@ public final class Constants {
     public static final double kLoadAndAlgaePosition = 0;
     public static final double kTolerance = 3; //position tolerance
     public static final double kPositionIncrement = 15.0;
-    public static final double kAlgaeLevel = 350;
+    public static final double kAlgaeLevel = 150;
   }
 
   public static final class IntakeConstants {
@@ -197,8 +197,8 @@ public final class Constants {
     public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
     // public static final double armAngleOffsetRight = 113.4;
-    public static final double armAngleOffset = 144;
-    public static final double MaxArmAngle = 115.0;
+    public static final double armAngleOffset = 47.0;
+    public static final double MaxArmAngle = 113.0;
     public static final double MinArmAngle = -6.0;
     public static final double upSpeed = 0.5;
     public static final double downSpeed = -0.5;
@@ -210,7 +210,7 @@ public final class Constants {
     public static final double kMaxAcceleration = 200;
     public static final double kFloorPosition = MinArmAngle;
     public static final double kElevatorPosition = MaxArmAngle;
-    public static final double kTroughPosition = 73;
+    public static final double kTroughPosition = 70;
     public static final double upperLoadSpeed = 0;
     public static final double ejectTime = 1.0;
     public static final double kPositionTolerance = 2.0;
@@ -218,7 +218,7 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final double kP = 1.0;
+    public static final double kP = 1.2;
     public static final double kI = 0;
     public static final double kD = 0.5;
     public static final double kMaxVelocity = 100000; //RPM

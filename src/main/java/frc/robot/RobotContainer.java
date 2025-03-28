@@ -210,7 +210,7 @@ public class RobotContainer {
 
           //just move elevator up to top position (for knocking off algae faster?)
       new JoystickButton(m_buttonBoard, ButtonBox.Left1)
-          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel4));
+          .onTrue(new MoveElevator(m_elevator, Constants.ElevatorConstants.kLevel3));
       
 
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.LeftKnobCW))
@@ -268,11 +268,14 @@ public class RobotContainer {
       new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.RightKnobCCW))
         .onTrue(m_intakeArm.changePositionCommand(-IntakeConstants.kPositionIncrement));
 
-      JoystickButton armTrough = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Up);
-      armTrough.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
+      JoystickButton armIn = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Up);
+      JoystickButton armFloor = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Down);
 
-      JoystickButton armIn = new JoystickButton(m_buttonBoard, ButtonBox.Switch2Down);
       armIn.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kElevatorPosition));
+
+      armFloor.onTrue(m_intakeArm.setPositionCommand(IntakeConstants.kFloorPosition));
+
+      armIn.or(armFloor).onFalse(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
 
       //removed floor position
     }

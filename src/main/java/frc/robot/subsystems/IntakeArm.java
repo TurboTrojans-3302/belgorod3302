@@ -63,7 +63,9 @@ public class IntakeArm extends SubsystemBase {
   static {
     leftSparkConfig
           .idleMode(IdleMode.kBrake)
-          .smartCurrentLimit(50);
+          .smartCurrentLimit(50)
+          .inverted(true);
+          
 }
 
 
@@ -80,7 +82,9 @@ public class IntakeArm extends SubsystemBase {
       public IntakeArm() {
     
         m_armSparkMax = new SparkMax(Constants.CanIds.intakeArmMotorID, MotorType.kBrushed);
+      
         m_armSparkMax.configure(leftSparkConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+      
     
         m_ArmEncoder = new DutyCycleEncoder(Constants.DigitalIO.kIntakeArmEncoderDIO);
         m_ArmEncoder.setInverted(true);

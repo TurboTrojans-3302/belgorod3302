@@ -136,6 +136,7 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     System.out.println("autonomousInit() m_pos == " + m_robotContainer.m_nav.getPose());
     System.out.println("Starting command: " + m_autonomousCommand.getName());
+    m_robotContainer.m_intakeArm.stop();
 
 
     // schedule the autonomous command (example)
@@ -154,7 +155,7 @@ public class Robot extends TimedRobot {
 
     m_robotContainer.configureButtonBindings();
     m_robotContainer.setDefaultCommands();
-    //m_robotContainer.m_intakeArm.stop();
+    m_robotContainer.m_intakeArm.stop();
     
     setLED(LEDmode.Teleop);
     // This makes sure that the autonomous stops running when
