@@ -21,7 +21,7 @@ public class AutonMenus {
         RobotContainer bot = RobotContainer.getInstance();
     
         SendableChooser<Command> blueCommands = new SendableChooser<Command>();
-        blueCommands.setDefaultOption("DoNothing (blue)", new DoNothing());
+        blueCommands.addOption("DoNothing (blue)", new DoNothing());
         blueCommands.addOption("TroughScore 17 far left", new AutonCoralTrough(bot, 17));
         blueCommands.addOption("TroughScore 18 far center", new AutonCoralTrough(bot, 18));
         blueCommands.addOption("TroughScore 19 far right", new AutonCoralTrough(bot, 19));
@@ -36,7 +36,7 @@ public class AutonMenus {
         blueCommands.addOption("RemoveAlgae 21 near center", new AutonRemoveAlgae(bot, 21));
         blueCommands.addOption("RemoveAlgae 22 near left", new AutonRemoveAlgae(bot, 22));
 
-        blueCommands.addOption("go fwd 1m", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 1.0, 0, 0));
+        blueCommands.setDefaultOption("go fwd 1m", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 1.0, 0, 0));
         blueCommands.addOption("go fwd 2m", GoToCommand.relative(bot.m_robotDrive, bot.m_nav, 2.0, 0, 0));
         
         return blueCommands;

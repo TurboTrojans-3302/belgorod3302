@@ -411,11 +411,11 @@ public class RobotContainer {
   }
 
   private void setStartPosition(Pose2d pose) {
-    if (DriverStation.isDisabled()) {
+   
       System.out.println("setStartPosition()" + pose.toString());
       m_robotDrive.setGyroAngleDeg(pose.getRotation().getDegrees());
       m_nav.resetOdometry(pose);
-    }
+
   }
 
 }

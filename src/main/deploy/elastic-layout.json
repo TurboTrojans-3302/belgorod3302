@@ -255,7 +255,7 @@
             "title": "Auton Command",
             "x": 768.0,
             "y": 0.0,
-            "width": 384.0,
+            "width": 448.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -268,7 +268,7 @@
             "title": "Start Position",
             "x": 768.0,
             "y": 128.0,
-            "width": 384.0,
+            "width": 448.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -288,7 +288,7 @@
           {
             "title": "Swerve Drive",
             "x": 0.0,
-            "y": 64.0,
+            "y": 0.0,
             "width": 384.0,
             "height": 384.0,
             "type": "SwerveDrive",
