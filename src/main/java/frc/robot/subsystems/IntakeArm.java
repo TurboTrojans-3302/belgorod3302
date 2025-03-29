@@ -64,7 +64,7 @@ public class IntakeArm extends SubsystemBase {
     leftSparkConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(50)
-          .inverted(true);
+          .inverted(false);
           
 }
 
@@ -77,7 +77,21 @@ public class IntakeArm extends SubsystemBase {
   private double m_goal = kMaxArmAngle;
 
   private double kPositionTolerance = IntakeConstants.kPositionTolerance;
+
+  private boolean pidEnabled = false;
     
+  public boolean isPidEnabled() {
+    return pidEnabled;
+  }
+
+  public void setPidEnabled(boolean pidEnabled) {
+    this.pidEnabled = pidEnabled;
+    if(pidEnabled){
+      m_goal = getArmAngleDegrees();
+      stop();
+    }
+  }
+
       /** Creates a new IntakeArm. */
       public IntakeArm() {
     
@@ -87,7 +101,7 @@ public class IntakeArm extends SubsystemBase {
       
     
         m_ArmEncoder = new DutyCycleEncoder(Constants.DigitalIO.kIntakeArmEncoderDIO);
-        m_ArmEncoder.setInverted(true);
+        m_ArmEncoder.setInverted(false);
       
   
         m_PidController = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
@@ -116,12 +130,13 @@ public class IntakeArm extends SubsystemBase {
         pidLeft = m_PidController.calculate(newAngle);
         ffLeft = m_FeedforwardLeft.calculate(Math.toRadians(getArmAngleDegrees()), 0.0);
 
-        if(!DriverStation.isTest() && DriverStation.isEnabled()){
+        if(!DriverStation.isTest() && DriverStation.isEnabled() && isPidEnabled()){
           m_armSparkMax.set((pidLeft + ffLeft));
         }
     }
   
     public void setGoal(double angle) {
+      pidEnabled = true;
       m_goal = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
     }
   
@@ -171,7 +186,8 @@ public class IntakeArm extends SubsystemBase {
   
     public Command testCommand(double speed){
       return new FunctionalCommand(
-                            ()->{m_armSparkMax.set(speed);},
+                            ()->{setPidEnabled(false);
+                                 m_armSparkMax.set(speed);},
                             ()->{},
                             (x)->{m_armSparkMax.set(0.0);},
                             ()->false,
@@ -226,6 +242,7 @@ public class IntakeArm extends SubsystemBase {
     builder.addStringProperty("ffLeft", ()->String.format("%.2f", ffLeft), null);
     builder.addDoubleProperty("motorOutput", ()->m_armSparkMax.getAppliedOutput(), null);
     builder.addStringProperty("ArmAngleLabel", this::getPositionLabel, null);
+    builder.addBooleanProperty("PID Enabled", this::isPidEnabled, this::setPidEnabled);
   }
 
 

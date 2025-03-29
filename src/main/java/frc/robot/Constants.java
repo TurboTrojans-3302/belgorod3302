@@ -197,7 +197,7 @@ public final class Constants {
     public static final double intakeSpeedMin = -1.0;
     // public static final double armAngleOffsetLeft = -18.1;
     // public static final double armAngleOffsetRight = 113.4;
-    public static final double armAngleOffset = 47.0;
+    public static final double armAngleOffset = -28.0;
     public static final double MaxArmAngle = 113.0;
     public static final double MinArmAngle = -6.0;
     public static final double upSpeed = 0.5;
@@ -215,6 +215,8 @@ public final class Constants {
     public static final double ejectTime = 1.0;
     public static final double kPositionTolerance = 2.0;
     public static final double kPositionIncrement = 1.0;
+    public static final double kManualUpSpeed = 0.05;
+    public static final double kManualDownSpeed = -0.0375;
   }
 
   public static final class ClimberConstants {
@@ -225,8 +227,8 @@ public final class Constants {
     public static final double kMaxAcceleration = 100000; //RPM/s
     public static double kLowerLimit = -20;
     public static double kLockedPosition = -14;
-    public static double kUpperLimitRight = 16;
-    public static double kUpperLimitLeft = 22;
+    public static double kUpperLimitRight = 16.3;
+    public static double kUpperLimitLeft = 26.8;
     public static double increment = 1.0;
   }
 

@@ -104,6 +104,14 @@ public class Climbers extends SubsystemBase {
     return m_rightEncoder.getPosition();
   }
 
+  public void setPositionLeft(double value){
+    m_leftEncoder.setPosition(value);
+  }
+
+  public void setPositionRight(double value){
+    m_rightEncoder.setPosition(value);
+  }
+
  
   
   public void setPosition(double position){
@@ -171,8 +179,8 @@ public class Climbers extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty("increment", ()->this.increment, (x)->increment=x);
     builder.addDoubleProperty("Setpoint", this::getSetpoint, this::setPosition);
-    builder.addDoubleProperty("Right Pos", this::getPositionRight, null);
-    builder.addDoubleProperty("Left Pos", this::getPositionLeft, null);
+    builder.addDoubleProperty("Right Pos", this::getPositionRight, this::setPositionRight);
+    builder.addDoubleProperty("Left Pos", this::getPositionLeft, this::setPositionLeft);
     builder.addDoubleProperty("kP", ()->kP, (x)->{kP = x; updateConfig(); });
     builder.addDoubleProperty("kI", ()->kI, (x)->{kI = x; updateConfig(); });
     builder.addDoubleProperty("kD", ()->kD, (x)->{kD = x; updateConfig(); });

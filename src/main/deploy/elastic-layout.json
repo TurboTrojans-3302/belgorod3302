@@ -525,6 +525,37 @@
               "data_type": "double",
               "show_submit_button": false
             }
+          },
+          {
+            "title": "Goal",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/Goal",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "PID Enabled",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/IntakeArm/PID Enabled",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
           }
         ]
       }
@@ -662,7 +693,7 @@
             "title": "Position",
             "x": 0.0,
             "y": 256.0,
-            "width": 640.0,
+            "width": 576.0,
             "height": 128.0,
             "type": "Number Bar",
             "properties": {
@@ -692,7 +723,7 @@
           },
           {
             "title": "Elevator PID",
-            "x": 896.0,
+            "x": 640.0,
             "y": 0.0,
             "width": 256.0,
             "height": 384.0,
@@ -701,12 +732,26 @@
               "topic": "/SmartDashboard/Elevator PID",
               "period": 0.06
             }
+          },
+          {
+            "title": "Position",
+            "x": 128.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Elevator/Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
           }
         ]
       }
     },
     {
-      "name": "Gripper",
+      "name": "Extension",
       "grid_layout": {
         "layouts": [],
         "containers": [
@@ -780,16 +825,20 @@
           },
           {
             "title": "Extension Pos.",
-            "x": 640.0,
+            "x": 576.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 640.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Number Bar",
             "properties": {
               "topic": "/SmartDashboard/Gripper/Extension Pos.",
               "period": 0.06,
               "data_type": "double",
-              "show_submit_button": false
+              "min_value": -10.0,
+              "max_value": 300.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
             }
           },
           {
@@ -835,18 +884,6 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
-            }
-          },
-          {
-            "title": "GripperPID",
-            "x": 320.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 384.0,
-            "type": "PIDController",
-            "properties": {
-              "topic": "/SmartDashboard/GripperPID",
-              "period": 0.06
             }
           },
           {
@@ -1018,7 +1055,7 @@
             "title": "kUpperLimitLeft",
             "x": 0.0,
             "y": 0.0,
-            "width": 128.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -1030,7 +1067,7 @@
           },
           {
             "title": "kUpperLimitRight",
-            "x": 128.0,
+            "x": 192.0,
             "y": 0.0,
             "width": 128.0,
             "height": 128.0,
@@ -1054,6 +1091,22 @@
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
+            }
+          },
+          {
+            "title": "leftOutput",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 384.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Climbers/leftOutput",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 5.0,
+              "color": 4278238420,
+              "line_width": 2.0
             }
           }
         ]

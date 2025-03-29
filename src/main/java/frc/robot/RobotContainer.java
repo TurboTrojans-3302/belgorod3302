@@ -228,9 +228,9 @@ public class RobotContainer {
           .onTrue(m_gripper.retractCommand());
 
 
-      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Up)
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch4Up)
         .whileTrue(m_gripper.testExtensionCommand(Constants.GripperConstants.gripperExtensionSpeed));
-      new JoystickButton(m_buttonBoard, ButtonBox.Switch1Down)
+      new JoystickButton(m_buttonBoard, ButtonBox.Switch4Down)
         .whileTrue(m_gripper.testExtensionCommand(-Constants.GripperConstants.gripperExtensionSpeed));
     }
 
@@ -277,7 +277,10 @@ public class RobotContainer {
 
       armIn.or(armFloor).onFalse(m_intakeArm.setPositionCommand(IntakeConstants.kTroughPosition));
 
-      //removed floor position
+      new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.Switch1Up))
+        .whileTrue(m_intakeArm.testCommand(IntakeConstants.kManualUpSpeed));
+      new Trigger(()->m_buttonBoard.getRawButton(ButtonBox.Switch1Down))
+        .whileTrue(m_intakeArm.testCommand(IntakeConstants.kManualDownSpeed));
     }
 
     // m_reefController.getChangeTrigger()
@@ -305,11 +308,11 @@ public class RobotContainer {
     JoystickButton testMinus = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch1Down);
 
 
-    if (INTAKE_ARM_ENABLE) {
-      JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
-      testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.7));
-      testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.7));    
-    }
+    // if (INTAKE_ARM_ENABLE) {
+    //   JoystickButton testIntakeArm = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch2Up);
+    //   testIntakeArm.and(testPlus).whileTrue(m_intakeArm.testCommand(0.7));
+    //   testIntakeArm.and(testMinus).whileTrue(m_intakeArm.testCommand(-0.7));    
+    // }
 
     if (INTAKE_ENABLE) {
       JoystickButton testConveyor = new JoystickButton(m_buttonBoard, OIConstants.ButtonBox.Switch3Down);
