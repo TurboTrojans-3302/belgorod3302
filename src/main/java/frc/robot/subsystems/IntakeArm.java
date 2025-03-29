@@ -84,12 +84,15 @@ public class IntakeArm extends SubsystemBase {
     return pidEnabled;
   }
 
-  public void setPidEnabled(boolean pidEnabled) {
-    this.pidEnabled = pidEnabled;
-    if(pidEnabled){
-      m_goal = getArmAngleDegrees();
-      stop();
-    }
+  public void enablePID() {
+    pidEnabled = true;
+    m_goal = getArmAngleDegrees();
+    stop();
+  }
+
+  public void disablePID(){
+    pidEnabled=false;
+    stop();
   }
 
       /** Creates a new IntakeArm. */
@@ -136,7 +139,7 @@ public class IntakeArm extends SubsystemBase {
     }
   
     public void setGoal(double angle) {
-      pidEnabled = true;
+      if(!pidEnabled){enablePID();}
       m_goal = MathUtil.clamp(angle, kMinArmAngle, kMaxArmAngle);
     }
   
@@ -186,8 +189,10 @@ public class IntakeArm extends SubsystemBase {
   
     public Command testCommand(double speed){
       return new FunctionalCommand(
-                            ()->{setPidEnabled(false);
-                                 m_armSparkMax.set(speed);},
+                            ()->{
+                                 disablePID();
+                                 m_armSparkMax.set(speed);
+                                },
                             ()->{},
                             (x)->{m_armSparkMax.set(0.0);},
                             ()->false,
@@ -242,7 +247,7 @@ public class IntakeArm extends SubsystemBase {
     builder.addStringProperty("ffLeft", ()->String.format("%.2f", ffLeft), null);
     builder.addDoubleProperty("motorOutput", ()->m_armSparkMax.getAppliedOutput(), null);
     builder.addStringProperty("ArmAngleLabel", this::getPositionLabel, null);
-    builder.addBooleanProperty("PID Enabled", this::isPidEnabled, this::setPidEnabled);
+    builder.addBooleanProperty("PID Enabled", this::isPidEnabled, null);
   }
 
 
