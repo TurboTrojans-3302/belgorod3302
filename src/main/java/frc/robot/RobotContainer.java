@@ -365,11 +365,13 @@ public class RobotContainer {
 
   public void setAutonCommand(Command cmd){
     m_autonCommand = cmd;
-    System.out.println("setAutonCommand" + m_autonCommand);
+    System.out.println("setAutonCommand() " + m_autonCommand);
   }
 
   public Pose2d getStartPosition() {
+    System.out.println("setStartPos() " + m_startPosChooser.getSelected().toString());
     return m_startPosChooser.getSelected();
+
   }
 
   public void setLED(double value) {
@@ -383,10 +385,12 @@ public class RobotContainer {
     m_robotDrive.setGyroAngleDeg(0.0);
     m_autonomousChooser = AutonMenus.getRed();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
+    setAutonCommand(m_autonomousChooser.getSelected());
     m_autonomousChooser.onChange(this::setAutonCommand);
 
     m_startPosChooser = StartPositions.getRed();
     SmartDashboard.putData("Start Position", m_startPosChooser);
+    setStartPosition(m_startPosChooser.getSelected());
     m_startPosChooser.onChange(this::setStartPosition);
   }
 
@@ -397,10 +401,12 @@ public class RobotContainer {
     m_robotDrive.setGyroAngleDeg(180.0);
     m_autonomousChooser = AutonMenus.getBlue();
     SmartDashboard.putData("Auton Command", m_autonomousChooser);
+    setAutonCommand(m_autonomousChooser.getSelected());
     m_autonomousChooser.onChange((this::setAutonCommand));
 
     m_startPosChooser = StartPositions.getBlue();
     SmartDashboard.putData("Start Position", m_startPosChooser);
+    setStartPosition(m_startPosChooser.getSelected());
     m_startPosChooser.onChange(this::setStartPosition);
   }
 

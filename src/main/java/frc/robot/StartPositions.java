@@ -14,11 +14,11 @@ public class StartPositions {
     public static SendableChooser<Pose2d> getBlue(){
     
         SendableChooser<Pose2d> bluePoses = new SendableChooser<Pose2d>();
-        bluePoses.setDefaultOption("Zero-Zero", Pose2d.kZero);
+        bluePoses.addOption("Zero-Zero", Pose2d.kZero);
         bluePoses.addOption("Left Blue Cage",  new Pose2d(FieldConstants.startingLineX, FieldConstants.Barge.farCage.getY(), Rotation2d.k180deg));
         bluePoses.addOption("Mid Blue Cage",   new Pose2d(FieldConstants.startingLineX, FieldConstants.Barge.middleCage.getY(), Rotation2d.k180deg));
         bluePoses.addOption("Right Blue Cage", new Pose2d(FieldConstants.startingLineX, FieldConstants.Barge.closeCage.getY(), Rotation2d.k180deg));
-        bluePoses.addOption("Center Field",    new Pose2d(FieldConstants.startingLineX, FieldConstants.fieldWidth / 2, Rotation2d.k180deg));
+        bluePoses.setDefaultOption("Center Field",    new Pose2d(FieldConstants.startingLineX, FieldConstants.fieldWidth / 2, Rotation2d.k180deg));
         bluePoses.addOption("Left Red Cage",   new Pose2d(FieldConstants.startingLineX, 2.976, Rotation2d.k180deg));
         bluePoses.addOption("Mid Red Cage",    new Pose2d(FieldConstants.startingLineX, 1.886, Rotation2d.k180deg));
         bluePoses.addOption("Right Red Cage",  new Pose2d(FieldConstants.startingLineX, 0.786, Rotation2d.k180deg));
@@ -30,11 +30,11 @@ public class StartPositions {
         double redStartLine = FieldConstants.fieldLength - FieldConstants.startingLineX;
 
         SendableChooser<Pose2d> redPoses = new SendableChooser<Pose2d>();
-        redPoses.setDefaultOption("Zero-Zero", Pose2d.kZero);
+        redPoses.addOption("Zero-Zero", Pose2d.kZero);
         redPoses.addOption("Right Blue Cage", new Pose2d(redStartLine, FieldConstants.Barge.farCage.getY(), Rotation2d.kZero));
         redPoses.addOption("Mid Blue Cage",   new Pose2d(redStartLine, FieldConstants.Barge.middleCage.getY(), Rotation2d.kZero));
         redPoses.addOption("Left Blue Cage",  new Pose2d(redStartLine, FieldConstants.Barge.closeCage.getY(), Rotation2d.kZero));
-        redPoses.addOption("Center Field",    new Pose2d(redStartLine, FieldConstants.fieldWidth / 2, Rotation2d.kZero));
+        redPoses.setDefaultOption("Center Field",    new Pose2d(redStartLine, FieldConstants.fieldWidth / 2, Rotation2d.kZero));
         redPoses.addOption("Right Red Cage",  new Pose2d(redStartLine, 2.976, Rotation2d.kZero));
         redPoses.addOption("Mid Red Cage",    new Pose2d(redStartLine, 1.886, Rotation2d.kZero));
         redPoses.addOption("Left Red Cage",   new Pose2d(redStartLine, 0.786, Rotation2d.kZero));
